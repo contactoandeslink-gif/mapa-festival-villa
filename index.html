@@ -625,13 +625,65 @@
     }
 
     // ========================================================
-    // 5. RENDERIZADO DEL ESCENARIO "EN VIVO" & HORA DE CHILE
+    // 5. MOTOR INTELIGENTE DE HORARIOS EN VIVO (HORA DE CHILE)
     // ========================================================
     function getChileDateObj() {
       const now = new Date();
       const chileStr = now.toLocaleString("en-US", { timeZone: "America/Santiago" });
       return new Date(chileStr);
     }
+
+    function parseTimeToMinutes(timeStr) {
+      if (!timeStr || !timeStr.includes(':')) return 0;
+      const [h, m] = timeStr.trim().split(':').map(Number);
+      return (h || 0) * 60 + (m || 0);
+    }
+
+    // Calcula automáticamente qué show está en vivo según la hora real de Chile
+    function autoResolveScheduleStatus() {
+      const chileDate = getChileDateObj();
+      const currentTotalMin = chileDate.getHours() * 60 + chileDate.getMinutes();
+      const manualLiveId = localStorage.getItem('festival_manual_live_id');
+
+      let foundLive = false;
+
+      stageSchedule.forEach(act => {
+        if (!act.time || !act.time.includes('-')) return;
+        const parts = act.time.split('-').map(t => t.trim());
+        const startMin = parseTimeToMinutes(parts[0]);
+        let endMin = parseTimeToMinutes(parts[1]);
+        if (endMin < startMin) endMin += 24 * 60; // Para shows que pasan la medianoche
+
+        let checkNowMin = currentTotalMin;
+        if (checkNowMin < startMin && endMin > 24 * 60) checkNowMin += 24 * 60;
+
+        if (manualLiveId && Number(manualLiveId) === act.id) {
+          act.status = 'live';
+          foundLive = true;
+        } else if (!manualLiveId) {
+          if (checkNowMin >= startMin && checkNowMin < endMin) {
+            act.status = 'live';
+            foundLive = true;
+          } else if (checkNowMin >= endMin) {
+            act.status = 'finished';
+          } else {
+            act.status = 'upcoming';
+          }
+        }
+      });
+
+      // Si ningún show coincide exactamente (ej: antes de las 15:00 o después de la 01:00)
+      if (!foundLive && !manualLiveId && stageSchedule.length > 0) {
+        const upcomingAct = stageSchedule.find(s => parseTimeToMinutes(s.time.split('-')[0]) > currentTotalMin);
+        if (upcomingAct) {
+          upcomingAct.status = 'live';
+        } else {
+          stageSchedule[stageSchedule.length - 1].status = 'live';
+        }
+      }
+    }
+
+    let lastActiveActId = null;
 
     function updateLiveClockAndProgress() {
       const chileDate = getChileDateObj();
@@ -647,16 +699,27 @@
       const liveClock = document.getElementById('liveChileClock');
       if (liveClock) liveClock.textContent = `🇨🇱 ${timeStr} hrs (Chile)`;
 
-      // Calcular progreso y tiempos del show actual
-      const liveAct = stageSchedule.find(s => s.status === 'live') || stageSchedule[2];
-      if (liveAct && liveAct.time.includes('-')) {
+      // Recalcular estado según reloj
+      autoResolveScheduleStatus();
+
+      const liveAct = stageSchedule.find(s => s.status === 'live') || stageSchedule[0];
+      if (liveAct && liveAct.id !== lastActiveActId) {
+        lastActiveActId = liveAct.id;
+        renderLiveHero();
+        renderScheduleList();
+      }
+
+      if (liveAct && liveAct.time && liveAct.time.includes('-')) {
         const parts = liveAct.time.split('-').map(t => t.trim());
         const startParts = parts[0].split(':').map(Number);
         const endParts = parts[1].split(':').map(Number);
         
         const startTotalMin = startParts[0] * 60 + startParts[1];
-        const endTotalMin = endParts[0] * 60 + endParts[1];
-        const currentTotalMin = chileDate.getHours() * 60 + chileDate.getMinutes();
+        let endTotalMin = endParts[0] * 60 + endParts[1];
+        if (endTotalMin < startTotalMin) endTotalMin += 24 * 60;
+
+        let currentTotalMin = chileDate.getHours() * 60 + chileDate.getMinutes();
+        if (currentTotalMin < startTotalMin && endTotalMin > 24 * 60) currentTotalMin += 24 * 60;
 
         const duration = Math.max(1, endTotalMin - startTotalMin);
         const elapsed = Math.max(0, currentTotalMin - startTotalMin);
@@ -672,7 +735,7 @@
             const startsIn = startTotalMin - currentTotalMin;
             progText.innerHTML = `⏳ Comienza en <strong>${startsIn} min</strong> (${parts[0]} hrs)`;
           } else if (remaining > 0) {
-            progText.innerHTML = `⏱️ ${liveAct.artist} lleva <strong>${elapsed} min</strong> en tarima • Quedan <strong>${remaining} min</strong> de show`;
+            progText.innerHTML = `⏱️ ${liveAct.artist} lleva <strong>${elapsed} min</strong> en tarima • Faltan <strong>${remaining} min</strong> de show`;
           } else {
             progText.innerHTML = `🏁 Show en su cierre final • Próximo grupo subiendo a la tarima`;
           }
@@ -683,7 +746,8 @@
     setInterval(updateLiveClockAndProgress, 1000);
 
     function renderLiveHero() {
-      const liveAct = stageSchedule.find(s => s.status === 'live') || stageSchedule[2];
+      autoResolveScheduleStatus();
+      const liveAct = stageSchedule.find(s => s.status === 'live') || stageSchedule[0];
       if (!liveAct) return;
 
       const isIntermission = liveAct.type === 'intermission';
@@ -699,17 +763,19 @@
       }
 
       document.getElementById('liveArtistName').textContent = liveAct.artist;
-      document.getElementById('liveArtistGenre').textContent = isIntermission 
-        ? `${liveAct.genre} • Pausa de Escenario` 
-        : `${liveAct.genre} • Show Oficial`;
+      
+      // Limpiar subtítulo para no duplicar texto
+      let genreText = liveAct.genre;
+      if (!genreText.toLowerCase().includes('oficial') && !isIntermission) {
+        genreText += ' • Show Oficial';
+      }
+      document.getElementById('liveArtistGenre').textContent = genreText;
       document.getElementById('liveArtistDesc').textContent = liveAct.desc;
       document.getElementById('liveTimeBadge').textContent = `${liveAct.time} hrs`;
 
       if (liveAct.image) {
         document.getElementById('heroLiveBg').style.backgroundImage = `url('${liveAct.image}')`;
       }
-
-      updateLiveClockAndProgress();
 
       // Siguiente artista
       const currentIdx = stageSchedule.findIndex(s => s.id === liveAct.id);
@@ -841,69 +907,100 @@
     }
 
     // ========================================================
-    // 6. RENDERIZADO DEL FEED DE LOS 20 LOCALES (CON MENÚ)
+    // 6. RENDERIZADO DE FOOD TRUCKS CON SHOWCASE Y PLATOS CON FOTOS
     // ========================================================
     function renderStandsFeed(filterCat = 'all') {
       const container = document.getElementById('standsListGrid');
       container.innerHTML = '';
 
-      stands.forEach(stand => {
+      const commercial = stands.filter(s => s.category !== 'service');
+
+      commercial.forEach(stand => {
         if (filterCat !== 'all' && stand.category !== filterCat) return;
 
         const card = document.createElement('div');
-        card.className = 'bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-3xl p-4 shadow-lg space-y-3';
+        card.className = 'bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-3xl overflow-hidden shadow-2xl transition duration-300 flex flex-col justify-between';
         
+        // Render de 2 platos destacados con foto, descripción y precio
         let prodsHtml = '';
         if (stand.products && stand.products.length > 0) {
-          prodsHtml = '<div class="space-y-1.5 pt-1 border-t border-slate-800/80">';
-          stand.products.slice(0, 3).forEach(p => {
+          prodsHtml = '<div class="space-y-2 pt-2 border-t border-slate-800">';
+          prodsHtml += `<span class="text-[10px] font-black uppercase tracking-wider text-amber-400 flex items-center gap-1">
+            <span>🔥</span> Lo Más Pedido en este Food Truck:
+          </span>`;
+          prodsHtml += '<div class="grid grid-cols-1 sm:grid-cols-2 gap-2">';
+          
+          stand.products.slice(0, 2).forEach(p => {
             prodsHtml += `
-              <div class="flex items-center justify-between text-xs bg-slate-950/60 p-2 rounded-xl border border-slate-800">
-                <div class="flex items-center gap-1.5 min-w-0">
-                  <span class="font-bold text-slate-200 truncate ${!p.inStock ? 'line-through text-slate-400' : ''}">${p.name}</span>
-                  ${!p.inStock ? '<span class="text-[9px] bg-red-950 text-red-400 border border-red-800 px-1.5 rounded font-black shrink-0">Agotado</span>' : ''}
+              <div class="bg-slate-950/80 rounded-2xl p-2.5 border border-slate-800 flex items-center gap-3">
+                <div class="w-16 h-16 rounded-xl bg-slate-800 shrink-0 overflow-hidden border border-slate-700">
+                  <img src="${p.image}" class="w-full h-full object-cover" alt="${p.name}" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=200';">
                 </div>
-                <span class="font-extrabold text-orange-400 bg-orange-950/60 border border-orange-500/20 px-2 py-0.5 rounded shrink-0">${p.price}</span>
+                <div class="min-w-0 flex-1">
+                  <div class="flex items-center gap-1 mb-0.5">
+                    ${p.tag ? `<span class="text-[8px] bg-amber-500/20 text-amber-300 border border-amber-500/40 px-1 py-0.2 rounded font-black truncate">${p.tag}</span>` : ''}
+                  </div>
+                  <h5 class="text-xs font-black text-white truncate">${p.name}</h5>
+                  <p class="text-[10px] text-slate-400 line-clamp-1">${p.desc || ''}</p>
+                  <span class="text-xs font-extrabold text-orange-400 block mt-1">${p.price}</span>
+                </div>
               </div>
             `;
           });
-          if (stand.products.length > 3) {
-            prodsHtml += `<p class="text-[10px] text-slate-500 text-center font-medium">+ ${stand.products.length - 3} productos más en carta...</p>`;
+          
+          prodsHtml += '</div>';
+          if (stand.products.length > 2) {
+            prodsHtml += `<p class="text-[10px] text-slate-500 text-center font-bold pt-1">+ ${stand.products.length - 2} productos más en la carta oficial...</p>`;
           }
           prodsHtml += '</div>';
         }
 
-        const logoHtml = stand.logoUrl 
-          ? `<img src="${stand.logoUrl}" class="w-full h-full object-cover rounded-2xl" alt="${stand.name}" onerror="this.onerror=null;this.parentElement.innerHTML='<span class=\'text-2xl\'>${stand.icon}</span>';">`
-          : `<span class="text-2xl">${stand.icon}</span>`;
+        const bannerImage = stand.bannerUrl || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800';
 
         card.innerHTML = `
-          <div class="flex items-start justify-between">
-            <div class="flex items-center gap-3.5">
-              <div class="w-14 h-14 rounded-2xl bg-slate-800 border border-slate-700/80 overflow-hidden shrink-0 flex items-center justify-center shadow-inner">
-                ${logoHtml}
-              </div>
-              <div>
-                <div class="flex items-center gap-2">
-                  <span class="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-orange-600 text-white">${stand.categoryName}</span>
-                  <span class="text-xs text-slate-500 font-mono font-bold">${stand.number}</span>
-                </div>
-                <h3 class="text-base font-black text-white font-display mt-0.5">${stand.name}</h3>
-              </div>
+          <!-- Portada del Food Truck con rating y badge -->
+          <div class="relative h-28 w-full overflow-hidden bg-slate-950">
+            <img src="${bannerImage}" class="w-full h-full object-cover brightness-[0.70] hover:scale-105 transition duration-500" alt="${stand.name}">
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent"></div>
+            
+            <div class="absolute top-2.5 right-2.5 bg-black/70 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-black text-amber-300 border border-amber-500/40 flex items-center gap-1 shadow">
+              <span>⭐ ${stand.rating || '4.9'}</span>
+              <span class="text-slate-400 font-normal">• ${stand.prepTime || '10 min'}</span>
             </div>
           </div>
 
-          <p class="text-xs text-slate-400 leading-relaxed">${stand.desc}</p>
+          <!-- Cuerpo de la tarjeta con logo flotante -->
+          <div class="p-4 pt-0 relative space-y-3 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="flex items-end justify-between -mt-8 mb-2">
+                <div class="w-16 h-16 rounded-2xl bg-slate-900 border-2 border-amber-500/40 shadow-2xl overflow-hidden p-0.5 shrink-0">
+                  <img src="${stand.logoUrl}" class="w-full h-full object-contain rounded-xl" alt="${stand.name}">
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span class="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-lg bg-orange-600 text-white shadow">
+                    ${stand.categoryName}
+                  </span>
+                  <span class="text-xs text-slate-400 font-mono font-bold bg-slate-800 px-2 py-1 rounded-lg border border-slate-700">
+                    ${stand.number}
+                  </span>
+                </div>
+              </div>
 
-          ${prodsHtml}
+              <h3 class="text-base font-black text-white font-display">${stand.name}</h3>
+              <p class="text-xs text-slate-300 leading-relaxed mt-0.5">${stand.desc}</p>
+            </div>
 
-          <div class="grid grid-cols-2 gap-2 pt-1">
-            <button onclick="viewStandOnMap(${stand.id})" class="py-2.5 px-3 rounded-xl bg-orange-600 hover:bg-orange-500 text-white font-extrabold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-orange-600/20 active:scale-98 transition">
-              <span>🧭</span> ¿Cómo llegar?
-            </button>
-            <button onclick="openBottomSheetById(${stand.id})" class="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs flex items-center justify-center gap-1.5 border border-slate-700 transition">
-              <span>📋</span> Ver Carta
-            </button>
+            ${prodsHtml}
+
+            <!-- Botones de Acción -->
+            <div class="grid grid-cols-2 gap-2 pt-2">
+              <button onclick="viewStandOnMap(${stand.id})" class="py-2.5 px-3 rounded-xl bg-orange-600 hover:bg-orange-500 text-white font-extrabold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-orange-600/30 active:scale-98 transition">
+                <span>🧭</span> ¿Cómo llegar?
+              </button>
+              <button onclick="openBottomSheetById(${stand.id})" class="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-xs flex items-center justify-center gap-1.5 border border-slate-700 transition">
+                <span>📋</span> Ver Carta Completa
+              </button>
+            </div>
           </div>
         `;
 
@@ -1237,7 +1334,7 @@
       selectedStand = stand;
       const sheetLogo = document.getElementById('sheetLogo');
       if (stand.logoUrl) {
-        sheetLogo.innerHTML = `<img src="${stand.logoUrl}" class="w-full h-full object-cover rounded-2xl" onerror="this.onerror=null;this.parentElement.innerHTML='<span class=\'text-3xl\'>${stand.icon}</span>';">`;
+        sheetLogo.innerHTML = `<img src="${stand.logoUrl}" class="w-full h-full object-contain rounded-2xl" alt="${stand.name}">`;
       } else {
         sheetLogo.innerHTML = `<span class="text-3xl">${stand.icon}</span>`;
       }
@@ -1250,22 +1347,31 @@
       pList.innerHTML = '';
       if (stand.products && stand.products.length > 0) {
         stand.products.forEach(p => {
-          const row = document.createElement('div');
-          row.className = 'flex items-center justify-between py-1.5 border-b border-slate-700/60 last:border-none';
-          row.innerHTML = `
-            <div class="flex items-center gap-1.5">
-              <span class="font-bold text-slate-200">${p.name}</span>
-              ${!p.inStock ? '<span class="text-[9px] bg-red-950 text-red-400 border border-red-800 px-1.5 rounded font-black">Agotado</span>' : ''}
+          const item = document.createElement('div');
+          item.className = 'flex items-center gap-3 p-3 bg-slate-950/70 rounded-2xl border border-slate-800/90';
+          item.innerHTML = `
+            <div class="w-16 h-16 rounded-xl bg-slate-800 overflow-hidden shrink-0 border border-slate-700">
+              <img src="${p.image || 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=200'}" class="w-full h-full object-cover" alt="${p.name}" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=200';">
             </div>
-            <span class="font-black text-orange-400 bg-slate-950 px-2 py-0.5 rounded border border-slate-700">${p.price}</span>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-1.5 mb-0.5">
+                ${p.tag ? `<span class="text-[8px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-1.5 py-0.2 rounded font-black">${p.tag}</span>` : ''}
+                ${!p.inStock ? '<span class="text-[8px] bg-red-950 text-red-400 border border-red-800 px-1.5 rounded font-black">Agotado</span>' : ''}
+              </div>
+              <h5 class="text-xs font-black text-white leading-tight ${!p.inStock ? 'line-through text-slate-400' : ''}">${p.name}</h5>
+              <p class="text-[10px] text-slate-400 leading-snug mt-0.5">${p.desc || ''}</p>
+              <span class="text-xs font-black text-orange-400 block mt-1">${p.price}</span>
+            </div>
           `;
-          pList.appendChild(row);
+          pList.appendChild(item);
         });
+      } else {
+        pList.innerHTML = '<p class="text-xs text-slate-500 italic p-3 text-center">Punto de servicio o sin carta activa.</p>';
       }
 
       const wpBtn = document.getElementById('sheetWhatsappBtn');
       if (stand.whatsapp) {
-        wpBtn.href = `https://wa.me/${stand.whatsapp}?text=Hola!%20Te%20vi%20en%20el%20mapa%20del%20evento`;
+        wpBtn.href = `https://wa.me/${stand.whatsapp}?text=¡Hola!%20Estoy%20en%20el%20Festival%20de%20la%20Villa%20y%20quiero%20hacer%20un%20pedido%20a%20${encodeURIComponent(stand.name)}`;
         wpBtn.classList.remove('hidden');
       } else wpBtn.classList.add('hidden');
 
@@ -1366,4 +1472,1066 @@
     }
   </script>
 </body>
-</html>
+</html>// ----------------------------------------------------
+    // BASE DE DATOS INICIAL CON LOGOS REALES Y PRODUCTOS GOURMET
+    // ----------------------------------------------------
+    const DEFAULT_SCHEDULE = [
+  {
+    "id": 1,
+    "type": "music",
+    "artist": "Dj Set Bienvenida & Warm Up",
+    "genre": "Música Chill Out & Éxitos",
+    "time": "15:00 - 16:00",
+    "desc": "Música ambiental para recibir a las familias en la cancha.",
+    "image": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&auto=format&fit=crop&q=80"
+  },
+  {
+    "id": 2,
+    "type": "intermission",
+    "artist": "Prueba de Sonido & Pausa Técnica",
+    "genre": "Técnica de Audio y Micrófonos",
+    "time": "16:00 - 16:15",
+    "desc": "Ajuste de monitores e instrumentos en tarima.",
+    "image": "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800&auto=format&fit=crop&q=80"
+  },
+  {
+    "id": 3,
+    "type": "music",
+    "artist": "Ballet Folclórico de la Villa",
+    "genre": "Cuecas, Sau Sau y Tradición",
+    "time": "16:15 - 17:15",
+    "desc": "Presentación oficial de 30 bailarines con trajes típicos chilenos.",
+    "image": "https://images.unsplash.com/photo-1547153760-18fc86324498?w=800&auto=format&fit=crop&q=80"
+  },
+  {
+    "id": 4,
+    "type": "intermission",
+    "artist": "Animación de Bienvenida & Concursos",
+    "genre": "Premios al público en la cancha",
+    "time": "17:15 - 17:30",
+    "desc": "Concursos familiares con el animador oficial.",
+    "image": "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&auto=format&fit=crop&q=80"
+  },
+  {
+    "id": 5,
+    "type": "music",
+    "artist": "Américo",
+    "genre": "El Rey de la Cumbia Tropical",
+    "time": "17:30 - 19:00",
+    "desc": "Show estelar con orquesta completa: Te Vas, Que Levante la Mano, El Embrujo.",
+    "image": "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=800&auto=format&fit=crop&q=80"
+  },
+  {
+    "id": 6,
+    "type": "intermission",
+    "artist": "Intermedio / Cambio de Batería e Instrumentos",
+    "genre": "Pausa Técnica de Escenario",
+    "time": "19:00 - 19:20",
+    "desc": "Montaje de amplificadores y ecualización para la banda de rock.",
+    "image": "https://images.unsplash.com/photo-1465847899084-d164df4dedc6?w=800&auto=format&fit=crop&q=80"
+  },
+  {
+    "id": 7,
+    "type": "tribute",
+    "artist": "Guns N' Roses Experience",
+    "genre": "Banda Tributo Oficial Sudamericano",
+    "time": "19:20 - 20:45",
+    "desc": "Concierto estelar: Sweet Child O' Mine, Welcome to the Jungle, November Rain y Paradise City con voz y guitarras en vivo.",
+    "image": "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=800&auto=format&fit=crop&q=80"
+  },
+  {
+    "id": 8,
+    "type": "humor",
+    "artist": "Stand Up Comedy: Los Vecinos Ríen",
+    "genre": "Humor Costumbrista de Barrio",
+    "time": "20:45 - 21:20",
+    "desc": "Monólogo de comedia sobre anécdotas de ferias libres, pasajes y la vida de villa.",
+    "image": "https://images.unsplash.com/photo-1585699324551-f6c309eedeca?w=800&auto=format&fit=crop&q=80"
+  },
+  {
+    "id": 9,
+    "type": "tribute",
+    "artist": "Santaferia (Tributo Casero)",
+    "genre": "Cumbia Casera & Viento Metales",
+    "time": "21:30 - 22:45",
+    "desc": "El huracán bailable de la cumbia chilena con sección completa de vientos y percusión.",
+    "image": "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=800&auto=format&fit=crop&q=80"
+  },
+  {
+    "id": 10,
+    "type": "music",
+    "artist": "Dj Cierre Fiesta de las Luces",
+    "genre": "Electrónica, Pachanga & Old School",
+    "time": "23:00 - 01:00",
+    "desc": "Fiesta de cierre del festival con cañón de confeti, efectos de humo e iluminación robótica.",
+    "image": "https://images.unsplash.com/photo-1498038432885-c6f3f1b912ee?w=800&auto=format&fit=crop&q=80"
+  }
+];
+
+    const DEFAULT_STANDS = [
+  {
+    "id": 1,
+    "number": "P-01",
+    "name": "Cervecería El Roble",
+    "category": "beer",
+    "categoryName": "Cervezas & Tragos",
+    "icon": "🍺",
+    "logoUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20140%20140%22%20width%3D%22140%22%20height%3D%22140%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22bg_ELROBLE%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%231e293b%22%20/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%230f172a%22%20/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2266%22%20fill%3D%22url%28%23bg_ELROBLE%29%22%20stroke%3D%22%23f59e0b%22%20stroke-width%3D%224.5%22%20/%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2257%22%20fill%3D%22none%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.22%29%22%20stroke-dasharray%3D%223%2C3%22%20stroke-width%3D%221.5%22%20/%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2255%22%20font-size%3D%2236%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%3E%F0%9F%8D%BA%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2296%22%20font-family%3D%22%27Outfit%27%2C%20system-ui%2C%20-apple-system%2C%20sans-serif%22%20font-size%3D%229.5%22%20font-weight%3D%22900%22%20fill%3D%22%23ffffff%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%220.8%22%3EEL%20ROBLE%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%22110%22%20font-family%3D%22%27Plus%20Jakarta%20Sans%27%2C%20system-ui%2C%20sans-serif%22%20font-size%3D%227%22%20font-weight%3D%22800%22%20fill%3D%22%23fbbf24%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%221.2%22%3ECERVECER%C3%8DA%20ARTESANAL%3C/text%3E%0A%3C/svg%3E",
+    "bannerUrl": "https://images.unsplash.com/photo-1538488881522-4326c36660df?w=800&auto=format&fit=crop&q=80",
+    "color": "#f59e0b",
+    "desc": "Schops artesanales directos de barril servidos en vaso frío: IPA, Amber Ale y micheladas con sal de Cáhuil.",
+    "slogan": "Cerveza fresca de barril directo a tu vaso",
+    "rating": "4.9 (160 pedidos)",
+    "prepTime": "3 - 5 min",
+    "latOffset": 0.00015,
+    "lngOffset": 0.0002,
+    "whatsapp": "56912345678",
+    "bankData": {
+      "bank": "Banco Estado",
+      "accountType": "Cuenta RUT",
+      "accountNumber": "15.432.890-K",
+      "holderName": "Cervecería El Roble SpA",
+      "email": "pagos@roble.cl"
+    },
+    "products": [
+      {
+        "name": "Schop IPA Artesanal 500cc",
+        "price": "$4.000",
+        "desc": "Lúpulos patagónicos, aroma cítrico y floral, espuma densa y amargor equilibrado.",
+        "image": "https://images.unsplash.com/photo-1608270586620-248524c67de9?w=400&fit=crop",
+        "tag": "⭐ Más Pedido",
+        "inStock": true
+      },
+      {
+        "name": "Schop Amber Ale Roja 500cc",
+        "price": "$4.000",
+        "desc": "Cerveza roja con maltas tostadas caramelizadas, cuerpo medio y final sedoso a toffee.",
+        "image": "https://images.unsplash.com/photo-1538488881522-4326c36660df?w=400&fit=crop",
+        "tag": "🔥 Recomendada",
+        "inStock": true
+      },
+      {
+        "name": "Michelada Tradicional El Roble",
+        "price": "$4.500",
+        "desc": "Vaso escarchado con sal de mar de Cáhuil, jugo de limón recién exprimido y merkén ahumado.",
+        "image": "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&fit=crop",
+        "tag": "🌶️ Especial",
+        "inStock": true
+      },
+      {
+        "name": "Vaso Coleccionable Festival Villa 2026",
+        "price": "$1.000",
+        "desc": "Vaso oficial reutilizable de policarbonato rígido. Cuida la cancha y llévate tu recuerdo.",
+        "image": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=400&fit=crop",
+        "tag": "♻️ Reutilizable",
+        "inStock": true
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "number": "P-02",
+    "name": "Food Truck Bajón Criollo",
+    "category": "food",
+    "categoryName": "Comidas",
+    "icon": "🍔",
+    "logoUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20140%20140%22%20width%3D%22140%22%20height%3D%22140%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22bg_BAJ%C3%93NCRI%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%237c2d12%22%20/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23431407%22%20/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2266%22%20fill%3D%22url%28%23bg_BAJ%C3%93NCRI%29%22%20stroke%3D%22%23ea580c%22%20stroke-width%3D%224.5%22%20/%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2257%22%20fill%3D%22none%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.22%29%22%20stroke-dasharray%3D%223%2C3%22%20stroke-width%3D%221.5%22%20/%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2255%22%20font-size%3D%2236%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%3E%F0%9F%8D%94%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2296%22%20font-family%3D%22%27Outfit%27%2C%20system-ui%2C%20-apple-system%2C%20sans-serif%22%20font-size%3D%229.5%22%20font-weight%3D%22900%22%20fill%3D%22%23ffffff%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%220.8%22%3EBAJ%C3%93N%20CRIOLLO%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%22110%22%20font-family%3D%22%27Plus%20Jakarta%20Sans%27%2C%20system-ui%2C%20sans-serif%22%20font-size%3D%227%22%20font-weight%3D%22800%22%20fill%3D%22%23fde047%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%221.2%22%3EFOOD%20TRUCK%20GOURMET%3C/text%3E%0A%3C/svg%3E",
+    "bannerUrl": "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=800&auto=format&fit=crop&q=80",
+    "color": "#ea580c",
+    "desc": "El auténtico bajón chileno: Completos gigantes en pan amasado caliente, churrascos italianos y papas con cheddar.",
+    "slogan": "Pan amasado en el momento y palta hass 100% pura",
+    "rating": "4.9 (210 pedidos)",
+    "prepTime": "8 - 12 min",
+    "latOffset": 8e-05,
+    "lngOffset": -0.00018,
+    "whatsapp": "56987654321",
+    "bankData": {
+      "bank": "Banco Santander",
+      "accountType": "Cuenta Corriente",
+      "accountNumber": "000-7654321-9",
+      "holderName": "Bajón Criollo SpA",
+      "email": "pedidos@bajoncriollo.cl"
+    },
+    "products": [
+      {
+        "name": "Completo Italiano Gigante en Pan Amasado",
+        "price": "$2.800",
+        "desc": "Vienesa de campo, abundante palta hass recién molida, tomate en cubos y mayonesa casera batida a mano.",
+        "image": "https://images.unsplash.com/photo-1619740455993-9e612b1af08a?w=400&fit=crop",
+        "tag": "⭐ El Rey del Bajón",
+        "inStock": true
+      },
+      {
+        "name": "Churrasco Italiano en Marraqueta Crujiente",
+        "price": "$5.500",
+        "desc": "Finas láminas de posta rosada a la plancha, palta hass extra cremosa y tomate de estación.",
+        "image": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&fit=crop",
+        "tag": "🔥 Especialidad",
+        "inStock": true
+      },
+      {
+        "name": "Completo Alemán Tradicional",
+        "price": "$2.800",
+        "desc": "Vienesa artesanal, chucrut tibio casero, tomate fresco y mayonesa suave con toque de mostaza.",
+        "image": "https://images.unsplash.com/photo-1627054234594-541e7379766d?w=400&fit=crop",
+        "tag": "Clásico",
+        "inStock": true
+      },
+      {
+        "name": "Empanada de Pino al Horno a la Leña",
+        "price": "$2.500",
+        "desc": "Masa dorada a la manteca rellena con carne picada jugosa, cebolla caramelizada, aceituna y huevo.",
+        "image": "https://images.unsplash.com/photo-1608039829572-78524f79c4c7?w=400&fit=crop",
+        "tag": "Recién Horneada",
+        "inStock": true
+      },
+      {
+        "name": "Papas Rústicas con Cheddar & Tocino",
+        "price": "$3.800",
+        "desc": "Papas cortadas a mano con piel, salsa cheddar tibia fundida y lluvia de tocino ahumado crocante.",
+        "image": "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400&fit=crop",
+        "tag": "Para Compartir",
+        "inStock": true
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "number": "P-03",
+    "name": "El Rincón del Sabor",
+    "category": "food",
+    "categoryName": "Comidas",
+    "icon": "🌭",
+    "logoUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20140%20140%22%20width%3D%22140%22%20height%3D%22140%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22bg_RINC%C3%93NDE%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23831843%22%20/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23500724%22%20/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2266%22%20fill%3D%22url%28%23bg_RINC%C3%93NDE%29%22%20stroke%3D%22%23f43f5e%22%20stroke-width%3D%224.5%22%20/%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2257%22%20fill%3D%22none%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.22%29%22%20stroke-dasharray%3D%223%2C3%22%20stroke-width%3D%221.5%22%20/%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2255%22%20font-size%3D%2236%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%3E%F0%9F%8C%AD%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2296%22%20font-family%3D%22%27Outfit%27%2C%20system-ui%2C%20-apple-system%2C%20sans-serif%22%20font-size%3D%229.5%22%20font-weight%3D%22900%22%20fill%3D%22%23ffffff%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%220.8%22%3ERINC%C3%93N%20DEL%20SABOR%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%22110%22%20font-family%3D%22%27Plus%20Jakarta%20Sans%27%2C%20system-ui%2C%20sans-serif%22%20font-size%3D%227%22%20font-weight%3D%22800%22%20fill%3D%22%23fed7aa%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%221.2%22%3ETRADICI%C3%93N%20CHILENA%3C/text%3E%0A%3C/svg%3E",
+    "bannerUrl": "https://images.unsplash.com/photo-1550547660-d9450f859349?w=800&auto=format&fit=crop&q=80",
+    "color": "#ea580c",
+    "desc": "Completos dinámicos especiales, sándwiches de carne mechada en cocción lenta y bebidas heladas.",
+    "slogan": "Carne mechada tierna y salsas caseras de la abuela",
+    "rating": "4.8 (115 pedidos)",
+    "prepTime": "6 - 10 min",
+    "latOffset": -5e-05,
+    "lngOffset": -0.00025,
+    "whatsapp": "56955443322",
+    "bankData": {
+      "bank": "Banco de Chile",
+      "accountType": "Cuenta Vista",
+      "accountNumber": "12345678",
+      "holderName": "Marta Gómez R.",
+      "email": "marta@sabor.cl"
+    },
+    "products": [
+      {
+        "name": "Completo Dinámico Especial con Americana",
+        "price": "$2.700",
+        "desc": "Vienesa, tomate, palta hass, salsa americana casera de encurtidos, chucrut y mayo casera.",
+        "image": "https://images.unsplash.com/photo-1619740455993-9e612b1af08a?w=400&fit=crop",
+        "tag": "⭐ Favorito Criollo",
+        "inStock": true
+      },
+      {
+        "name": "Sándwich Mechada Italiana Deshilachada",
+        "price": "$5.800",
+        "desc": "Carne de vacuno estofada por 6 horas con verduras aromáticas, palta hass y tomate fresco.",
+        "image": "https://images.unsplash.com/photo-1509722747041-616f39b57569?w=400&fit=crop",
+        "tag": "🔥 6 Hrs de Cocción",
+        "inStock": true
+      },
+      {
+        "name": "Bebida en Lata 350cc Bien Helada",
+        "price": "$1.500",
+        "desc": "Coca-Cola, Coca Zero, Fanta o Sprite servidas al punto de escarcha.",
+        "image": "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=400&fit=crop",
+        "tag": "Bien Helada",
+        "inStock": true
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "number": "P-04",
+    "name": "Asados & Brasas del Sur",
+    "category": "food",
+    "categoryName": "Comidas",
+    "icon": "🥩",
+    "logoUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20140%20140%22%20width%3D%22140%22%20height%3D%22140%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22bg_BRASASDE%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23450a0a%22%20/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%231c0404%22%20/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2266%22%20fill%3D%22url%28%23bg_BRASASDE%29%22%20stroke%3D%22%23dc2626%22%20stroke-width%3D%224.5%22%20/%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2257%22%20fill%3D%22none%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.22%29%22%20stroke-dasharray%3D%223%2C3%22%20stroke-width%3D%221.5%22%20/%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2255%22%20font-size%3D%2236%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%3E%F0%9F%A5%A9%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2296%22%20font-family%3D%22%27Outfit%27%2C%20system-ui%2C%20-apple-system%2C%20sans-serif%22%20font-size%3D%229.5%22%20font-weight%3D%22900%22%20fill%3D%22%23ffffff%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%220.8%22%3EBRASAS%20DEL%20SUR%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%22110%22%20font-family%3D%22%27Plus%20Jakarta%20Sans%27%2C%20system-ui%2C%20sans-serif%22%20font-size%3D%227%22%20font-weight%3D%22800%22%20fill%3D%22%23fca5a5%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%221.2%22%3EASADOS%20A%20LA%20LE%C3%91A%3C/text%3E%0A%3C/svg%3E",
+    "bannerUrl": "https://images.unsplash.com/photo-1544025162-d76694265947?w=800&auto=format&fit=crop&q=80",
+    "color": "#dc2626",
+    "desc": "Carnes premium asadas al fuego de leña nativa: Brochetas gigantes de 40 cm, choripanes con pebre y cortes tiernos.",
+    "slogan": "Fuego, carbón y los mejores cortes de campo",
+    "rating": "4.9 (190 pedidos)",
+    "prepTime": "10 - 15 min",
+    "latOffset": 0.0002,
+    "lngOffset": -0.0001,
+    "whatsapp": "56933221144",
+    "bankData": {
+      "bank": "Banco BCI",
+      "accountType": "Cuenta Corriente",
+      "accountNumber": "555-12345-6",
+      "holderName": "Brasas del Sur SpA",
+      "email": "asados@brasas.cl"
+    },
+    "products": [
+      {
+        "name": "Anticucho Mixto Lomo y Cerdo (40cm)",
+        "price": "$4.500",
+        "desc": "Brocheta XL con trozos de lomo liso, pulpa de cerdo macerada, longaniza de Chillán y pimentones a las brasas.",
+        "image": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&fit=crop",
+        "tag": "⭐ Brocheta XL",
+        "inStock": true
+      },
+      {
+        "name": "Choripán Artesanal con Pebre Campesino",
+        "price": "$2.500",
+        "desc": "Longaniza ahumada artesanal en marraqueta caliente con abundante pebre de tomate, cilantro y ají verde.",
+        "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=400&fit=crop",
+        "tag": "🔥 Clásico Parrillero",
+        "inStock": true
+      },
+      {
+        "name": "Plato Parrillero con Ensalada a la Chilena",
+        "price": "$7.500",
+        "desc": "Corte jugoso de vacuno a la leña, longaniza, papas cocidas al vapor y ensalada fresca de tomate con cebolla.",
+        "image": "https://images.unsplash.com/photo-1544025162-d76694265947?w=400&fit=crop",
+        "tag": "Plato Fuerte",
+        "inStock": true
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "number": "P-05",
+    "name": "La Barra Terremotera",
+    "category": "beer",
+    "categoryName": "Cervezas & Tragos",
+    "icon": "🍷",
+    "logoUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20140%20140%22%20width%3D%22140%22%20height%3D%22140%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22bg_BARRATER%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23581c87%22%20/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%233b0764%22%20/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2266%22%20fill%3D%22url%28%23bg_BARRATER%29%22%20stroke%3D%22%23a855f7%22%20stroke-width%3D%224.5%22%20/%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2257%22%20fill%3D%22none%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.22%29%22%20stroke-dasharray%3D%223%2C3%22%20stroke-width%3D%221.5%22%20/%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2255%22%20font-size%3D%2236%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%3E%F0%9F%8D%B7%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2296%22%20font-family%3D%22%27Outfit%27%2C%20system-ui%2C%20-apple-system%2C%20sans-serif%22%20font-size%3D%229.5%22%20font-weight%3D%22900%22%20fill%3D%22%23ffffff%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%220.8%22%3EBARRA%20TERREMOTERA%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%22110%22%20font-family%3D%22%27Plus%20Jakarta%20Sans%27%2C%20system-ui%2C%20sans-serif%22%20font-size%3D%227%22%20font-weight%3D%22800%22%20fill%3D%22%23fef08a%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%221.2%22%3EPIPE%C3%91O%20%26%20TRAGOS%3C/text%3E%0A%3C/svg%3E",
+    "bannerUrl": "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=800&auto=format&fit=crop&q=80",
+    "color": "#f59e0b",
+    "desc": "Los terremotos oficiales del festival con pipeño de Portezuelo, helado artesanal de piña dulce y granadina.",
+    "slogan": "La tradición fiestera chilena en su punto justo",
+    "rating": "4.9 (240 pedidos)",
+    "prepTime": "2 - 4 min",
+    "latOffset": -0.00015,
+    "lngOffset": 0.00018,
+    "whatsapp": "56966778899",
+    "bankData": {
+      "bank": "Banco Estado",
+      "accountType": "Cuenta RUT",
+      "accountNumber": "18.990.112-4",
+      "holderName": "Barra Terremotera",
+      "email": "barra@terremoto.cl"
+    },
+    "products": [
+      {
+        "name": "Terremoto Tradicional 1/2 Litro",
+        "price": "$3.500",
+        "desc": "Vino pipeño campesino blanco, abundante helado de piña dulce, toque amargo de Fernet y lluvia de granadina.",
+        "image": "https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=400&fit=crop",
+        "tag": "⭐ Terremoto Oficial",
+        "inStock": true
+      },
+      {
+        "name": "Terremoto Infantil / Conductor (0% Alcohol)",
+        "price": "$2.500",
+        "desc": "Bebida blanca de limón bien fría, helado artesanal de piña cremosa y granadina dulce. 100% familiar.",
+        "image": "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=400&fit=crop",
+        "tag": "🚗 0% Alcohol",
+        "inStock": true
+      },
+      {
+        "name": "Vino Navegado Calentito con Naranja",
+        "price": "$3.000",
+        "desc": "Vino tinto del valle cocinado con rodajas de naranja dulce, canela en rama y clavo de olor.",
+        "image": "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&fit=crop",
+        "tag": "Reconfortante",
+        "inStock": true
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "number": "P-06",
+    "name": "Papas Fritas El Cono Loco",
+    "category": "food",
+    "categoryName": "Comidas",
+    "icon": "🍟",
+    "logoUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20140%20140%22%20width%3D%22140%22%20height%3D%22140%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22bg_ELCONOLO%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23713f12%22%20/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23422006%22%20/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2266%22%20fill%3D%22url%28%23bg_ELCONOLO%29%22%20stroke%3D%22%23eab308%22%20stroke-width%3D%224.5%22%20/%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2257%22%20fill%3D%22none%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.22%29%22%20stroke-dasharray%3D%223%2C3%22%20stroke-width%3D%221.5%22%20/%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2255%22%20font-size%3D%2236%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%3E%F0%9F%8D%9F%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2296%22%20font-family%3D%22%27Outfit%27%2C%20system-ui%2C%20-apple-system%2C%20sans-serif%22%20font-size%3D%229.5%22%20font-weight%3D%22900%22%20fill%3D%22%23ffffff%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%220.8%22%3EEL%20CONO%20LOCO%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%22110%22%20font-family%3D%22%27Plus%20Jakarta%20Sans%27%2C%20system-ui%2C%20sans-serif%22%20font-size%3D%227%22%20font-weight%3D%22800%22%20fill%3D%22%23fef08a%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%221.2%22%3EPAPAS%20R%C3%9ASTICAS%3C/text%3E%0A%3C/svg%3E",
+    "bannerUrl": "https://images.unsplash.com/photo-1576107232684-1279f3908594?w=800&auto=format&fit=crop&q=80",
+    "color": "#ea580c",
+    "desc": "Conos gigantes de papas fritas naturales con doble fritura crujiente y barra con más de 10 salsas caseras.",
+    "slogan": "Papas 100% naturales, nunca congeladas",
+    "rating": "4.8 (175 pedidos)",
+    "prepTime": "5 - 8 min",
+    "latOffset": 2e-05,
+    "lngOffset": -0.0003,
+    "whatsapp": "56944332211",
+    "bankData": {
+      "bank": "Banco Scotiabank",
+      "accountType": "Cuenta Corriente",
+      "accountNumber": "77665544",
+      "holderName": "El Cono Loco SpA",
+      "email": "papas@conoloco.cl"
+    },
+    "products": [
+      {
+        "name": "Cono Gigante de Papas Naturales (500g)",
+        "price": "$3.500",
+        "desc": "Medio kilo de papas con corte bastón grueso, doradas y crujientes con 2 salsas caseras a elección.",
+        "image": "https://images.unsplash.com/photo-1576107232684-1279f3908594?w=400&fit=crop",
+        "tag": "⭐ 1/2 Kilo",
+        "inStock": true
+      },
+      {
+        "name": "Papas con Tocino Crispy y Cheddar Fundido",
+        "price": "$4.500",
+        "desc": "Cono familiar cubierto de abundante queso cheddar líquido caliente y trocitos de tocino crocante.",
+        "image": "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400&fit=crop",
+        "tag": "🔥 El Más Pedido",
+        "inStock": true
+      },
+      {
+        "name": "Nuggets de Pechuga Caseros (8 un)",
+        "price": "$3.000",
+        "desc": "Bocaditos de pollo marinados rebozados en panko crujiente servidos con salsa barbacoa ahumada.",
+        "image": "https://images.unsplash.com/photo-1562967914-608f82629710?w=400&fit=crop",
+        "tag": "Para Picar",
+        "inStock": true
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "number": "P-07",
+    "name": "Waffles & Crepes Dulce Antojo",
+    "category": "sweets",
+    "categoryName": "Postres & Dulces",
+    "icon": "🧇",
+    "logoUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20140%20140%22%20width%3D%22140%22%20height%3D%22140%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22bg_DULCEANT%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23831843%22%20/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%234c0519%22%20/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2266%22%20fill%3D%22url%28%23bg_DULCEANT%29%22%20stroke%3D%22%23ec4899%22%20stroke-width%3D%224.5%22%20/%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2257%22%20fill%3D%22none%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.22%29%22%20stroke-dasharray%3D%223%2C3%22%20stroke-width%3D%221.5%22%20/%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2255%22%20font-size%3D%2236%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%3E%F0%9F%A7%87%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2296%22%20font-family%3D%22%27Outfit%27%2C%20system-ui%2C%20-apple-system%2C%20sans-serif%22%20font-size%3D%229.5%22%20font-weight%3D%22900%22%20fill%3D%22%23ffffff%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%220.8%22%3EDULCE%20ANTOJO%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%22110%22%20font-family%3D%22%27Plus%20Jakarta%20Sans%27%2C%20system-ui%2C%20sans-serif%22%20font-size%3D%227%22%20font-weight%3D%22800%22%20fill%3D%22%23fbcfe8%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%221.2%22%3EWAFFLES%20%26%20CREPES%3C/text%3E%0A%3C/svg%3E",
+    "bannerUrl": "https://images.unsplash.com/photo-1562376552-0d160a2f238d?w=800&auto=format&fit=crop&q=80",
+    "color": "#ec4899",
+    "desc": "Repostería en vivo: Waffles belgas con masa crocante, crepes con Nutella italiana y churros rellenos con manjar.",
+    "slogan": "El toque dulce del festival recién horneado",
+    "rating": "4.9 (180 pedidos)",
+    "prepTime": "5 - 7 min",
+    "latOffset": -0.00018,
+    "lngOffset": -0.00015,
+    "whatsapp": "56999887766",
+    "bankData": {
+      "bank": "Banco Estado",
+      "accountType": "Cuenta RUT",
+      "accountNumber": "19.334.556-7",
+      "holderName": "Dulce Antojo",
+      "email": "waffles@antojo.cl"
+    },
+    "products": [
+      {
+        "name": "Waffle Belga con Frutillas, Manjar y Crema",
+        "price": "$3.800",
+        "desc": "Waffle recién horneado con manjar artesanal tibio, frutillas del día, crema chantilly y salsa de chocolate.",
+        "image": "https://images.unsplash.com/photo-1562376552-0d160a2f238d?w=400&fit=crop",
+        "tag": "⭐ El Favorito Dulce",
+        "inStock": true
+      },
+      {
+        "name": "Crepe Francés de Nutella y Plátano",
+        "price": "$3.500",
+        "desc": "Fina masa de crepe doblada con abundante Nutella original avellanada y rodajas de plátano fresco.",
+        "image": "https://images.unsplash.com/photo-1519676867240-f03562e64548?w=400&fit=crop",
+        "tag": "Nutella Original",
+        "inStock": true
+      },
+      {
+        "name": "Churros Españoles Rellenos con Manjar (5 un)",
+        "price": "$2.500",
+        "desc": "Churros crujientes rellenos de manjar caliente y espolvoreados con azúcar flor y canela.",
+        "image": "https://images.unsplash.com/photo-1624371414361-e670edf4898d?w=400&fit=crop",
+        "tag": "Recién Fritos",
+        "inStock": true
+      }
+    ]
+  },
+  {
+    "id": 8,
+    "number": "P-08",
+    "name": "Helados Artesanales La Nieve",
+    "category": "sweets",
+    "categoryName": "Postres & Dulces",
+    "icon": "🍦",
+    "logoUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20140%20140%22%20width%3D%22140%22%20height%3D%22140%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22bg_LANIEVE%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23083344%22%20/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23041f2d%22%20/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2266%22%20fill%3D%22url%28%23bg_LANIEVE%29%22%20stroke%3D%22%2306b6d4%22%20stroke-width%3D%224.5%22%20/%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2257%22%20fill%3D%22none%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.22%29%22%20stroke-dasharray%3D%223%2C3%22%20stroke-width%3D%221.5%22%20/%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2255%22%20font-size%3D%2236%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%3E%F0%9F%8D%A6%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2296%22%20font-family%3D%22%27Outfit%27%2C%20system-ui%2C%20-apple-system%2C%20sans-serif%22%20font-size%3D%229.5%22%20font-weight%3D%22900%22%20fill%3D%22%23ffffff%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%220.8%22%3ELA%20NIEVE%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%22110%22%20font-family%3D%22%27Plus%20Jakarta%20Sans%27%2C%20system-ui%2C%20sans-serif%22%20font-size%3D%227%22%20font-weight%3D%22800%22%20fill%3D%22%23a5f3fc%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%221.2%22%3EHELADOS%20ARTESANALES%3C/text%3E%0A%3C/svg%3E",
+    "bannerUrl": "https://images.unsplash.com/photo-1501443762994-82bd5dace89a?w=800&auto=format&fit=crop&q=80",
+    "color": "#ec4899",
+    "desc": "Helados 100% artesanales hechos con fruta fresca sin colorantes: Lúcuma chilena, maracuyá, frambuesa y manjar chips.",
+    "slogan": "Pura fruta natural en cada barquillo",
+    "rating": "4.8 (130 pedidos)",
+    "prepTime": "2 - 3 min",
+    "latOffset": -0.00022,
+    "lngOffset": -5e-05,
+    "whatsapp": "56911335577",
+    "bankData": {
+      "bank": "Banco Itaú",
+      "accountType": "Cuenta Corriente",
+      "accountNumber": "11223344",
+      "holderName": "La Nieve Helados",
+      "email": "helados@lanieve.cl"
+    },
+    "products": [
+      {
+        "name": "Copa Helado 2 Sabores Artesanales",
+        "price": "$2.800",
+        "desc": "Elige 2 bolitas: Lúcuma chilena, Frambuesa del sur, Chocolate belga o Manjar con chips.",
+        "image": "https://images.unsplash.com/photo-1501443762994-82bd5dace89a?w=400&fit=crop",
+        "tag": "⭐ 100% Fruta",
+        "inStock": true
+      },
+      {
+        "name": "Paleta Rellena de Leche Condensada",
+        "price": "$2.000",
+        "desc": "Paleta artesanal de fruta natural con centro cremoso de leche condensada líquida.",
+        "image": "https://images.unsplash.com/photo-1488900128323-21503983a07e?w=400&fit=crop",
+        "tag": "Centro Líquido",
+        "inStock": true
+      },
+      {
+        "name": "Milkshake Clásico Cremoso con Chantilly",
+        "price": "$3.500",
+        "desc": "Batido denso preparado con 3 bolas de helado, leche fresca entera y cobertura de salsa dulce.",
+        "image": "https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=400&fit=crop",
+        "tag": "Súper Espeso",
+        "inStock": true
+      }
+    ]
+  },
+  {
+    "id": 9,
+    "number": "P-09",
+    "name": "Cervecería Artesanal Kutral",
+    "category": "beer",
+    "categoryName": "Cervezas & Tragos",
+    "icon": "🍺",
+    "logoUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20140%20140%22%20width%3D%22140%22%20height%3D%22140%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22bg_KUTRAL%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23292524%22%20/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%230c0a09%22%20/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2266%22%20fill%3D%22url%28%23bg_KUTRAL%29%22%20stroke%3D%22%23f97316%22%20stroke-width%3D%224.5%22%20/%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2257%22%20fill%3D%22none%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.22%29%22%20stroke-dasharray%3D%223%2C3%22%20stroke-width%3D%221.5%22%20/%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2255%22%20font-size%3D%2236%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%3E%F0%9F%8D%BA%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2296%22%20font-family%3D%22%27Outfit%27%2C%20system-ui%2C%20-apple-system%2C%20sans-serif%22%20font-size%3D%229.5%22%20font-weight%3D%22900%22%20fill%3D%22%23ffffff%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%220.8%22%3EKUTRAL%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%22110%22%20font-family%3D%22%27Plus%20Jakarta%20Sans%27%2C%20system-ui%2C%20sans-serif%22%20font-size%3D%227%22%20font-weight%3D%22800%22%20fill%3D%22%23fdba74%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%221.2%22%3ECERVEZA%20AHUMADA%3C/text%3E%0A%3C/svg%3E",
+    "bannerUrl": "https://images.unsplash.com/photo-1575037614876-c38a4d44f5b8?w=800&auto=format&fit=crop&q=80",
+    "color": "#f59e0b",
+    "desc": "Cervezas del sur elaboradas con fuego y maltas ahumadas con madera nativa de roble y miel de ulmo.",
+    "slogan": "El fuego y sabor del sur en tu schop",
+    "rating": "4.9 (140 pedidos)",
+    "prepTime": "3 - 5 min",
+    "latOffset": 0.00012,
+    "lngOffset": 0.00028,
+    "whatsapp": "56922446688",
+    "bankData": {
+      "bank": "Banco BICE",
+      "accountType": "Cuenta Corriente",
+      "accountNumber": "88990011",
+      "holderName": "Kutral Cervezas",
+      "email": "kutral@cerveza.cl"
+    },
+    "products": [
+      {
+        "name": "Schop Golden Ale con Miel de Ulmo 500cc",
+        "price": "$3.800",
+        "desc": "Cerveza rubia de verano, ligera y refrescante, con un sutil aroma a miel campesina de ulmo.",
+        "image": "https://images.unsplash.com/photo-1538488881522-4326c36660df?w=400&fit=crop",
+        "tag": "Miel de Ulmo",
+        "inStock": true
+      },
+      {
+        "name": "Schop Red Ale Ahumada con Roble 500cc",
+        "price": "$4.200",
+        "desc": "Cerveza roja con maltas tostadas sobre leña nativa, cuerpo pleno y notas tostadas.",
+        "image": "https://images.unsplash.com/photo-1575037614876-c38a4d44f5b8?w=400&fit=crop",
+        "tag": "🔥 Ahumada con Roble",
+        "inStock": true
+      },
+      {
+        "name": "Pack 3 Botellas de Colección Kutral 330cc",
+        "price": "$8.500",
+        "desc": "Pack de 3 botellas de vidrio selladas para regalo o llevar a casa.",
+        "image": "https://images.unsplash.com/photo-1608270586620-248524c67de9?w=400&fit=crop",
+        "tag": "Para Llevar",
+        "inStock": true
+      }
+    ]
+  },
+  {
+    "id": 10,
+    "number": "P-10",
+    "name": "Pizzería Nápoles al Paso",
+    "category": "food",
+    "categoryName": "Comidas",
+    "icon": "🍕",
+    "logoUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20140%20140%22%20width%3D%22140%22%20height%3D%22140%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22bg_N%C3%81POLES%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%2314532d%22%20/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23052e16%22%20/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2266%22%20fill%3D%22url%28%23bg_N%C3%81POLES%29%22%20stroke%3D%22%2322c55e%22%20stroke-width%3D%224.5%22%20/%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2257%22%20fill%3D%22none%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.22%29%22%20stroke-dasharray%3D%223%2C3%22%20stroke-width%3D%221.5%22%20/%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2255%22%20font-size%3D%2236%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%3E%F0%9F%8D%95%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2296%22%20font-family%3D%22%27Outfit%27%2C%20system-ui%2C%20-apple-system%2C%20sans-serif%22%20font-size%3D%229.5%22%20font-weight%3D%22900%22%20fill%3D%22%23ffffff%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%220.8%22%3EN%C3%81POLES%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%22110%22%20font-family%3D%22%27Plus%20Jakarta%20Sans%27%2C%20system-ui%2C%20sans-serif%22%20font-size%3D%227%22%20font-weight%3D%22800%22%20fill%3D%22%23fef08a%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%221.2%22%3EPIZZA%20A%20LA%20PIEDRA%3C/text%3E%0A%3C/svg%3E",
+    "bannerUrl": "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&auto=format&fit=crop&q=80",
+    "color": "#ea580c",
+    "desc": "Pizzas individuales estilo napolitano con masa madre fermentada 48 horas, salsa San Marzano y queso mozzarella.",
+    "slogan": "Masa madre a la piedra crujiente e inflada",
+    "rating": "4.9 (170 pedidos)",
+    "prepTime": "7 - 10 min",
+    "latOffset": 0.00025,
+    "lngOffset": -0.00022,
+    "whatsapp": "56933557799",
+    "bankData": {
+      "bank": "Banco Santander",
+      "accountType": "Cuenta Corriente",
+      "accountNumber": "99887711",
+      "holderName": "Nápoles al Paso",
+      "email": "pizza@napoles.cl"
+    },
+    "products": [
+      {
+        "name": "Pizza Margarita Individual Masa Madre",
+        "price": "$4.500",
+        "desc": "Masa madre de 48 horas, salsa de tomates San Marzano, queso mozzarella fundido y albahaca fresca.",
+        "image": "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400&fit=crop",
+        "tag": "⭐ Masa Madre",
+        "inStock": true
+      },
+      {
+        "name": "Pizza Pepperoni & Mozzarella Fundida",
+        "price": "$5.000",
+        "desc": "Doble queso mozzarella gratinado y láminas crocantes de pepperoni italiano ahumado.",
+        "image": "https://images.unsplash.com/photo-1628840042765-356cda07504e?w=400&fit=crop",
+        "tag": "Doble Queso",
+        "inStock": true
+      },
+      {
+        "name": "Focaccia al Romero y Sal de Cáhuil",
+        "price": "$2.000",
+        "desc": "Pan esponjoso horneado con aceite de oliva extra virgen, romero fresco y escamas de sal de mar.",
+        "image": "https://images.unsplash.com/photo-1589367920969-ab8e050bbb04?w=400&fit=crop",
+        "tag": "Receta Italiana",
+        "inStock": true
+      }
+    ]
+  },
+  {
+    "id": 11,
+    "number": "P-11",
+    "name": "Sabor Mexicano: Tacos & Burritos",
+    "category": "food",
+    "categoryName": "Comidas",
+    "icon": "🌮",
+    "logoUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20140%20140%22%20width%3D%22140%22%20height%3D%22140%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22bg_SABORMEX%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23701a75%22%20/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%234a044e%22%20/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2266%22%20fill%3D%22url%28%23bg_SABORMEX%29%22%20stroke%3D%22%23d946ef%22%20stroke-width%3D%224.5%22%20/%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2257%22%20fill%3D%22none%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.22%29%22%20stroke-dasharray%3D%223%2C3%22%20stroke-width%3D%221.5%22%20/%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2255%22%20font-size%3D%2236%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%3E%F0%9F%8C%AE%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2296%22%20font-family%3D%22%27Outfit%27%2C%20system-ui%2C%20-apple-system%2C%20sans-serif%22%20font-size%3D%229.5%22%20font-weight%3D%22900%22%20fill%3D%22%23ffffff%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%220.8%22%3ESABOR%20MEXICANO%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%22110%22%20font-family%3D%22%27Plus%20Jakarta%20Sans%27%2C%20system-ui%2C%20sans-serif%22%20font-size%3D%227%22%20font-weight%3D%22800%22%20fill%3D%22%23fde047%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%221.2%22%3ETACOS%20%26%20BURRITOS%3C/text%3E%0A%3C/svg%3E",
+    "bannerUrl": "https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=800&auto=format&fit=crop&q=80",
+    "color": "#ea580c",
+    "desc": "Tacos al pastor en tortilla de maíz nixtamalizado, quesadillas con queso fundido y totopos con guacamole fresco.",
+    "slogan": "Recetas mexicanas con cilantro, lima y guacamole casero",
+    "rating": "4.8 (145 pedidos)",
+    "prepTime": "6 - 9 min",
+    "latOffset": 0.00018,
+    "lngOffset": -0.0003,
+    "whatsapp": "56944668800",
+    "bankData": {
+      "bank": "Banco de Chile",
+      "accountType": "Cuenta Corriente",
+      "accountNumber": "33445566",
+      "holderName": "Sabor Mexicano",
+      "email": "tacos@mexicano.cl"
+    },
+    "products": [
+      {
+        "name": "Trío de Tacos al Pastor con Guacamole",
+        "price": "$4.800",
+        "desc": "3 tortillas de maíz calientes con carne marinada al achiote, piña asada, cebolla, cilantro y guacamole.",
+        "image": "https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=400&fit=crop",
+        "tag": "⭐ Trío de Tacos",
+        "inStock": true
+      },
+      {
+        "name": "Quesadilla Gigante de Pollo y Queso",
+        "price": "$4.200",
+        "desc": "Tortilla de trigo de 30 cm doblada con queso mozzarella fundido y pollo desmenuzado a la parrilla.",
+        "image": "https://images.unsplash.com/photo-1618040996337-56904b7850b9?w=400&fit=crop",
+        "tag": "Queso Fundido",
+        "inStock": true
+      },
+      {
+        "name": "Porción de Totopos con Guacamole y Salsa",
+        "price": "$2.800",
+        "desc": "Nachos de maíz crujientes para compartir con pocillo de guacamole fresco y salsa suave.",
+        "image": "https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?w=400&fit=crop",
+        "tag": "Para Picar",
+        "inStock": true
+      }
+    ]
+  },
+  {
+    "id": 12,
+    "number": "P-12",
+    "name": "La Coctelería del Parque",
+    "category": "beer",
+    "categoryName": "Cervezas & Tragos",
+    "icon": "🍸",
+    "logoUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20140%20140%22%20width%3D%22140%22%20height%3D%22140%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22bg_COCTELER%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23312e81%22%20/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%231e1b4b%22%20/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2266%22%20fill%3D%22url%28%23bg_COCTELER%29%22%20stroke%3D%22%236366f1%22%20stroke-width%3D%224.5%22%20/%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2257%22%20fill%3D%22none%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.22%29%22%20stroke-dasharray%3D%223%2C3%22%20stroke-width%3D%221.5%22%20/%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2255%22%20font-size%3D%2236%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%3E%F0%9F%8D%B8%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2296%22%20font-family%3D%22%27Outfit%27%2C%20system-ui%2C%20-apple-system%2C%20sans-serif%22%20font-size%3D%229.5%22%20font-weight%3D%22900%22%20fill%3D%22%23ffffff%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%220.8%22%3ECOCTELER%C3%8DA%20PARQUE%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%22110%22%20font-family%3D%22%27Plus%20Jakarta%20Sans%27%2C%20system-ui%2C%20sans-serif%22%20font-size%3D%227%22%20font-weight%3D%22800%22%20fill%3D%22%23a5b4fc%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%221.2%22%3EBARRAS%20%26%20MOCKTAILS%3C/text%3E%0A%3C/svg%3E",
+    "bannerUrl": "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=800&auto=format&fit=crop&q=80",
+    "color": "#8b5cf6",
+    "desc": "Barra de coctelería móvil con mojitos de menta fresca, Aperol Spritz, Pisco Sour del Elqui y mocktails sin alcohol.",
+    "slogan": "Coctelería de autor y frescura en tu vaso",
+    "rating": "4.9 (155 pedidos)",
+    "prepTime": "3 - 5 min",
+    "latOffset": -0.0001,
+    "lngOffset": 0.00025,
+    "whatsapp": "56955779911",
+    "bankData": {
+      "bank": "Banco Security",
+      "accountType": "Cuenta Corriente",
+      "accountNumber": "55667788",
+      "holderName": "Coctelería del Parque",
+      "email": "tragos@parque.cl"
+    },
+    "products": [
+      {
+        "name": "Mojito Cubano Menta Fresca 500cc",
+        "price": "$4.500",
+        "desc": "Ron blanco caribeño, hojas de menta fresca maceradas con lima, azúcar y soda helada.",
+        "image": "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=400&fit=crop",
+        "tag": "⭐ El Más Pedido",
+        "inStock": true
+      },
+      {
+        "name": "Aperol Spritz Clásico con Rodaja de Naranja",
+        "price": "$5.000",
+        "desc": "Aperol italiano, vino espumante brut, chorrito de agua con gas y rodaja de naranja fresca.",
+        "image": "https://images.unsplash.com/photo-1560512823-829485b8bf24?w=400&fit=crop",
+        "tag": "Refrescante",
+        "inStock": true
+      },
+      {
+        "name": "Pisco Sour Artesanal Valle del Elqui",
+        "price": "$4.000",
+        "desc": "Pisco premium transparente de 40°, limón de pica, jarabe de goma y clara batida con amargo de angostura.",
+        "image": "https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=400&fit=crop",
+        "tag": "Pisco Chileno",
+        "inStock": true
+      },
+      {
+        "name": "Mocktail Frutos Rojos (100% Sin Alcohol)",
+        "price": "$3.000",
+        "desc": "Pulpa de frambuesas y moras, agua tónica y hojas de albahaca fresca en copa con hielo.",
+        "image": "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=400&fit=crop",
+        "tag": "🌱 0% Alcohol",
+        "inStock": true
+      }
+    ]
+  },
+  {
+    "id": 13,
+    "number": "P-13",
+    "name": "Cafetería & Pastelería de la Abuela",
+    "category": "sweets",
+    "categoryName": "Postres & Dulces",
+    "icon": "☕",
+    "logoUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20140%20140%22%20width%3D%22140%22%20height%3D%22140%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22bg_CAF%C3%89DELA%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%233e2723%22%20/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%231b0000%22%20/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2266%22%20fill%3D%22url%28%23bg_CAF%C3%89DELA%29%22%20stroke%3D%22%23d7ccc8%22%20stroke-width%3D%224.5%22%20/%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2257%22%20fill%3D%22none%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.22%29%22%20stroke-dasharray%3D%223%2C3%22%20stroke-width%3D%221.5%22%20/%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2255%22%20font-size%3D%2236%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%3E%E2%98%95%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2296%22%20font-family%3D%22%27Outfit%27%2C%20system-ui%2C%20-apple-system%2C%20sans-serif%22%20font-size%3D%229.5%22%20font-weight%3D%22900%22%20fill%3D%22%23ffffff%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%220.8%22%3ECAF%C3%89%20DE%20LA%20ABUELA%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%22110%22%20font-family%3D%22%27Plus%20Jakarta%20Sans%27%2C%20system-ui%2C%20sans-serif%22%20font-size%3D%227%22%20font-weight%3D%22800%22%20fill%3D%22%23ffcc80%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%221.2%22%3ETOSTADUR%C3%8DA%20%26%20TORTAS%3C/text%3E%0A%3C/svg%3E",
+    "bannerUrl": "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=800&auto=format&fit=crop&q=80",
+    "color": "#ec4899",
+    "desc": "Café de especialidad en grano recién molido, tortas caseras de milhojas con manjar y medialunas de manteca.",
+    "slogan": "Café de grano tostado y dulzura familiar",
+    "rating": "4.9 (135 pedidos)",
+    "prepTime": "3 - 5 min",
+    "latOffset": -0.00025,
+    "lngOffset": -0.0001,
+    "whatsapp": "56966880022",
+    "bankData": {
+      "bank": "Banco Estado",
+      "accountType": "Cuenta RUT",
+      "accountNumber": "14.223.445-8",
+      "holderName": "Pastelería Abuela",
+      "email": "cafe@abuela.cl"
+    },
+    "products": [
+      {
+        "name": "Café Cappuccino de Grano 300cc",
+        "price": "$2.500",
+        "desc": "Espresso doble de granos tostados con leche cremosa vaporizada y toque de cacao o canela.",
+        "image": "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400&fit=crop",
+        "tag": "⭐ Café de Grano",
+        "inStock": true
+      },
+      {
+        "name": "Porción Torta Milhojas con Manjar Casero",
+        "price": "$3.500",
+        "desc": "Masa hojaldrada crujiente intercalada con manjar de campo y trocitos de nuez chilena.",
+        "image": "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400&fit=crop",
+        "tag": "Receta Tradicional",
+        "inStock": true
+      },
+      {
+        "name": "Par de Medialunas Artesanales Tibias",
+        "price": "$1.800",
+        "desc": "Dos medialunas de manteca esponjosas pinceladas con almíbar de naranja y vainilla.",
+        "image": "https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=400&fit=crop",
+        "tag": "Recién Horneadas",
+        "inStock": true
+      }
+    ]
+  },
+  {
+    "id": 14,
+    "number": "P-14",
+    "name": "Tejidos & Lana Natural del Valle",
+    "category": "crafts",
+    "categoryName": "Artesanías",
+    "icon": "🧶",
+    "logoUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20140%20140%22%20width%3D%22140%22%20height%3D%22140%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22bg_TEJIDOSD%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23064e3b%22%20/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23022c22%22%20/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2266%22%20fill%3D%22url%28%23bg_TEJIDOSD%29%22%20stroke%3D%22%2310b981%22%20stroke-width%3D%224.5%22%20/%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2257%22%20fill%3D%22none%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.22%29%22%20stroke-dasharray%3D%223%2C3%22%20stroke-width%3D%221.5%22%20/%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2255%22%20font-size%3D%2236%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%3E%F0%9F%A7%B6%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2296%22%20font-family%3D%22%27Outfit%27%2C%20system-ui%2C%20-apple-system%2C%20sans-serif%22%20font-size%3D%229.5%22%20font-weight%3D%22900%22%20fill%3D%22%23ffffff%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%220.8%22%3ETEJIDOS%20DEL%20VALLE%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%22110%22%20font-family%3D%22%27Plus%20Jakarta%20Sans%27%2C%20system-ui%2C%20sans-serif%22%20font-size%3D%227%22%20font-weight%3D%22800%22%20fill%3D%22%23a7f3d0%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%221.2%22%3E100%25%20LANA%20NATURAL%3C/text%3E%0A%3C/svg%3E",
+    "bannerUrl": "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=800&auto=format&fit=crop&q=80",
+    "color": "#059669",
+    "desc": "Prendas tejidas a mano en telar y palillo con pura lana de oveja virgen teñida con tintes vegetales del valle.",
+    "slogan": "Artesanía textil chilena 100% natural",
+    "rating": "4.9 (45 compras)",
+    "prepTime": "Inmediato",
+    "latOffset": -8e-05,
+    "lngOffset": -0.00012,
+    "whatsapp": "56977991133",
+    "bankData": {
+      "bank": "Banco Falabella",
+      "accountType": "Cuenta Corriente",
+      "accountNumber": "66778899",
+      "holderName": "Tejidos del Valle",
+      "email": "tejidos@valle.cl"
+    },
+    "products": [
+      {
+        "name": "Gorro a Telar Lana de Oveja Virgen",
+        "price": "$8.000",
+        "desc": "Gorro abrigador tejido en telar artesanal, suave y resistente al viento.",
+        "image": "https://images.unsplash.com/photo-1576871337622-98d48d1cf531?w=400&fit=crop",
+        "tag": "Pura Lana",
+        "inStock": true
+      },
+      {
+        "name": "Bufanda Infinita Pura Lana Natural",
+        "price": "$12.000",
+        "desc": "Bufanda larga circular con textura rústica teñida con hojas de nogal y cebolla.",
+        "image": "https://images.unsplash.com/photo-1520903920243-00d872a2d1c9?w=400&fit=crop",
+        "tag": "⭐ Más Vendida",
+        "inStock": true
+      }
+    ]
+  },
+  {
+    "id": 15,
+    "number": "P-15",
+    "name": "Orfebrería en Cobre & Cuero",
+    "category": "crafts",
+    "categoryName": "Artesanías",
+    "icon": "💍",
+    "logoUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20140%20140%22%20width%3D%22140%22%20height%3D%22140%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22bg_COBRECUE%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%237c2d12%22%20/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%233f1708%22%20/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2266%22%20fill%3D%22url%28%23bg_COBRECUE%29%22%20stroke%3D%22%23f97316%22%20stroke-width%3D%224.5%22%20/%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2257%22%20fill%3D%22none%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.22%29%22%20stroke-dasharray%3D%223%2C3%22%20stroke-width%3D%221.5%22%20/%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2255%22%20font-size%3D%2236%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%3E%F0%9F%92%8D%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2296%22%20font-family%3D%22%27Outfit%27%2C%20system-ui%2C%20-apple-system%2C%20sans-serif%22%20font-size%3D%229.5%22%20font-weight%3D%22900%22%20fill%3D%22%23ffffff%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%220.8%22%3ECOBRE%20%26%20CUERO%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%22110%22%20font-family%3D%22%27Plus%20Jakarta%20Sans%27%2C%20system-ui%2C%20sans-serif%22%20font-size%3D%227%22%20font-weight%3D%22800%22%20fill%3D%22%23fed7aa%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%221.2%22%3EORFEBRER%C3%8DA%20CHILENA%3C/text%3E%0A%3C/svg%3E",
+    "bannerUrl": "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=800&auto=format&fit=crop&q=80",
+    "color": "#059669",
+    "desc": "Joyas forjadas en cobre chileno esmaltado al fuego, aros, colgantes del árbol de la vida y pulseras de cuero trenzado.",
+    "slogan": "El metal noble de Chile transformado en arte",
+    "rating": "4.8 (60 compras)",
+    "prepTime": "Inmediato",
+    "latOffset": -0.00014,
+    "lngOffset": -8e-05,
+    "whatsapp": "56988002244",
+    "bankData": {
+      "bank": "Banco Estado",
+      "accountType": "Cuenta RUT",
+      "accountNumber": "16.778.899-2",
+      "holderName": "Cobre & Cuero",
+      "email": "joyas@cobre.cl"
+    },
+    "products": [
+      {
+        "name": "Aros de Cobre Esmaltado a Fuego",
+        "price": "$5.000",
+        "desc": "Diseños geométricos únicos con pátinas de color verde turquesa y fuego.",
+        "image": "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=400&fit=crop",
+        "tag": "⭐ Cobre Chileno",
+        "inStock": true
+      },
+      {
+        "name": "Colgante Árbol de la Vida en Cobre",
+        "price": "$7.500",
+        "desc": "Colgante forjado a mano con hilo de cuero legítimo regulable.",
+        "image": "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400&fit=crop",
+        "tag": "Hecho a Mano",
+        "inStock": true
+      }
+    ]
+  },
+  {
+    "id": 16,
+    "number": "P-16",
+    "name": "Cerámica & Alfarería Tradicional",
+    "category": "crafts",
+    "categoryName": "Artesanías",
+    "icon": "🏺",
+    "logoUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20140%20140%22%20width%3D%22140%22%20height%3D%22140%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22bg_CER%C3%81MICA%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%2378350f%22%20/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23451a03%22%20/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2266%22%20fill%3D%22url%28%23bg_CER%C3%81MICA%29%22%20stroke%3D%22%23d97706%22%20stroke-width%3D%224.5%22%20/%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2257%22%20fill%3D%22none%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.22%29%22%20stroke-dasharray%3D%223%2C3%22%20stroke-width%3D%221.5%22%20/%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2255%22%20font-size%3D%2236%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%3E%F0%9F%8F%BA%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2296%22%20font-family%3D%22%27Outfit%27%2C%20system-ui%2C%20-apple-system%2C%20sans-serif%22%20font-size%3D%229.5%22%20font-weight%3D%22900%22%20fill%3D%22%23ffffff%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%220.8%22%3ECER%C3%81MICA%20TRADICI%C3%93N%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%22110%22%20font-family%3D%22%27Plus%20Jakarta%20Sans%27%2C%20system-ui%2C%20sans-serif%22%20font-size%3D%227%22%20font-weight%3D%22800%22%20fill%3D%22%23fde68a%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%221.2%22%3EGREDA%20DE%20POMAIRE%3C/text%3E%0A%3C/svg%3E",
+    "bannerUrl": "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=800&auto=format&fit=crop&q=80",
+    "color": "#059669",
+    "desc": "Vasijas, pocillos pebreros y maceteros rústicos elaborados en greda cocida tradicional esmaltada al horno.",
+    "slogan": "Greda cocida de tradición campesina",
+    "rating": "4.9 (50 compras)",
+    "prepTime": "Inmediato",
+    "latOffset": -0.00018,
+    "lngOffset": 2e-05,
+    "whatsapp": "56999113355",
+    "bankData": {
+      "bank": "Banco BCI",
+      "accountType": "Cuenta Corriente",
+      "accountNumber": "77889900",
+      "holderName": "Cerámica Tradición",
+      "email": "greda@ceramica.cl"
+    },
+    "products": [
+      {
+        "name": "Pocillo de Greda Esmaltada para Pebre",
+        "price": "$3.000",
+        "desc": "El infaltable pocillo chileno para la mesa del asado.",
+        "image": "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=400&fit=crop",
+        "tag": "⭐ Clásico Chileno",
+        "inStock": true
+      },
+      {
+        "name": "Juego de 4 Vasos de Greda Campesinos",
+        "price": "$8.000",
+        "desc": "Vasos rústicos ideales para chicha, pipeño o vino navegado.",
+        "image": "https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=400&fit=crop",
+        "tag": "Juego Familiar",
+        "inStock": true
+      }
+    ]
+  },
+  {
+    "id": 17,
+    "number": "P-17",
+    "name": "Cosmética Natural & Aceites Esenciales",
+    "category": "crafts",
+    "categoryName": "Artesanías",
+    "icon": "🌿",
+    "logoUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20140%20140%22%20width%3D%22140%22%20height%3D%22140%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22bg_COSM%C3%89TIC%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%2314532d%22%20/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23052e16%22%20/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2266%22%20fill%3D%22url%28%23bg_COSM%C3%89TIC%29%22%20stroke%3D%22%2316a34a%22%20stroke-width%3D%224.5%22%20/%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2257%22%20fill%3D%22none%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.22%29%22%20stroke-dasharray%3D%223%2C3%22%20stroke-width%3D%221.5%22%20/%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2255%22%20font-size%3D%2236%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%3E%F0%9F%8C%BF%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2296%22%20font-family%3D%22%27Outfit%27%2C%20system-ui%2C%20-apple-system%2C%20sans-serif%22%20font-size%3D%229.5%22%20font-weight%3D%22900%22%20fill%3D%22%23ffffff%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%220.8%22%3ECOSM%C3%89TICA%20NATURAL%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%22110%22%20font-family%3D%22%27Plus%20Jakarta%20Sans%27%2C%20system-ui%2C%20sans-serif%22%20font-size%3D%227%22%20font-weight%3D%22800%22%20fill%3D%22%23bbf7d0%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%221.2%22%3EBOT%C3%81NICA%20BIO%20%26%20ECO%3C/text%3E%0A%3C/svg%3E",
+    "bannerUrl": "https://images.unsplash.com/photo-1608248597359-0a648e4b8577?w=800&auto=format&fit=crop&q=80",
+    "color": "#059669",
+    "desc": "Jabones biodegradables de avena y miel, cremas de caléndula, rosa mosqueta y aceites de aromaterapia.",
+    "slogan": "Botánica pura, orgánica y libre de químicos",
+    "rating": "4.9 (75 compras)",
+    "prepTime": "Inmediato",
+    "latOffset": -0.00022,
+    "lngOffset": 8e-05,
+    "whatsapp": "56911224466",
+    "bankData": {
+      "bank": "Banco Santander",
+      "accountType": "Cuenta Corriente",
+      "accountNumber": "44556677",
+      "holderName": "Cosmética Natural",
+      "email": "natural@eco.cl"
+    },
+    "products": [
+      {
+        "name": "Jabón Artesanal de Avena, Miel & Propóleo",
+        "price": "$3.000",
+        "desc": "Jabón exfoliante suave y humectante para piel sensible.",
+        "image": "https://images.unsplash.com/photo-1608248597359-0a648e4b8577?w=400&fit=crop",
+        "tag": "⭐ 100% Orgánico",
+        "inStock": true
+      },
+      {
+        "name": "Crema Facial de Rosa Mosqueta Chilena",
+        "price": "$7.000",
+        "desc": "Poderoso regenerador celular con aceite puro prensado en frío.",
+        "image": "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400&fit=crop",
+        "tag": "Regeneradora",
+        "inStock": true
+      }
+    ]
+  },
+  {
+    "id": 18,
+    "number": "P-18",
+    "name": "Cervecería Austral Valle",
+    "category": "beer",
+    "categoryName": "Cervezas & Tragos",
+    "icon": "🍺",
+    "logoUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20140%20140%22%20width%3D%22140%22%20height%3D%22140%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22bg_AUSTRALV%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%230f172a%22%20/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23020617%22%20/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2266%22%20fill%3D%22url%28%23bg_AUSTRALV%29%22%20stroke%3D%22%2338bdf8%22%20stroke-width%3D%224.5%22%20/%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2257%22%20fill%3D%22none%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.22%29%22%20stroke-dasharray%3D%223%2C3%22%20stroke-width%3D%221.5%22%20/%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2255%22%20font-size%3D%2236%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%3E%F0%9F%8D%BA%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2296%22%20font-family%3D%22%27Outfit%27%2C%20system-ui%2C%20-apple-system%2C%20sans-serif%22%20font-size%3D%229.5%22%20font-weight%3D%22900%22%20fill%3D%22%23ffffff%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%220.8%22%3EAUSTRAL%20VALLE%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%22110%22%20font-family%3D%22%27Plus%20Jakarta%20Sans%27%2C%20system-ui%2C%20sans-serif%22%20font-size%3D%227%22%20font-weight%3D%22800%22%20fill%3D%22%23bae6fd%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%221.2%22%3ESCHOP%20PATAG%C3%93NICO%3C/text%3E%0A%3C/svg%3E",
+    "bannerUrl": "https://images.unsplash.com/photo-1608270586620-248524c67de9?w=800&auto=format&fit=crop&q=80",
+    "color": "#f59e0b",
+    "desc": "Cervezas patagónicas en barril: Schop Calafate con notas de bayas silvestres y Schop Lager rubia cristalina.",
+    "slogan": "La frescura del fin del mundo en tu vaso",
+    "rating": "4.9 (165 pedidos)",
+    "prepTime": "3 - 5 min",
+    "latOffset": 5e-05,
+    "lngOffset": 0.00032,
+    "whatsapp": "56922335577",
+    "bankData": {
+      "bank": "Banco de Chile",
+      "accountType": "Cuenta Corriente",
+      "accountNumber": "88776655",
+      "holderName": "Austral Valle",
+      "email": "cerveza@austral.cl"
+    },
+    "products": [
+      {
+        "name": "Schop Calafate Austral 500cc",
+        "price": "$4.500",
+        "desc": "Cerveza negra con extracto de calafate silvestre, aroma frutal y espuma tostada.",
+        "image": "https://images.unsplash.com/photo-1538488881522-4326c36660df?w=400&fit=crop",
+        "tag": "⭐ Fruto Patagónico",
+        "inStock": true
+      },
+      {
+        "name": "Schop Lager Rubia Cristalina 500cc",
+        "price": "$3.800",
+        "desc": "Lager clásica rubia de gran tomabilidad, balanceada, bien carbonatada y fría.",
+        "image": "https://images.unsplash.com/photo-1608270586620-248524c67de9?w=400&fit=crop",
+        "tag": "Refrescante",
+        "inStock": true
+      }
+    ]
+  },
+  {
+    "id": 19,
+    "number": "ESC",
+    "name": "Escenario Principal",
+    "category": "service",
+    "categoryName": "Escenario",
+    "icon": "🎸",
+    "logoUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20140%20140%22%20width%3D%22140%22%20height%3D%22140%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22bg_ESCENARI%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%237f1d1d%22%20/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23450a0a%22%20/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2266%22%20fill%3D%22url%28%23bg_ESCENARI%29%22%20stroke%3D%22%23ef4444%22%20stroke-width%3D%224.5%22%20/%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2257%22%20fill%3D%22none%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.22%29%22%20stroke-dasharray%3D%223%2C3%22%20stroke-width%3D%221.5%22%20/%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2255%22%20font-size%3D%2236%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%3E%F0%9F%8E%B8%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2296%22%20font-family%3D%22%27Outfit%27%2C%20system-ui%2C%20-apple-system%2C%20sans-serif%22%20font-size%3D%229.5%22%20font-weight%3D%22900%22%20fill%3D%22%23ffffff%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%220.8%22%3EESCENARIO%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%22110%22%20font-family%3D%22%27Plus%20Jakarta%20Sans%27%2C%20system-ui%2C%20sans-serif%22%20font-size%3D%227%22%20font-weight%3D%22800%22%20fill%3D%22%23fca5a5%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%221.2%22%3ETARIMA%20CENTRAL%3C/text%3E%0A%3C/svg%3E",
+    "bannerUrl": "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=800&auto=format&fit=crop&q=80",
+    "color": "#dc2626",
+    "desc": "Tarima central donde se presentan las bandas, humoristas y grupos del festival.",
+    "slogan": "Sonido, luces y música en vivo",
+    "rating": "Tarima Central",
+    "prepTime": "En Vivo",
+    "latOffset": 0.00028,
+    "lngOffset": 0.0,
+    "whatsapp": "",
+    "bankData": null,
+    "products": []
+  },
+  {
+    "id": 20,
+    "number": "WC",
+    "name": "Batería de Baños Químicos",
+    "category": "service",
+    "categoryName": "Servicios",
+    "icon": "🚻",
+    "logoUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20140%20140%22%20width%3D%22140%22%20height%3D%22140%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22bg_SERVICIO%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%231e3a8a%22%20/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23172554%22%20/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2266%22%20fill%3D%22url%28%23bg_SERVICIO%29%22%20stroke%3D%22%233b82f6%22%20stroke-width%3D%224.5%22%20/%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2257%22%20fill%3D%22none%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.22%29%22%20stroke-dasharray%3D%223%2C3%22%20stroke-width%3D%221.5%22%20/%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2255%22%20font-size%3D%2236%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%3E%F0%9F%9A%BB%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2296%22%20font-family%3D%22%27Outfit%27%2C%20system-ui%2C%20-apple-system%2C%20sans-serif%22%20font-size%3D%229.5%22%20font-weight%3D%22900%22%20fill%3D%22%23ffffff%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%220.8%22%3ESERVICIOS%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%22110%22%20font-family%3D%22%27Plus%20Jakarta%20Sans%27%2C%20system-ui%2C%20sans-serif%22%20font-size%3D%227%22%20font-weight%3D%22800%22%20fill%3D%22%2393c5fd%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%221.2%22%3EBA%C3%91OS%20%26%20PRIMEROS%20AUX%3C/text%3E%0A%3C/svg%3E",
+    "bannerUrl": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=800&auto=format&fit=crop&q=80",
+    "color": "#2563eb",
+    "desc": "Servicios higiénicos higienizados, lavamanos con jabón, estación de primeros auxilios y punto verde de reciclaje.",
+    "slogan": "Punto de higiene y asistencia",
+    "rating": "Servicios",
+    "prepTime": "24 hrs",
+    "latOffset": -0.00024,
+    "lngOffset": 0.00022,
+    "whatsapp": "",
+    "bankData": null,
+    "products": []
+  }
+];
+
+    // Limpiar caché vieja si la versión de datos cambió
+    const DATA_VERSION = '2026.02.visual_pro';
+    if (localStorage.getItem('festival_data_version') !== DATA_VERSION) {
+      localStorage.setItem('festival_data_version', DATA_VERSION);
+      localStorage.removeItem('festival_admin_schedule');
+      localStorage.removeItem('festival_admin_stands');
+      localStorage.removeItem('festival_manual_live_id');
+    }
+
+    // Cargar del localStorage o inicializar con los nuevos defaults profesionales
+    let stageSchedule = JSON.parse(localStorage.getItem('festival_admin_schedule') || 'null') || DEFAULT_SCHEDULE;
+    let stands = JSON.parse(localStorage.getItem('festival_admin_stands') || 'null') || DEFAULT_STANDS;
+
+    
