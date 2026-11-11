@@ -44,25 +44,25 @@
           ⚙️
         </div>
         <div>
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2 flex-wrap">
             <h1 class="text-base sm:text-lg font-black text-white font-display tracking-tight">ADMINISTRADOR MAESTRO</h1>
-            <span class="text-[10px] bg-red-600 text-white font-black uppercase px-2 py-0.5 rounded-full animate-pulse">Sincronizado</span>
-            <span id="adminChileClock" class="text-xs font-mono font-bold text-emerald-400 bg-slate-950 border border-emerald-500/30 px-2.5 py-0.5 rounded-md">🇨🇱 18:00 hrs</span>
+            <span class="text-[10px] bg-red-600 text-white font-black uppercase px-2 py-0.5 rounded-full animate-pulse">En Vivo</span>
+            <span id="adminChileClock" class="text-xs font-mono font-bold text-emerald-400 bg-slate-950 border border-emerald-500/30 px-2.5 py-0.5 rounded-md">🇨🇱 18:30:00 (Chile)</span>
           </div>
-          <p class="text-xs text-slate-400">Control total en vivo de Artistas, Horarios, Puestos, Stock y Precios</p>
+          <p class="text-xs text-slate-400">Control total: Fotos y Logos reales, Horarios, Retrasos en vivo, Tiempos muertos, Stock y Precios</p>
         </div>
       </div>
 
       <!-- Acciones de Cabecera -->
-      <div class="flex items-center gap-2.5 flex-wrap">
+      <div class="flex items-center gap-2 flex-wrap">
         <button onclick="broadcastAnnouncement()" class="px-3.5 py-2 bg-red-600 hover:bg-red-500 text-white text-xs font-black rounded-xl shadow-lg shadow-red-600/30 transition flex items-center gap-1.5 active:scale-95">
-          <span>📢</span> Alerta a Clientes
+          <span>📢</span> Notificación Masiva
         </button>
         <button onclick="exportDataBackup()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl border border-slate-700 transition flex items-center gap-1.5">
-          <span>💾</span> Respaldar JSON
+          <span>💾</span> Respaldar
         </button>
         <button onclick="resetDefaultData()" class="px-3 py-2 bg-slate-800 hover:bg-red-950 text-slate-400 hover:text-red-400 text-xs font-bold rounded-xl border border-slate-700 transition">
-          ↺ Resetear
+          ↺ Reset
         </button>
         <a href="index.html" target="_blank" class="px-3.5 py-2 bg-orange-600 hover:bg-orange-500 text-white text-xs font-black rounded-xl shadow-lg shadow-orange-600/30 transition flex items-center gap-1.5 active:scale-95">
           <span>👀</span> Ver App Cliente
@@ -78,102 +78,112 @@
   <div class="bg-slate-900/60 border-b border-slate-800 px-4 py-2 sticky top-[73px] z-30 backdrop-blur-md">
     <div class="max-w-7xl mx-auto flex items-center gap-2 overflow-x-auto no-scrollbar">
       <button onclick="switchAdminTab('stage')" id="tab-btn-stage" class="px-4 py-2 rounded-xl text-xs font-extrabold bg-orange-600 text-white transition flex items-center gap-2 shadow-md">
-        <span>🎸</span> Escenario & Artistas (<span id="stageCountBadge">10</span>)
+        <span>🎸</span> Escenario, Shows & Tiempos Muertos (<span id="stageCountBadge">10</span>)
       </button>
       <button onclick="switchAdminTab('stands')" id="tab-btn-stands" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition flex items-center gap-2">
-        <span>🏪</span> Puestos & Locales (<span id="standsCountBadge">20</span>)
+        <span>🏪</span> Puestos, Food Trucks & Logos (<span id="standsCountBadge">18</span>)
       </button>
       <button onclick="switchAdminTab('services')" id="tab-btn-services" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition flex items-center gap-2">
-        <span>🚻</span> Baños, Tarima & Servicios
+        <span>🚻</span> Baños & Servicios
       </button>
     </div>
   </div>
 
   <!-- ======================================================== -->
-  <!-- CONTENIDO PRINCIPAL SEGÚN PESTAÑA                        -->
+  <!-- CONTENIDO PRINCIPAL                                      -->
   <!-- ======================================================== -->
   <main class="max-w-7xl mx-auto p-4 sm:p-6 w-full flex-1">
 
     <!-- ======================================================== -->
-    <!-- PESTAÑA 1: ESCENARIO & ARTISTAS (CONTROL COMPLETO)       -->
+    <!-- PESTAÑA 1: ESCENARIO, HORARIOS, RETRASOS & TIEMPOS MUERTOS-->
     <!-- ======================================================== -->
     <section id="admin-view-stage" class="space-y-4">
       
-      <!-- Barra de herramientas del escenario -->
-      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-xl flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h2 class="text-lg font-black text-white font-display flex items-center gap-2">
-            <span>🎸</span> Programación del Escenario en Vivo
-          </h2>
-          <p class="text-xs text-slate-400">Agrega artistas, cambia horarios, ajusta retrasos o sube a cualquiera al escenario ahora mismo.</p>
-        </div>
-
-        <div class="flex items-center gap-2.5 flex-wrap">
-          <button onclick="openAddArtistModal()" class="px-4 py-2.5 bg-gradient-to-r from-red-600 to-orange-600 hover:brightness-110 text-white text-xs font-black rounded-xl shadow-lg shadow-red-600/30 flex items-center gap-1.5 transition active:scale-95">
-            <span>➕</span> Agregar Artista / Show / Concurso
-          </button>
-        </div>
-      </div>
-
-      <!-- Ajuste Rápido de Retrasos en el Escenario -->
-      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3">
-        <div class="flex items-center gap-2">
-          <span class="text-xl">⏱️</span>
+      <!-- Panel de Control de Horarios y Retrasos Inteligentes -->
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-xl space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h4 class="text-xs font-black text-white uppercase tracking-wider">Ajuste de Horarios en Cascada:</h4>
-            <p class="text-[11px] text-slate-400">Suma o resta minutos a todos los shows que aún no han comenzado.</p>
+            <h2 class="text-lg font-black text-white font-display flex items-center gap-2">
+              <span>⏱️</span> Manejo de Horarios, Retrasos y Tiempos Muertos
+            </h2>
+            <p class="text-xs text-slate-400">Si un show se atrasa, aplica el retraso y todos los shows posteriores se reprogramarán automáticamente.</p>
+          </div>
+
+          <div class="flex items-center gap-2 flex-wrap">
+            <button onclick="openAddArtistModal('show')" class="px-3.5 py-2 bg-red-600 hover:bg-red-500 text-white text-xs font-black rounded-xl shadow-md flex items-center gap-1.5 transition">
+              <span>➕</span> Agregar Artista / Show
+            </button>
+            <button onclick="openAddArtistModal('intermission')" class="px-3.5 py-2 bg-amber-600 hover:bg-amber-500 text-white text-xs font-black rounded-xl shadow-md flex items-center gap-1.5 transition">
+              <span>⏱️</span> Agregar Tiempo Muerto / Prueba
+            </button>
           </div>
         </div>
 
-        <div class="flex items-center gap-2">
-          <button onclick="shiftUpcomingSchedule(10)" class="px-3 py-1.5 bg-amber-950/70 border border-amber-600/40 text-amber-300 rounded-xl text-xs font-bold hover:bg-amber-900/80 transition">
-            ⏳ +10 min retraso
-          </button>
-          <button onclick="shiftUpcomingSchedule(15)" class="px-3 py-1.5 bg-amber-950/70 border border-amber-600/40 text-amber-300 rounded-xl text-xs font-bold hover:bg-amber-900/80 transition">
-            ⏳ +15 min retraso
-          </button>
-          <button onclick="shiftUpcomingSchedule(-10)" class="px-3 py-1.5 bg-slate-800 border border-slate-700 text-slate-300 rounded-xl text-xs font-bold hover:bg-slate-700 transition">
-            ⚡ -10 min (Recuperar)
-          </button>
+        <!-- Botones de Retraso Rápido + Retraso Personalizado -->
+        <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Desfases Rápidos:</span>
+            <button onclick="shiftUpcomingSchedule(5)" class="px-3 py-1.5 bg-amber-950/80 hover:bg-amber-900 border border-amber-600/40 text-amber-300 rounded-xl text-xs font-bold transition">
+              +5 min
+            </button>
+            <button onclick="shiftUpcomingSchedule(10)" class="px-3 py-1.5 bg-amber-950/80 hover:bg-amber-900 border border-amber-600/40 text-amber-300 rounded-xl text-xs font-bold transition">
+              +10 min
+            </button>
+            <button onclick="shiftUpcomingSchedule(15)" class="px-3 py-1.5 bg-amber-950/80 hover:bg-amber-900 border border-amber-600/40 text-amber-300 rounded-xl text-xs font-bold transition">
+              +15 min
+            </button>
+            <button onclick="shiftUpcomingSchedule(-10)" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl text-xs font-bold transition">
+              -10 min (Recuperar)
+            </button>
+          </div>
+
+          <!-- Input para retraso libre -->
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-slate-400 font-bold">Retraso libre:</span>
+            <input id="customDelayInput" type="number" value="20" class="w-16 bg-slate-900 border border-slate-700 rounded-xl px-2 py-1 text-center font-bold text-xs text-white outline-none">
+            <span class="text-xs text-slate-400">min</span>
+            <button onclick="applyCustomDelay()" class="px-3 py-1.5 bg-orange-600 hover:bg-orange-500 text-white rounded-xl text-xs font-black shadow transition">
+              Aplicar a siguientes
+            </button>
+          </div>
         </div>
       </div>
 
-      <!-- Lista completa de los Artistas administrables -->
+      <!-- Lista de Shows y Tiempos Muertos -->
       <div class="space-y-3" id="adminArtistsListContainer">
-        <!-- Render dinámico con acciones de editar, subir a tarima, mover y eliminar -->
+        <!-- Render dinámico con tiempos muertos calculados entre shows -->
       </div>
 
     </section>
 
     <!-- ======================================================== -->
-    <!-- PESTAÑA 2: PUESTOS & LOCALES (PRODUCTOS, STOCK Y PRECIOS)-->
+    <!-- PESTAÑA 2: PUESTOS, FOOD TRUCKS, LOGOS Y PRODUCTOS       -->
     <!-- ======================================================== -->
     <section id="admin-view-stands" class="space-y-4 hidden">
       
-      <!-- Barra de herramientas de Puestos -->
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-xl flex flex-wrap items-center justify-between gap-4">
         <div>
           <h2 class="text-lg font-black text-white font-display flex items-center gap-2">
-            <span>🏪</span> Gestión de Puestos & Locales
+            <span>🏪</span> Gestión de Puestos, Fotos de Food Trucks y Logos
           </h2>
-          <p class="text-xs text-slate-400">Modifica nombres, logos, categorías, agrega o elimina productos y controla el stock.</p>
+          <p class="text-xs text-slate-400">Personaliza la imagen real de cada local, agrega o elimina productos y define qué está agotado.</p>
         </div>
 
         <div class="flex items-center gap-3">
           <input 
             id="searchStandAdminInput"
             type="text" 
-            placeholder="Buscar puesto o plato..." 
+            placeholder="Buscar local o comida..." 
             class="bg-slate-800 text-white rounded-xl px-3.5 py-2 text-xs border border-slate-700 outline-none w-56"
             oninput="renderAdminStandsList(this.value)"
           />
-          <button onclick="openAddStandModal()" class="px-4 py-2.5 bg-gradient-to-r from-orange-600 to-amber-600 hover:brightness-110 text-white text-xs font-black rounded-xl shadow-lg shadow-orange-600/30 flex items-center gap-1.5 transition active:scale-95">
-            <span>➕</span> Nuevo Puesto
+          <button onclick="openAddStandModal()" class="px-4 py-2 bg-gradient-to-r from-orange-600 to-amber-600 hover:brightness-110 text-white text-xs font-black rounded-xl shadow-lg shadow-orange-600/30 flex items-center gap-1.5 transition active:scale-95">
+            <span>➕</span> Nuevo Local
           </button>
         </div>
       </div>
 
-      <!-- Feed de los puestos con gestión de productos -->
+      <!-- Feed de locales con fotos reales y carta -->
       <div class="space-y-4" id="adminStandsListContainer">
         <!-- Render dinámico -->
       </div>
@@ -181,96 +191,127 @@
     </section>
 
     <!-- ======================================================== -->
-    <!-- PESTAÑA 3: PUNTOS DE SERVICIO (BAÑOS, ESCENARIO, ACCESOS) -->
+    <!-- PESTAÑA 3: PUNTOS DE SERVICIO (BAÑOS, SEGURIDAD, ACCESOS) -->
     <!-- ======================================================== -->
     <section id="admin-view-services" class="space-y-4 hidden">
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-xl">
-        <h2 class="text-lg font-black text-white font-display flex items-center gap-2 mb-1">
-          <span>🚻</span> Puntos de Servicio e Infraestructura
-        </h2>
-        <p class="text-xs text-slate-400 mb-4">Administra baños, tarima, primeros auxilios, boleterías y puntos limpios de la cancha.</p>
-
-        <div class="space-y-3" id="adminServicesContainer">
-          <!-- Render dinámico de servicios -->
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h2 class="text-lg font-black text-white font-display flex items-center gap-2">
+              <span>🚻</span> Infraestructura y Servicios de la Cancha
+            </h2>
+            <p class="text-xs text-slate-400">Baños químicos, tarima principal, enfermería/primeros auxilios y boleterías.</p>
+          </div>
+          <button onclick="openAddServiceModal()" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-black rounded-xl shadow transition">
+            <span>➕</span> Agregar Punto de Servicio
+          </button>
         </div>
+
+        <div class="space-y-3" id="adminServicesContainer"></div>
       </div>
     </section>
 
   </main>
 
   <!-- ======================================================== -->
-  <!-- MODAL: AGREGAR / EDITAR ARTISTA                         -->
+  <!-- MODAL: AGREGAR / EDITAR ARTISTA O TIEMPO MUERTO          -->
   <!-- ======================================================== -->
-  <div id="artistModal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-md w-full p-6 shadow-2xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto no-scrollbar text-white">
+  <div id="artistModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-lg w-full p-6 shadow-2xl flex flex-col gap-4 max-h-[92vh] overflow-y-auto no-scrollbar text-white">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <h3 id="artistModalTitle" class="text-base font-black font-display text-white">Agregar Show al Escenario</h3>
+        <h3 id="artistModalTitle" class="text-base font-black font-display text-white">Editar Show</h3>
         <button onclick="closeArtistModal()" class="text-slate-400 hover:text-white text-lg">✕</button>
       </div>
 
       <input type="hidden" id="editArtistId" value="">
 
       <div class="space-y-3 text-xs">
+        
         <div>
-          <label class="font-bold text-slate-300 block mb-1">Nombre del Artista / Grupo / Show:</label>
-          <input id="artName" type="text" placeholder="Ej: Américo, Guns N' Roses Experience, Show de Magia..." class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none focus:ring-2 focus:ring-red-500">
+          <label class="font-bold text-slate-300 block mb-1">Tipo de Actividad:</label>
+          <select id="artType" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none focus:ring-2 focus:ring-red-500" onchange="toggleArtistTypeFields(this.value)">
+            <option value="music">🎤 Concierto / Banda Musical</option>
+            <option value="tribute">🎸 Banda Tributo Oficial</option>
+            <option value="humor">😂 Humor / Stand Up Comedy</option>
+            <option value="animation">📢 Animación, Premios & Concursos</option>
+            <option value="intermission">⏱️ Tiempo Muerto / Pausa Técnica / Prueba de Sonido</option>
+          </select>
         </div>
 
         <div>
-          <label class="font-bold text-slate-300 block mb-1">Género / Tipo de Espectáculo:</label>
-          <input id="artGenre" type="text" placeholder="Ej: Cumbia Tropical, Tributo Oficial, Humor, Animación..." class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none focus:ring-2 focus:ring-red-500">
+          <label class="font-bold text-slate-300 block mb-1">Nombre del Show o Artista:</label>
+          <input id="artName" type="text" placeholder="Ej: Américo, Guns N' Roses Experience, Prueba de Sonido..." class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none focus:ring-2 focus:ring-red-500 font-bold">
+        </div>
+
+        <div>
+          <label class="font-bold text-slate-300 block mb-1">Subtítulo / Estilo / Género:</label>
+          <input id="artGenre" type="text" placeholder="Ej: El Rey de la Cumbia Tropical • Show Oficial" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none focus:ring-2 focus:ring-red-500">
         </div>
 
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="font-bold text-slate-300 block mb-1">Hora Inicio (HH:MM):</label>
-            <input id="artStart" type="text" placeholder="18:30" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white font-mono outline-none focus:ring-2 focus:ring-red-500">
+            <input id="artStart" type="text" placeholder="18:30" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white font-mono font-bold outline-none focus:ring-2 focus:ring-red-500">
           </div>
           <div>
-            <label class="font-bold text-slate-300 block mb-1">Hora Fin (HH:MM):</label>
-            <input id="artEnd" type="text" placeholder="19:45" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white font-mono outline-none focus:ring-2 focus:ring-red-500">
+            <label class="font-bold text-slate-300 block mb-1">Hora Término (HH:MM):</label>
+            <input id="artEnd" type="text" placeholder="19:45" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white font-mono font-bold outline-none focus:ring-2 focus:ring-red-500">
           </div>
         </div>
 
         <div>
-          <label class="font-bold text-slate-300 block mb-1">URL de Foto de Fondo / Poster:</label>
-          <input id="artImage" type="text" placeholder="https://images.unsplash.com/..." class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white text-[11px] outline-none focus:ring-2 focus:ring-red-500">
+          <div class="flex items-center justify-between mb-1">
+            <label class="font-bold text-slate-300">URL Foto del Artista o Show:</label>
+            <span class="text-[10px] text-slate-400">Pegar enlace de imagen</span>
+          </div>
+          <input id="artImage" type="text" placeholder="https://images.unsplash.com/..." oninput="updateArtistPreview(this.value)" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white text-[11px] outline-none focus:ring-2 focus:ring-red-500">
+          
+          <!-- Vista previa de imagen -->
+          <div class="mt-2 flex items-center gap-3 bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+            <div id="artPreviewImg" class="w-14 h-14 rounded-xl bg-slate-800 bg-cover bg-center border border-slate-700 shrink-0"></div>
+            <div class="text-[11px] text-slate-400">
+              <span class="font-bold text-white block">Vista previa de imagen</span>
+              Esta foto se verá en el Hero principal y en la parrilla del cliente.
+            </div>
+          </div>
         </div>
 
         <div>
-          <label class="font-bold text-slate-300 block mb-1">Descripción / Detalles del Show:</label>
-          <textarea id="artDesc" rows="3" placeholder="Repertorio, si son dobles oficiales, premios, etc..." class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none focus:ring-2 focus:ring-red-500"></textarea>
+          <label class="font-bold text-slate-300 block mb-1">Descripción / Biografía completa:</label>
+          <textarea id="artDesc" rows="3" placeholder="Repertorio, trayectoria, si son dobles oficiales o banda con orquesta..." class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none focus:ring-2 focus:ring-red-500 leading-relaxed"></textarea>
         </div>
+
       </div>
 
       <div class="flex gap-2 pt-2 border-t border-slate-800">
         <button onclick="closeArtistModal()" class="flex-1 py-2.5 rounded-xl border border-slate-700 text-slate-300 font-bold text-xs">Cancelar</button>
-        <button onclick="saveArtist()" class="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-black text-xs shadow-lg shadow-red-600/30">Guardar Artista</button>
+        <button onclick="saveArtist()" class="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-black text-xs shadow-lg shadow-red-600/30">Guardar Cambios</button>
       </div>
     </div>
   </div>
 
   <!-- ======================================================== -->
-  <!-- MODAL: AGREGAR / EDITAR PUESTO                           -->
+  <!-- MODAL: AGREGAR / EDITAR PUESTO (CON FOTO Y LOGO REAL)    -->
   <!-- ======================================================== -->
-  <div id="standModal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-lg w-full p-6 shadow-2xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto no-scrollbar text-white">
+  <div id="standModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-lg w-full p-6 shadow-2xl flex flex-col gap-4 max-h-[92vh] overflow-y-auto no-scrollbar text-white">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <h3 id="standModalTitle" class="text-base font-black font-display text-white">Editar Puesto</h3>
+        <h3 id="standModalTitle" class="text-base font-black font-display text-white">Editar Puesto / Food Truck</h3>
         <button onclick="closeStandModal()" class="text-slate-400 hover:text-white text-lg">✕</button>
       </div>
 
       <input type="hidden" id="editStandId" value="">
 
       <div class="space-y-3 text-xs">
+        
         <div class="grid grid-cols-3 gap-3">
           <div class="col-span-2">
-            <label class="font-bold text-slate-300 block mb-1">Nombre del Local / Stand:</label>
-            <input id="stName" type="text" placeholder="Ej: Food Truck El Bajón" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none focus:ring-2 focus:ring-orange-500">
+            <label class="font-bold text-slate-300 block mb-1">Nombre del Local o Food Truck:</label>
+            <input id="stName" type="text" placeholder="Ej: Food Truck Bajón Criollo" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none focus:ring-2 focus:ring-orange-500 font-bold">
           </div>
           <div>
             <label class="font-bold text-slate-300 block mb-1">N° Puesto:</label>
-            <input id="stNumber" type="text" placeholder="P-01" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white font-bold outline-none focus:ring-2 focus:ring-orange-500">
+            <input id="stNumber" type="text" placeholder="P-01" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white font-mono font-bold outline-none focus:ring-2 focus:ring-orange-500">
           </div>
         </div>
 
@@ -282,37 +323,67 @@
               <option value="beer">🍺 Cervezas & Tragos</option>
               <option value="sweets">🍦 Postres & Dulces</option>
               <option value="crafts">🧶 Artesanías</option>
-              <option value="service">🚻 Servicios / Baños</option>
+              <option value="service">🚻 Baños / Servicios</option>
             </select>
           </div>
           <div>
-            <label class="font-bold text-slate-300 block mb-1">Emoji / Ícono representativo:</label>
-            <input id="stIcon" type="text" value="🍔" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white text-center text-base outline-none focus:ring-2 focus:ring-orange-500">
+            <label class="font-bold text-slate-300 block mb-1">Ícono de Respaldo:</label>
+            <input id="stIcon" type="text" value="🍔" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white text-center text-base outline-none">
+          </div>
+        </div>
+
+        <!-- FOTO / LOGO REAL DEL LOCAL -->
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="font-bold text-slate-300">URL del Logo o Foto del Food Truck:</label>
+            <span class="text-[10px] text-slate-400">Se muestra en el mapa y la carta</span>
+          </div>
+          <input id="stLogoUrl" type="text" placeholder="https://images.unsplash.com/..." oninput="updateStandLogoPreview(this.value)" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white text-[11px] outline-none focus:ring-2 focus:ring-orange-500">
+
+          <!-- Presets rápidos para asignar fotos bonitas con 1 clic -->
+          <div class="flex items-center gap-1.5 flex-wrap mt-2">
+            <span class="text-[10px] text-slate-400 font-bold">Presets rápidos:</span>
+            <button type="button" onclick="setStandPresetLogo('burger')" class="text-[10px] bg-slate-800 hover:bg-slate-700 px-2 py-0.5 rounded border border-slate-700">🍔 Burger Truck</button>
+            <button type="button" onclick="setStandPresetLogo('beer')" class="text-[10px] bg-slate-800 hover:bg-slate-700 px-2 py-0.5 rounded border border-slate-700">🍺 Cervecería</button>
+            <button type="button" onclick="setStandPresetLogo('bbq')" class="text-[10px] bg-slate-800 hover:bg-slate-700 px-2 py-0.5 rounded border border-slate-700">🥩 Asados</button>
+            <button type="button" onclick="setStandPresetLogo('waffle')" class="text-[10px] bg-slate-800 hover:bg-slate-700 px-2 py-0.5 rounded border border-slate-700">🧇 Waffles</button>
+            <button type="button" onclick="setStandPresetLogo('craft')" class="text-[10px] bg-slate-800 hover:bg-slate-700 px-2 py-0.5 rounded border border-slate-700">🧶 Artesanía</button>
+          </div>
+
+          <div class="mt-2 flex items-center gap-3 bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+            <div id="stLogoPreviewBox" class="w-14 h-14 rounded-2xl bg-slate-800 bg-cover bg-center border border-slate-700 shrink-0 flex items-center justify-center text-xl overflow-hidden">
+              🍔
+            </div>
+            <div class="text-[11px] text-slate-400">
+              <span class="font-bold text-white block">Vista previa del pin</span>
+              Este círculo con la foto real aparecerá sobre la cancha en el mapa interactivo.
+            </div>
           </div>
         </div>
 
         <div>
           <label class="font-bold text-slate-300 block mb-1">Descripción del Puesto:</label>
-          <input id="stDesc" type="text" placeholder="Especialidad, carnes, tragos caseros..." class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none focus:ring-2 focus:ring-orange-500">
+          <input id="stDesc" type="text" placeholder="Especialidades, completos gigantes, sándwiches..." class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none">
         </div>
 
         <div>
-          <label class="font-bold text-slate-300 block mb-1">WhatsApp para Pedidos (con código 56):</label>
-          <input id="stWp" type="text" placeholder="56912345678" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white font-mono outline-none focus:ring-2 focus:ring-orange-500">
+          <label class="font-bold text-slate-300 block mb-1">WhatsApp para Pedidos (con 56):</label>
+          <input id="stWp" type="text" placeholder="56912345678" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white font-mono outline-none">
         </div>
 
-        <!-- Datos Bancarios para Transferencias -->
+        <!-- Datos Bancarios -->
         <div class="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
-          <span class="text-[10px] font-black uppercase tracking-wider text-blue-400 block">🏦 Datos Bancarios para Transferencias de Clientes:</span>
+          <span class="text-[10px] font-black uppercase tracking-wider text-blue-400 block">🏦 Datos Bancarios para Transferencias:</span>
           <div class="grid grid-cols-2 gap-2">
-            <input id="stBank" type="text" placeholder="Banco (ej: Banco Estado)" class="bg-slate-900 border border-slate-700 rounded-lg p-2 text-white outline-none">
-            <input id="stAccount" type="text" placeholder="Tipo y N° Cuenta (Cuenta RUT...)" class="bg-slate-900 border border-slate-700 rounded-lg p-2 text-white outline-none">
+            <input id="stBank" type="text" placeholder="Banco (Banco Estado, BCI...)" class="bg-slate-900 border border-slate-700 rounded-lg p-2 text-white outline-none">
+            <input id="stAccount" type="text" placeholder="Tipo y N° Cuenta (Cta RUT...)" class="bg-slate-900 border border-slate-700 rounded-lg p-2 text-white outline-none">
           </div>
           <div class="grid grid-cols-2 gap-2">
-            <input id="stHolder" type="text" placeholder="Nombre Titular" class="bg-slate-900 border border-slate-700 rounded-lg p-2 text-white outline-none">
+            <input id="stHolder" type="text" placeholder="Titular" class="bg-slate-900 border border-slate-700 rounded-lg p-2 text-white outline-none">
             <input id="stEmail" type="text" placeholder="Correo para comprobante" class="bg-slate-900 border border-slate-700 rounded-lg p-2 text-white outline-none">
           </div>
         </div>
+
       </div>
 
       <div class="flex gap-2 pt-2 border-t border-slate-800">
@@ -322,10 +393,8 @@
     </div>
   </div>
 
-  <!-- ======================================================== -->
-  <!-- MODAL: AGREGAR PRODUCTO A UN PUESTO                     -->
-  <!-- ======================================================== -->
-  <div id="productModal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
+  <!-- MODAL: AGREGAR PRODUCTO -->
+  <div id="productModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-sm w-full p-5 shadow-2xl flex flex-col gap-3 text-white">
       <div class="flex items-center justify-between border-b border-slate-800 pb-2">
         <h3 class="text-sm font-black font-display text-white">Agregar Producto a la Carta</h3>
@@ -337,73 +406,70 @@
       <div class="space-y-2.5 text-xs">
         <div>
           <label class="font-bold text-slate-300 block mb-1">Nombre del Producto / Plato / Bebida:</label>
-          <input id="newProdName" type="text" placeholder="Ej: Completo Italiano Gigante" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none focus:ring-2 focus:ring-orange-500">
+          <input id="newProdName" type="text" placeholder="Ej: Completo Italiano Gigante" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none font-bold">
         </div>
         <div>
           <label class="font-bold text-slate-300 block mb-1">Precio (en CLP):</label>
-          <input id="newProdPrice" type="text" placeholder="$2.500" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white font-black outline-none focus:ring-2 focus:ring-orange-500">
+          <input id="newProdPrice" type="text" placeholder="$2.500" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white font-black outline-none">
         </div>
       </div>
 
       <div class="flex gap-2 pt-2 border-t border-slate-800">
         <button onclick="closeProductModal()" class="flex-1 py-2 rounded-xl border border-slate-700 text-slate-300 font-bold text-xs">Cancelar</button>
-        <button onclick="saveNewProduct()" class="flex-1 py-2 rounded-xl bg-orange-600 hover:bg-orange-500 text-white font-black text-xs shadow-md">Agregar Producto</button>
+        <button onclick="saveNewProduct()" class="flex-1 py-2 rounded-xl bg-orange-600 hover:bg-orange-500 text-white font-black text-xs shadow-md">Guardar Producto</button>
       </div>
     </div>
   </div>
 
   <!-- ======================================================== -->
-  <!-- JAVASCRIPT DEL ADMINISTRADOR MAESTRO                     -->
+  <!-- JAVASCRIPT DEL ADMINISTRADOR                             -->
   <!-- ======================================================== -->
   <script>
     const eventChannel = new BroadcastChannel('festival_live_sync');
 
     // ----------------------------------------------------
-    // BASE DE DATOS INICIAL DE LOS 10 ARTISTAS
+    // BASE DE DATOS INICIAL CON FOTOS REALES Y HORARIOS
     // ----------------------------------------------------
     const DEFAULT_SCHEDULE = [
-      { id: 1, artist: "Dj Set Bienvenida & Warm Up", genre: "Música Chill Out & Éxitos", time: "15:00 - 16:00", status: "finished", desc: "Música ambiental para recibir a las familias en la cancha.", image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=600&auto=format&fit=crop&q=80" },
-      { id: 2, artist: "Ballet Folclórico de la Villa", genre: "Cuecas, Sau Sau y Tradición", time: "16:00 - 17:00", status: "finished", desc: "Presentación oficial de 30 bailarines con trajes típicos chilenos.", image: "https://images.unsplash.com/photo-1547153760-18fc86324498?w=600&auto=format&fit=crop&q=80" },
-      { id: 3, artist: "Américo", genre: "El Rey de la Cumbia Tropical", time: "17:00 - 18:30", status: "live", desc: "Show estelar con orquesta completa: Te Vas, Que Levante la Mano, El Embrujo.", image: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=600&auto=format&fit=crop&q=80" },
-      { id: 4, artist: "Guns N' Roses Experience", genre: "Banda Tributo Oficial Internacional", time: "19:00 - 20:15", status: "upcoming", desc: "Sweet Child O' Mine, Welcome to the Jungle y November Rain en vivo.", image: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=600&auto=format&fit=crop&q=80" },
-      { id: 5, artist: "Stand Up Comedy: Los Vecinos Ríen", genre: "Humor Costumbrista", time: "20:15 - 20:45", status: "upcoming", desc: "Monólogo humorístico sobre anécdotas de barrio y ferias libres.", image: "https://images.unsplash.com/photo-1585699324551-f6c309eedeca?w=600&auto=format&fit=crop&q=80" },
-      { id: 6, artist: "Los Jaivas (Tributo Cósmico)", genre: "Rock Progresivo & Fusión", time: "21:00 - 22:00", status: "upcoming", desc: "Homenaje musical con charangos, trutrucas y la suite Alturas de Macchu Picchu.", image: "https://images.unsplash.com/photo-1465847899084-d164df4dedc6?w=600&auto=format&fit=crop&q=80" },
-      { id: 7, artist: "Santaferia (Tributo Casero)", genre: "Cumbia Casera & Metales", time: "22:15 - 23:15", status: "upcoming", desc: "El huracán bailable de la cumbia chilena para saltar en la cancha.", image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600&auto=format&fit=crop&q=80" },
-      { id: 8, artist: "Los Prisioneros (Tributo Década 80)", genre: "Rock & New Wave Chileno", time: "23:30 - 00:30", status: "upcoming", desc: "La Voz de los 80, Tren al Sur, Estrechez de Corazón y El Baile de los que Sobran.", image: "https://images.unsplash.com/photo-1498038432885-c6f3f1b912ee?w=600&auto=format&fit=crop&q=80" },
-      { id: 9, artist: "Gran Sonora Palacios Tradicional", genre: "Cumbia Clásica de Siempre", time: "00:45 - 01:45", status: "upcoming", desc: "Los clásicos infaltables: El Galeón Español, Un Año Más y Pedacito de Mi Vida.", image: "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=600&auto=format&fit=crop&q=80" },
-      { id: 10, artist: "Dj Cierre Fiesta de las Luces", genre: "Electrónica & Pachanga", time: "01:45 - 03:00", status: "upcoming", desc: "Fiesta de cierre del festival con cañón de confeti y show de iluminación.", image: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=600&auto=format&fit=crop&q=80" }
+      { id: 1, type: "music", artist: "Dj Set Bienvenida & Warm Up", genre: "Música Chill Out & Éxitos", time: "15:00 - 16:00", status: "finished", desc: "Música ambiental para recibir a las familias en la cancha.", image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&auto=format&fit=crop&q=80" },
+      { id: 2, type: "intermission", artist: "Prueba de Sonido & Pausa Técnica", genre: "Técnica de Audio y Micrófonos", time: "16:00 - 16:15", status: "finished", desc: "Ajuste de monitores e instrumentos en tarima.", image: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800&auto=format&fit=crop&q=80" },
+      { id: 3, type: "music", artist: "Ballet Folclórico de la Villa", genre: "Cuecas, Sau Sau y Tradición", time: "16:15 - 17:15", status: "finished", desc: "Presentación oficial de 30 bailarines con trajes típicos chilenos.", image: "https://images.unsplash.com/photo-1547153760-18fc86324498?w=800&auto=format&fit=crop&q=80" },
+      { id: 4, type: "intermission", artist: "Animación de Bienvenida & Concursos", genre: "Premios al público en la cancha", time: "17:15 - 17:30", status: "finished", desc: "Concursos familiares con el animador oficial.", image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&auto=format&fit=crop&q=80" },
+      { id: 5, type: "music", artist: "Américo", genre: "El Rey de la Cumbia Tropical • Show Oficial", time: "17:30 - 19:00", status: "live", desc: "Show estelar con orquesta completa: Te Vas, Que Levante la Mano, El Embrujo.", image: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=800&auto=format&fit=crop&q=80" },
+      { id: 6, type: "intermission", artist: "Intermedio / Cambio de Batería e Instrumentos", genre: "Pausa Técnica de Escenario", time: "19:00 - 19:20", status: "upcoming", desc: "Montaje de amplificadores para la banda de rock.", image: "https://images.unsplash.com/photo-1465847899084-d164df4dedc6?w=800&auto=format&fit=crop&q=80" },
+      { id: 7, type: "tribute", artist: "Guns N' Roses Experience", genre: "Banda Tributo Oficial Sudamericano", time: "19:20 - 20:45", status: "upcoming", desc: "Sweet Child O' Mine, Welcome to the Jungle y November Rain en vivo.", image: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=800&auto=format&fit=crop&q=80" },
+      { id: 8, type: "humor", artist: "Stand Up Comedy: Los Vecinos Ríen", genre: "Humor Costumbrista", time: "20:45 - 21:20", status: "upcoming", desc: "Monólogo humorístico sobre anécdotas de barrio y ferias libres.", image: "https://images.unsplash.com/photo-1585699324551-f6c309eedeca?w=800&auto=format&fit=crop&q=80" },
+      { id: 9, type: "tribute", artist: "Santaferia (Tributo Casero)", genre: "Cumbia Casera & Viento Metales", time: "21:30 - 22:45", status: "upcoming", desc: "El huracán bailable de la cumbia chilena para saltar en la cancha.", image: "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=800&auto=format&fit=crop&q=80" },
+      { id: 10, type: "music", artist: "Dj Cierre Fiesta de las Luces", genre: "Electrónica, Pachanga & Old School", time: "23:00 - 01:00", status: "upcoming", desc: "Fiesta de cierre del festival con cañón de confeti y show de iluminación.", image: "https://images.unsplash.com/photo-1498038432885-c6f3f1b912ee?w=800&auto=format&fit=crop&q=80" }
     ];
 
-    // ----------------------------------------------------
-    // BASE DE DATOS INICIAL DE LOS 20 LOCALES
-    // ----------------------------------------------------
     const DEFAULT_STANDS = [
-      { id: 1, number: "P-01", name: "Cervecería El Roble", category: "beer", categoryName: "Cervezas & Tragos", icon: "🍺", color: "#f59e0b", desc: "Schops artesanales directos de barril: IPA, Amber Ale y Stout.", latOffset: 0.00015, lngOffset: 0.00020, whatsapp: "56912345678", bankData: { bank: "Banco Estado", accountType: "Cuenta RUT", accountNumber: "15.432.890-K", holderName: "Cervecería El Roble", email: "pagos@roble.cl" }, products: [ { name: "Schop IPA Artesanal 500cc", price: "$4.000", inStock: true }, { name: "Schop Amber Ale 500cc", price: "$4.000", inStock: true }, { name: "Michelada Tradicional", price: "$4.500", inStock: true }, { name: "Vaso Coleccionable Festival", price: "$1.000", inStock: true } ] },
-      { id: 2, number: "P-02", name: "Food Truck Bajón Criollo", category: "food", categoryName: "Comidas", icon: "🍔", color: "#ea580c", desc: "Completos gigantes en pan amasado, churrascos italianos y papas rústicas.", latOffset: 0.00008, lngOffset: -0.00018, whatsapp: "56987654321", bankData: { bank: "Banco Santander", accountType: "Cuenta Corriente", accountNumber: "000-7654321-9", holderName: "Bajón Criollo SpA", email: "pedidos@bajoncriollo.cl" }, products: [ { name: "Completo Italiano Gigante", price: "$2.500", inStock: true }, { name: "Completo Alemán (Chucrut/Tomate/Mayo)", price: "$2.800", inStock: true }, { name: "Churrasco Italiano en Marraqueta", price: "$5.500", inStock: true }, { name: "Empanada de Pino al Horno", price: "$2.500", inStock: true }, { name: "Papas Rústicas con Cheddar", price: "$3.500", inStock: true } ] },
-      { id: 3, number: "P-03", name: "El Rincón del Sabor", category: "food", categoryName: "Comidas", icon: "🌭", color: "#ea580c", desc: "Completos dinámicos, sándwiches de mechada y bebidas heladas.", latOffset: -0.00005, lngOffset: -0.00025, whatsapp: "56955443322", bankData: { bank: "Banco de Chile", accountType: "Cuenta Vista", accountNumber: "12345678", holderName: "Marta Gómez", email: "marta@sabor.cl" }, products: [ { name: "Completo Dinámico Especial", price: "$2.700", inStock: true }, { name: "Sándwich Mechada Italiana", price: "$5.800", inStock: true }, { name: "Bebida en Lata 350cc", price: "$1.500", inStock: true } ] },
-      { id: 4, number: "P-04", name: "Asados & Brasas del Sur", category: "food", categoryName: "Comidas", icon: "🥩", color: "#dc2626", desc: "Carnes a la parrilla, anticuchos de lomo y choripanes con pebre.", latOffset: 0.00020, lngOffset: -0.00010, whatsapp: "56933221144", bankData: { bank: "Banco BCI", accountType: "Cuenta Corriente", accountNumber: "555-12345-6", holderName: "Brasas del Sur", email: "asados@brasas.cl" }, products: [ { name: "Anticucho Mixto Lomo y Cerdo (40cm)", price: "$4.500", inStock: true }, { name: "Choripán Artesanal con Pebre", price: "$2.500", inStock: true }, { name: "Plato Parrillero con Ensalada", price: "$7.500", inStock: true } ] },
-      { id: 5, number: "P-05", name: "La Barra Terremotera", category: "beer", categoryName: "Cervezas & Tragos", icon: "🍷", color: "#f59e0b", desc: "Terremotos tradicionales con pipeño campesino, helado de piña y granadina.", latOffset: -0.00015, lngOffset: 0.00018, whatsapp: "56966778899", bankData: { bank: "Banco Estado", accountType: "Cuenta RUT", accountNumber: "18.990.112-4", holderName: "Barra Terremotera", email: "barra@terremoto.cl" }, products: [ { name: "Terremoto Tradicional 1/2 Litro", price: "$3.500", inStock: true }, { name: "Terremoto Infantil (Sin alcohol)", price: "$2.500", inStock: true }, { name: "Vino Navegado Calentito", price: "$3.000", inStock: true } ] },
-      { id: 6, number: "P-06", name: "Papas Fritas El Cono Loco", category: "food", categoryName: "Comidas", icon: "🍟", color: "#ea580c", desc: "Conos gigantes de papas fritas naturales con más de 10 salsas caseras.", latOffset: 0.00002, lngOffset: -0.00030, whatsapp: "56944332211", bankData: { bank: "Banco Scotiabank", accountType: "Cuenta Corriente", accountNumber: "77665544", holderName: "El Cono Loco", email: "papas@conoloco.cl" }, products: [ { name: "Cono Gigante de Papas Naturales", price: "$3.500", inStock: true }, { name: "Papas con Tocino Crispy y Queso", price: "$4.500", inStock: true }, { name: "Nuggets de Pollo Caseros (8 un)", price: "$3.000", inStock: true } ] },
-      { id: 7, number: "P-07", name: "Waffles & Crepes Dulce Antojo", category: "sweets", categoryName: "Postres & Dulces", icon: "🧇", color: "#ec4899", desc: "Waffles belgas recién horneados, crepes con manjar, frutillas y nutella.", latOffset: -0.00018, lngOffset: -0.00015, whatsapp: "56999887766", bankData: { bank: "Banco Estado", accountType: "Cuenta RUT", accountNumber: "19.334.556-7", holderName: "Dulce Antojo", email: "waffles@antojo.cl" }, products: [ { name: "Waffle con Frutillas, Manjar y Crema", price: "$3.800", inStock: true }, { name: "Crepe de Nutella y Plátano", price: "$3.500", inStock: true }, { name: "Churros Rellenos con Manjar (5 un)", price: "$2.500", inStock: true } ] },
-      { id: 8, number: "P-08", name: "Helados Artesanales La Nieve", category: "sweets", categoryName: "Postres & Dulces", icon: "🍦", color: "#ec4899", desc: "Helados artesanales 100% de fruta natural: Lúcuma, Frambuesa, Maracuyá.", latOffset: -0.00022, lngOffset: -0.00005, whatsapp: "56911335577", bankData: { bank: "Banco Itaú", accountType: "Cuenta Corriente", accountNumber: "11223344", holderName: "La Nieve Helados", email: "helados@lanieve.cl" }, products: [ { name: "Copa Helado 2 Sabores Artesanales", price: "$2.800", inStock: true }, { name: "Paleta Rellena de Leche Condensada", price: "$2.000", inStock: true }, { name: "Milkshake Clásico Espeso", price: "$3.500", inStock: true } ] },
-      { id: 9, number: "P-09", name: "Cervecería Artesanal Kutral", category: "beer", categoryName: "Cervezas & Tragos", icon: "🍺", color: "#f59e0b", desc: "Cervezas campesinas ahumadas, Golden Ale y Red Ale.", latOffset: 0.00012, lngOffset: 0.00028, whatsapp: "56922446688", bankData: { bank: "Banco BICE", accountType: "Cuenta Corriente", accountNumber: "88990011", holderName: "Kutral Cervezas", email: "kutral@cerveza.cl" }, products: [ { name: "Schop Golden Ale 500cc", price: "$3.800", inStock: true }, { name: "Schop Red Ale Ahumada 500cc", price: "$4.200", inStock: true }, { name: "Pack 3 Botellas de Colección", price: "$8.500", inStock: true } ] },
-      { id: 10, number: "P-10", name: "Pizzería Nápoles al Paso", category: "food", categoryName: "Comidas", icon: "🍕", color: "#ea580c", desc: "Pizzas individuales a la piedra con masa madre e ingredientes frescos.", latOffset: 0.00025, lngOffset: -0.00022, whatsapp: "56933557799", bankData: { bank: "Banco Santander", accountType: "Cuenta Corriente", accountNumber: "99887711", holderName: "Nápoles al Paso", email: "pizza@napoles.cl" }, products: [ { name: "Pizza Margarita Individual Masa Madre", price: "$4.500", inStock: true }, { name: "Pizza Pepperoni y Queso Fundido", price: "$5.000", inStock: true }, { name: "Trozos de Focaccia con Romero", price: "$2.000", inStock: true } ] },
-      { id: 11, number: "P-11", name: "Sabor Mexicano: Tacos & Burritos", category: "food", categoryName: "Comidas", icon: "🌮", color: "#ea580c", desc: "Tacos al pastor, quesadillas con guacamole y totopos con salsa.", latOffset: 0.00018, lngOffset: -0.00030, whatsapp: "56944668800", bankData: { bank: "Banco de Chile", accountType: "Cuenta Corriente", accountNumber: "33445566", holderName: "Sabor Mexicano", email: "tacos@mexicano.cl" }, products: [ { name: "Trío de Tacos al Pastor con Guacamole", price: "$4.800", inStock: true }, { name: "Quesadilla Gigante de Queso y Pollo", price: "$4.200", inStock: true }, { name: "Porción de Totopos con Queso y Salsa", price: "$2.800", inStock: true } ] },
-      { id: 12, number: "P-12", name: "La Coctelería del Parque", category: "beer", categoryName: "Cervezas & Tragos", icon: "🍸", color: "#8b5cf6", desc: "Mojitos cubanos tradicionales, Aperol Spritz, Pisco Sour artesanal y Mocktails.", latOffset: -0.00010, lngOffset: 0.00025, whatsapp: "56955779911", bankData: { bank: "Banco Security", accountType: "Cuenta Corriente", accountNumber: "55667788", holderName: "Coctelería del Parque", email: "tragos@parque.cl" }, products: [ { name: "Mojito Cubano Menta Fresca 500cc", price: "$4.500", inStock: true }, { name: "Aperol Spritz Clásico", price: "$5.000", inStock: true }, { name: "Pisco Sour Valle del Elqui", price: "$4.000", inStock: true }, { name: "Mocktail Frutos Rojos (Sin alcohol)", price: "$3.000", inStock: true } ] },
-      { id: 13, number: "P-13", name: "Cafetería & Pastelería de la Abuela", category: "sweets", categoryName: "Postres & Dulces", icon: "☕", color: "#ec4899", desc: "Café de grano recién molido, tortas caseras de milhojas y medialunas.", latOffset: -0.00025, lngOffset: -0.00010, whatsapp: "56966880022", bankData: { bank: "Banco Estado", accountType: "Cuenta RUT", accountNumber: "14.223.445-8", holderName: "Pastelería Abuela", email: "cafe@abuela.cl" }, products: [ { name: "Café Cappuccino de Grano 300cc", price: "$2.500", inStock: true }, { name: "Porción Torta Milhojas con Manjar", price: "$3.500", inStock: true }, { name: "Par de Medialunas Artesanales", price: "$1.800", inStock: true } ] },
-      { id: 14, number: "P-14", name: "Tejidos & Lana Natural del Valle", category: "crafts", categoryName: "Artesanías", icon: "🧶", color: "#059669", desc: "Prendas tejidas a mano en telar y palillo con lana de oveja virgen.", latOffset: -0.00008, lngOffset: -0.00012, whatsapp: "56977991133", bankData: { bank: "Banco Falabella", accountType: "Cuenta Corriente", accountNumber: "66778899", holderName: "Tejidos del Valle", email: "tejidos@valle.cl" }, products: [ { name: "Gorro a Telar Lana de Oveja", price: "$8.000", inStock: true }, { name: "Bufanda Infinita Pura Lana", price: "$12.000", inStock: true }, { name: "Zapatillas de Estar en Casa Lana", price: "$9.500", inStock: true } ] },
-      { id: 15, number: "P-15", name: "Orfebrería en Cobre & Cuero", category: "crafts", categoryName: "Artesanías", icon: "💍", color: "#059669", desc: "Joyas artesanales forjadas en cobre chileno y pulseras de cuero trenzado.", latOffset: -0.00014, lngOffset: -0.00008, whatsapp: "56988002244", bankData: { bank: "Banco Estado", accountType: "Cuenta RUT", accountNumber: "16.778.899-2", holderName: "Cobre & Cuero", email: "joyas@cobre.cl" }, products: [ { name: "Aros de Cobre Esmaltado a Fuego", price: "$5.000", inStock: true }, { name: "Colgante Árbol de la Vida en Cobre", price: "$7.500", inStock: true }, { name: "Pulsera de Cuero con Broche Metálico", price: "$4.000", inStock: true } ] },
-      { id: 16, number: "P-16", name: "Cerámica & Alfarería Tradicional", category: "crafts", categoryName: "Artesanías", icon: "🏺", color: "#059669", desc: "Macetas, vasijas y pocillos hechos en greda cocida y esmalte.", latOffset: -0.00018, lngOffset: 0.00002, whatsapp: "56999113355", bankData: { bank: "Banco BCI", accountType: "Cuenta Corriente", accountNumber: "77889900", holderName: "Cerámica Tradición", email: "greda@ceramica.cl" }, products: [ { name: "Pocillo Greda Esmaltada para Pebre", price: "$3.000", inStock: true }, { name: "Maceta Decorativa Rústica", price: "$6.000", inStock: true }, { name: "Juego 4 Vasos de Greda Campesinos", price: "$8.000", inStock: true } ] },
-      { id: 17, number: "P-17", name: "Cosmética Natural & Aceites Esenciales", category: "crafts", categoryName: "Artesanías", icon: "🌿", color: "#059669", desc: "Jabones biodegradables, cremas de caléndula y aceites de aromaterapia.", latOffset: -0.00022, lngOffset: 0.00008, whatsapp: "56911224466", bankData: { bank: "Banco Santander", accountType: "Cuenta Corriente", accountNumber: "44556677", holderName: "Cosmética Natural", email: "natural@eco.cl" }, products: [ { name: "Jabón Artesanal de Avena y Miel", price: "$3.000", inStock: true }, { name: "Crema Facial de Rosa Mosqueta", price: "$7.000", inStock: true }, { name: "Roll-on Aceite Esencial Lavanda", price: "$4.500", inStock: true } ] },
-      { id: 18, number: "P-18", name: "Cervecería Austral Valle", category: "beer", categoryName: "Cervezas & Tragos", icon: "🍺", color: "#f59e0b", desc: "Cervezas rubias livianas lager y calafate austral.", latOffset: 0.00005, lngOffset: 0.00032, whatsapp: "56922335577", bankData: { bank: "Banco de Chile", accountType: "Cuenta Corriente", accountNumber: "88776655", holderName: "Austral Valle", email: "cerveza@austral.cl" }, products: [ { name: "Schop Calafate Austral 500cc", price: "$4.500", inStock: true }, { name: "Schop Lager Rubia Refrescante", price: "$3.800", inStock: true } ] }
+      { id: 1, number: "P-01", name: "Cervecería El Roble", category: "beer", categoryName: "Cervezas & Tragos", icon: "🍺", logoUrl: "https://images.unsplash.com/photo-1538488881522-4326c36660df?w=300&h=300&fit=crop", color: "#f59e0b", desc: "Schops artesanales directos de barril: IPA, Amber Ale y Stout.", latOffset: 0.00015, lngOffset: 0.00020, whatsapp: "56912345678", bankData: { bank: "Banco Estado", accountType: "Cuenta RUT", accountNumber: "15.432.890-K", holderName: "Cervecería El Roble", email: "pagos@roble.cl" }, products: [ { name: "Schop IPA Artesanal 500cc", price: "$4.000", inStock: true }, { name: "Schop Amber Ale 500cc", price: "$4.000", inStock: true }, { name: "Michelada Tradicional", price: "$4.500", inStock: true }, { name: "Vaso Coleccionable Festival", price: "$1.000", inStock: true } ] },
+      { id: 2, number: "P-02", name: "Food Truck Bajón Criollo", category: "food", categoryName: "Comidas", icon: "🍔", logoUrl: "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=300&h=300&fit=crop", color: "#ea580c", desc: "Completos gigantes en pan amasado, churrascos italianos y papas rústicas.", latOffset: 0.00008, lngOffset: -0.00018, whatsapp: "56987654321", bankData: { bank: "Banco Santander", accountType: "Cuenta Corriente", accountNumber: "000-7654321-9", holderName: "Bajón Criollo SpA", email: "pedidos@bajoncriollo.cl" }, products: [ { name: "Completo Italiano Gigante", price: "$2.500", inStock: true }, { name: "Completo Alemán (Chucrut/Tomate/Mayo)", price: "$2.800", inStock: true }, { name: "Churrasco Italiano en Marraqueta", price: "$5.500", inStock: true }, { name: "Empanada de Pino al Horno", price: "$2.500", inStock: true }, { name: "Papas Rústicas con Cheddar", price: "$3.500", inStock: true } ] },
+      { id: 3, number: "P-03", name: "El Rincón del Sabor", category: "food", categoryName: "Comidas", icon: "🌭", logoUrl: "https://images.unsplash.com/photo-1619740455993-9e612b1af08a?w=300&h=300&fit=crop", color: "#ea580c", desc: "Completos dinámicos, sándwiches de mechada y bebidas heladas.", latOffset: -0.00005, lngOffset: -0.00025, whatsapp: "56955443322", bankData: { bank: "Banco de Chile", accountType: "Cuenta Vista", accountNumber: "12345678", holderName: "Marta Gómez", email: "marta@sabor.cl" }, products: [ { name: "Completo Dinámico Especial", price: "$2.700", inStock: true }, { name: "Sándwich Mechada Italiana", price: "$5.800", inStock: true }, { name: "Bebida en Lata 350cc", price: "$1.500", inStock: true } ] },
+      { id: 4, number: "P-04", name: "Asados & Brasas del Sur", category: "food", categoryName: "Comidas", icon: "🥩", logoUrl: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=300&h=300&fit=crop", color: "#dc2626", desc: "Carnes a la parrilla, anticuchos de lomo y choripanes con pebre.", latOffset: 0.00020, lngOffset: -0.00010, whatsapp: "56933221144", bankData: { bank: "Banco BCI", accountType: "Cuenta Corriente", accountNumber: "555-12345-6", holderName: "Brasas del Sur", email: "asados@brasas.cl" }, products: [ { name: "Anticucho Mixto Lomo y Cerdo (40cm)", price: "$4.500", inStock: true }, { name: "Choripán Artesanal con Pebre", price: "$2.500", inStock: true }, { name: "Plato Parrillero con Ensalada", price: "$7.500", inStock: true } ] },
+      { id: 5, number: "P-05", name: "La Barra Terremotera", category: "beer", categoryName: "Cervezas & Tragos", icon: "🍷", logoUrl: "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=300&h=300&fit=crop", color: "#f59e0b", desc: "Terremotos tradicionales con pipeño campesino, helado de piña y granadina.", latOffset: -0.00015, lngOffset: 0.00018, whatsapp: "56966778899", bankData: { bank: "Banco Estado", accountType: "Cuenta RUT", accountNumber: "18.990.112-4", holderName: "Barra Terremotera", email: "barra@terremoto.cl" }, products: [ { name: "Terremoto Tradicional 1/2 Litro", price: "$3.500", inStock: true }, { name: "Terremoto Infantil (Sin alcohol)", price: "$2.500", inStock: true }, { name: "Vino Navegado Calentito", price: "$3.000", inStock: true } ] },
+      { id: 6, number: "P-06", name: "Papas Fritas El Cono Loco", category: "food", categoryName: "Comidas", icon: "🍟", logoUrl: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=300&h=300&fit=crop", color: "#ea580c", desc: "Conos gigantes de papas fritas naturales con más de 10 salsas caseras.", latOffset: 0.00002, lngOffset: -0.00030, whatsapp: "56944332211", bankData: { bank: "Banco Scotiabank", accountType: "Cuenta Corriente", accountNumber: "77665544", holderName: "El Cono Loco", email: "papas@conoloco.cl" }, products: [ { name: "Cono Gigante de Papas Naturales", price: "$3.500", inStock: true }, { name: "Papas con Tocino Crispy y Queso", price: "$4.500", inStock: true }, { name: "Nuggets de Pollo Caseros (8 un)", price: "$3.000", inStock: true } ] },
+      { id: 7, number: "P-07", name: "Waffles & Crepes Dulce Antojo", category: "sweets", categoryName: "Postres & Dulces", icon: "🧇", logoUrl: "https://images.unsplash.com/photo-1562376552-0d160a2f238d?w=300&h=300&fit=crop", color: "#ec4899", desc: "Waffles belgas recién horneados, crepes con manjar, frutillas y nutella.", latOffset: -0.00018, lngOffset: -0.00015, whatsapp: "56999887766", bankData: { bank: "Banco Estado", accountType: "Cuenta RUT", accountNumber: "19.334.556-7", holderName: "Dulce Antojo", email: "waffles@antojo.cl" }, products: [ { name: "Waffle con Frutillas, Manjar y Crema", price: "$3.800", inStock: true }, { name: "Crepe de Nutella y Plátano", price: "$3.500", inStock: true }, { name: "Churros Rellenos con Manjar (5 un)", price: "$2.500", inStock: true } ] },
+      { id: 8, number: "P-08", name: "Helados Artesanales La Nieve", category: "sweets", categoryName: "Postres & Dulces", icon: "🍦", logoUrl: "https://images.unsplash.com/photo-1501443762994-82bd5dace89a?w=300&h=300&fit=crop", color: "#ec4899", desc: "Helados artesanales 100% de fruta natural: Lúcuma, Frambuesa, Maracuyá.", latOffset: -0.00022, lngOffset: -0.00005, whatsapp: "56911335577", bankData: { bank: "Banco Itaú", accountType: "Cuenta Corriente", accountNumber: "11223344", holderName: "La Nieve Helados", email: "helados@lanieve.cl" }, products: [ { name: "Copa Helado 2 Sabores Artesanales", price: "$2.800", inStock: true }, { name: "Paleta Rellena de Leche Condensada", price: "$2.000", inStock: true }, { name: "Milkshake Clásico Espeso", price: "$3.500", inStock: true } ] },
+      { id: 9, number: "P-09", name: "Cervecería Artesanal Kutral", category: "beer", categoryName: "Cervezas & Tragos", icon: "🍺", logoUrl: "https://images.unsplash.com/photo-1575037614876-c38a4d44f5b8?w=300&h=300&fit=crop", color: "#f59e0b", desc: "Cervezas campesinas ahumadas, Golden Ale y Red Ale.", latOffset: 0.00012, lngOffset: 0.00028, whatsapp: "56922446688", bankData: { bank: "Banco BICE", accountType: "Cuenta Corriente", accountNumber: "88990011", holderName: "Kutral Cervezas", email: "kutral@cerveza.cl" }, products: [ { name: "Schop Golden Ale 500cc", price: "$3.800", inStock: true }, { name: "Schop Red Ale Ahumada 500cc", price: "$4.200", inStock: true }, { name: "Pack 3 Botellas de Colección", price: "$8.500", inStock: true } ] },
+      { id: 10, number: "P-10", name: "Pizzería Nápoles al Paso", category: "food", categoryName: "Comidas", icon: "🍕", logoUrl: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=300&h=300&fit=crop", color: "#ea580c", desc: "Pizzas individuales a la piedra con masa madre e ingredientes frescos.", latOffset: 0.00025, lngOffset: -0.00022, whatsapp: "56933557799", bankData: { bank: "Banco Santander", accountType: "Cuenta Corriente", accountNumber: "99887711", holderName: "Nápoles al Paso", email: "pizza@napoles.cl" }, products: [ { name: "Pizza Margarita Individual Masa Madre", price: "$4.500", inStock: true }, { name: "Pizza Pepperoni y Queso Fundido", price: "$5.000", inStock: true }, { name: "Trozos de Focaccia con Romero", price: "$2.000", inStock: true } ] },
+      { id: 11, number: "P-11", name: "Sabor Mexicano: Tacos & Burritos", category: "food", categoryName: "Comidas", icon: "🌮", logoUrl: "https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=300&h=300&fit=crop", color: "#ea580c", desc: "Tacos al pastor, quesadillas con guacamole y totopos con salsa.", latOffset: 0.00018, lngOffset: -0.00030, whatsapp: "56944668800", bankData: { bank: "Banco de Chile", accountType: "Cuenta Corriente", accountNumber: "33445566", holderName: "Sabor Mexicano", email: "tacos@mexicano.cl" }, products: [ { name: "Trío de Tacos al Pastor con Guacamole", price: "$4.800", inStock: true }, { name: "Quesadilla Gigante de Queso y Pollo", price: "$4.200", inStock: true }, { name: "Porción de Totopos con Queso y Salsa", price: "$2.800", inStock: true } ] },
+      { id: 12, number: "P-12", name: "La Coctelería del Parque", category: "beer", categoryName: "Cervezas & Tragos", icon: "🍸", logoUrl: "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=300&h=300&fit=crop", color: "#8b5cf6", desc: "Mojitos cubanos tradicionales, Aperol Spritz, Pisco Sour artesanal y Mocktails.", latOffset: -0.00010, lngOffset: 0.00025, whatsapp: "56955779911", bankData: { bank: "Banco Security", accountType: "Cuenta Corriente", accountNumber: "55667788", holderName: "Coctelería del Parque", email: "tragos@parque.cl" }, products: [ { name: "Mojito Cubano Menta Fresca 500cc", price: "$4.500", inStock: true }, { name: "Aperol Spritz Clásico", price: "$5.000", inStock: true }, { name: "Pisco Sour Valle del Elqui", price: "$4.000", inStock: true }, { name: "Mocktail Frutos Rojos (Sin alcohol)", price: "$3.000", inStock: true } ] },
+      { id: 13, number: "P-13", name: "Cafetería & Pastelería de la Abuela", category: "sweets", categoryName: "Postres & Dulces", icon: "☕", logoUrl: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=300&h=300&fit=crop", color: "#ec4899", desc: "Café de grano recién molido, tortas caseras de milhojas y medialunas.", latOffset: -0.00025, lngOffset: -0.00010, whatsapp: "56966880022", bankData: { bank: "Banco Estado", accountType: "Cuenta RUT", accountNumber: "14.223.445-8", holderName: "Pastelería Abuela", email: "cafe@abuela.cl" }, products: [ { name: "Café Cappuccino de Grano 300cc", price: "$2.500", inStock: true }, { name: "Porción Torta Milhojas con Manjar", price: "$3.500", inStock: true }, { name: "Par de Medialunas Artesanales", price: "$1.800", inStock: true } ] },
+      { id: 14, number: "P-14", name: "Tejidos & Lana Natural del Valle", category: "crafts", categoryName: "Artesanías", icon: "🧶", logoUrl: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=300&h=300&fit=crop", color: "#059669", desc: "Prendas tejidas a mano en telar y palillo con lana de oveja virgen.", latOffset: -0.00008, lngOffset: -0.00012, whatsapp: "56977991133", bankData: { bank: "Banco Falabella", accountType: "Cuenta Corriente", accountNumber: "66778899", holderName: "Tejidos del Valle", email: "tejidos@valle.cl" }, products: [ { name: "Gorro a Telar Lana de Oveja", price: "$8.000", inStock: true }, { name: "Bufanda Infinita Pura Lana", price: "$12.000", inStock: true }, { name: "Zapatillas de Estar en Casa Lana", price: "$9.500", inStock: true } ] },
+      { id: 15, number: "P-15", name: "Orfebrería en Cobre & Cuero", category: "crafts", categoryName: "Artesanías", icon: "💍", logoUrl: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=300&h=300&fit=crop", color: "#059669", desc: "Joyas artesanales forjadas en cobre chileno y pulseras de cuero trenzado.", latOffset: -0.00014, lngOffset: -0.00008, whatsapp: "56988002244", bankData: { bank: "Banco Estado", accountType: "Cuenta RUT", accountNumber: "16.778.899-2", holderName: "Cobre & Cuero", email: "joyas@cobre.cl" }, products: [ { name: "Aros de Cobre Esmaltado a Fuego", price: "$5.000", inStock: true }, { name: "Colgante Árbol de la Vida en Cobre", price: "$7.500", inStock: true }, { name: "Pulsera de Cuero con Broche Metálico", price: "$4.000", inStock: true } ] },
+      { id: 16, number: "P-16", name: "Cerámica & Alfarería Tradicional", category: "crafts", categoryName: "Artesanías", icon: "🏺", logoUrl: "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=300&h=300&fit=crop", color: "#059669", desc: "Macetas, vasijas y pocillos hechos en greda cocida y esmalte.", latOffset: -0.00018, lngOffset: 0.00002, whatsapp: "56999113355", bankData: { bank: "Banco BCI", accountType: "Cuenta Corriente", accountNumber: "77889900", holderName: "Cerámica Tradición", email: "greda@ceramica.cl" }, products: [ { name: "Pocillo Greda Esmaltada para Pebre", price: "$3.000", inStock: true }, { name: "Maceta Decorativa Rústica", price: "$6.000", inStock: true }, { name: "Juego 4 Vasos de Greda Campesinos", price: "$8.000", inStock: true } ] },
+      { id: 17, number: "P-17", name: "Cosmética Natural & Aceites Esenciales", category: "crafts", categoryName: "Artesanías", icon: "🌿", logoUrl: "https://images.unsplash.com/photo-1608248597359-0a648e4b8577?w=300&h=300&fit=crop", color: "#059669", desc: "Jabones biodegradables, cremas de caléndula y aceites de aromaterapia.", latOffset: -0.00022, lngOffset: 0.00008, whatsapp: "56911224466", bankData: { bank: "Banco Santander", accountType: "Cuenta Corriente", accountNumber: "44556677", holderName: "Cosmética Natural", email: "natural@eco.cl" }, products: [ { name: "Jabón Artesanal de Avena y Miel", price: "$3.000", inStock: true }, { name: "Crema Facial de Rosa Mosqueta", price: "$7.000", inStock: true }, { name: "Roll-on Aceite Esencial Lavanda", price: "$4.500", inStock: true } ] },
+      { id: 18, number: "P-18", name: "Cervecería Austral Valle", category: "beer", categoryName: "Cervezas & Tragos", icon: "🍺", logoUrl: "https://images.unsplash.com/photo-1608270586620-248524c67de9?w=300&h=300&fit=crop", color: "#f59e0b", desc: "Cervezas rubias livianas lager y calafate austral.", latOffset: 0.00005, lngOffset: 0.00032, whatsapp: "56922335577", bankData: { bank: "Banco de Chile", accountType: "Cuenta Corriente", accountNumber: "88776655", holderName: "Austral Valle", email: "cerveza@austral.cl" }, products: [ { name: "Schop Calafate Austral 500cc", price: "$4.500", inStock: true }, { name: "Schop Lager Rubia Refrescante", price: "$3.800", inStock: true } ] }
     ];
 
     const DEFAULT_SERVICES = [
-      { id: 19, number: "ESC", name: "Escenario Principal", category: "service", categoryName: "Escenario", icon: "🎸", color: "#dc2626", desc: "Tarima principal donde se presentan los shows del festival.", latOffset: 0.00028, lngOffset: 0.00000, whatsapp: "", bankData: null, products: [] },
-      { id: 20, number: "WC", name: "Batería de Baños Químicos", category: "service", categoryName: "Servicios", icon: "🚻", color: "#2563eb", desc: "Servicios higiénicos, lavamanos con jabón, primeros auxilios y punto limpio.", latOffset: -0.00024, lngOffset: 0.00022, whatsapp: "", bankData: null, products: [] }
+      { id: 19, number: "ESC", name: "Escenario Principal", category: "service", categoryName: "Escenario", icon: "🎸", logoUrl: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=300&h=300&fit=crop", color: "#dc2626", desc: "Tarima principal donde se presentan los shows del festival.", latOffset: 0.00028, lngOffset: 0.00000, whatsapp: "", bankData: null, products: [] },
+      { id: 20, number: "WC", name: "Batería de Baños Químicos", category: "service", categoryName: "Servicios", icon: "🚻", logoUrl: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=300&h=300&fit=crop", color: "#2563eb", desc: "Servicios higiénicos, lavamanos con jabón, primeros auxilios y punto limpio.", latOffset: -0.00024, lngOffset: 0.00022, whatsapp: "", bankData: null, products: [] }
     ];
 
-    // Cargar del localStorage o inicializar con los defaults
+    // Cargar del localStorage o inicializar
     let stageSchedule = JSON.parse(localStorage.getItem('festival_admin_schedule') || 'null') || DEFAULT_SCHEDULE;
     let stands = JSON.parse(localStorage.getItem('festival_admin_stands') || 'null') || [...DEFAULT_STANDS, ...DEFAULT_SERVICES];
 
@@ -419,9 +485,6 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    // ----------------------------------------------------
-    // CONTROL DE PESTAÑAS (TABS)
-    // ----------------------------------------------------
     function switchAdminTab(tab) {
       document.getElementById('admin-view-stage').classList.add('hidden');
       document.getElementById('admin-view-stands').classList.add('hidden');
@@ -442,7 +505,7 @@
     }
 
     // ========================================================
-    // 1. MÓDULO ARTISTAS Y ESCENARIO
+    // 1. MÓDULO ARTISTAS, HORARIOS Y TIEMPOS MUERTOS
     // ========================================================
     function renderAdminArtists() {
       const container = document.getElementById('adminArtistsListContainer');
@@ -452,70 +515,105 @@
       stageSchedule.forEach((act, idx) => {
         const isLive = act.status === 'live';
         const isFinished = act.status === 'finished';
+        const isIntermission = act.type === 'intermission';
+
+        // Calcular si hay tiempo muerto antes de este show
+        let deadTimeNotice = '';
+        if (idx > 0) {
+          const prevAct = stageSchedule[idx - 1];
+          if (prevAct.time && act.time && prevAct.time.includes('-') && act.time.includes('-')) {
+            const prevEnd = prevAct.time.split('-')[1].trim();
+            const curStart = act.time.split('-')[0].trim();
+            const gap = getMinutesDiff(prevEnd, curStart);
+            if (gap > 0) {
+              deadTimeNotice = `
+                <div class="my-1 py-1 px-3 bg-amber-950/40 border border-amber-600/30 rounded-xl text-amber-300/90 text-[11px] font-bold flex items-center justify-between">
+                  <span>⏱️ Intervalo / Tiempo muerto entre shows: <strong>${gap} minutos</strong> (${prevEnd} ➔ ${curStart})</span>
+                  <button onclick="eliminateDeadTime(${idx}, '${prevEnd}')" class="text-[10px] bg-amber-900/60 hover:bg-amber-800 px-2 py-0.5 rounded text-amber-200">Alinear inmediato</button>
+                </div>
+              `;
+            } else if (gap < 0) {
+              deadTimeNotice = `
+                <div class="my-1 py-1 px-3 bg-red-950/50 border border-red-500/40 rounded-xl text-red-300 text-[11px] font-bold">
+                  ⚠️ Conflicto de horario: Este show empieza ${Math.abs(gap)} min antes de que termine el anterior.
+                </div>
+              `;
+            }
+          }
+        }
 
         const card = document.createElement('div');
-        card.className = `p-4 rounded-2xl border transition flex flex-col md:flex-row md:items-center justify-between gap-4 ${
-          isLive 
-            ? 'bg-red-950/60 border-red-500/80 ring-2 ring-red-500 shadow-xl' 
-            : isFinished 
-            ? 'bg-slate-900/40 border-slate-800/80 opacity-60' 
-            : 'bg-slate-900 border-slate-800 hover:border-slate-700'
-        }`;
-
         card.innerHTML = `
-          <div class="flex items-center gap-3 flex-1 min-w-0">
-            <!-- Imagen o avatar del show -->
-            <div class="w-14 h-14 rounded-2xl bg-slate-800 bg-cover bg-center border border-slate-700 shrink-0 relative overflow-hidden" style="background-image: url('${act.image || ''}')">
-              ${!act.image ? '<span class="text-2xl flex items-center justify-center h-full">🎸</span>' : ''}
-              ${isLive ? '<span class="absolute bottom-0 inset-x-0 bg-red-600 text-white text-[8px] font-black text-center uppercase tracking-wider py-0.5">EN VIVO</span>' : ''}
-            </div>
-
-            <div class="min-w-0 flex-1">
-              <div class="flex items-center gap-2 flex-wrap">
-                <span class="text-xs font-black text-slate-500">#${idx + 1}</span>
-                <h3 class="text-sm font-black text-white truncate">${act.artist}</h3>
-                ${isLive ? '<span class="text-[9px] bg-red-600 text-white font-black uppercase px-2 py-0.5 rounded-full animate-pulse">🔴 EN TARIMA</span>' : ''}
-                ${isFinished ? '<span class="text-[9px] bg-slate-800 text-slate-400 font-bold px-2 py-0.5 rounded">Finalizado</span>' : ''}
+          ${deadTimeNotice}
+          <div class="p-4 rounded-2xl border transition flex flex-col md:flex-row md:items-center justify-between gap-4 ${
+            isLive 
+              ? 'bg-red-950/60 border-red-500/80 ring-2 ring-red-500 shadow-xl' 
+              : isIntermission
+              ? 'bg-amber-950/30 border-amber-600/40'
+              : isFinished 
+              ? 'bg-slate-900/40 border-slate-800/80 opacity-60' 
+              : 'bg-slate-900 border-slate-800 hover:border-slate-700'
+          }">
+            <div class="flex items-center gap-3.5 flex-1 min-w-0">
+              <div class="w-14 h-14 rounded-2xl bg-slate-800 bg-cover bg-center border border-slate-700 shrink-0 relative overflow-hidden shadow-inner" style="background-image: url('${act.image || ''}')">
+                ${!act.image ? `<span class="text-2xl flex items-center justify-center h-full">${isIntermission ? '⏱️' : '🎤'}</span>` : ''}
+                ${isLive ? '<span class="absolute bottom-0 inset-x-0 bg-red-600 text-white text-[8px] font-black text-center uppercase tracking-wider py-0.5 animate-pulse">EN VIVO</span>' : ''}
               </div>
-              <p class="text-xs text-orange-400 font-medium">${act.genre}</p>
-              <p class="text-[11px] text-slate-400 truncate max-w-md mt-0.5">${act.desc}</p>
-            </div>
-          </div>
 
-          <!-- Horario y Botones de Control -->
-          <div class="flex items-center gap-2 flex-wrap md:flex-nowrap shrink-0">
-            
-            <!-- Input rápido de horario -->
-            <div class="flex items-center gap-1 bg-slate-950 p-1.5 rounded-xl border border-slate-800">
-              <span class="text-xs">🕒</span>
-              <input 
-                type="text" 
-                value="${act.time}" 
-                onchange="updateArtistTimeQuick(${act.id}, this.value)"
-                title="Edita el horario directo aquí (ej: 18:30 - 19:45)"
-                class="w-28 bg-transparent text-amber-400 font-mono font-bold text-xs text-center outline-none"
-              />
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="text-xs font-black text-slate-500">#${idx + 1}</span>
+                  <h3 class="text-sm font-black text-white truncate font-display">${act.artist}</h3>
+                  ${isLive ? '<span class="text-[9px] bg-red-600 text-white font-black uppercase px-2 py-0.5 rounded-full animate-pulse">🔴 EN TARIMA</span>' : ''}
+                  ${isIntermission ? '<span class="text-[9px] bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold px-2 py-0.5 rounded">Intervalo / Pausa</span>' : ''}
+                  ${isFinished ? '<span class="text-[9px] bg-slate-800 text-slate-400 font-bold px-2 py-0.5 rounded">Finalizado</span>' : ''}
+                </div>
+                <p class="text-xs text-orange-400 font-semibold">${act.genre}</p>
+                <p class="text-[11px] text-slate-400 truncate max-w-md mt-0.5">${act.desc}</p>
+              </div>
             </div>
 
-            <!-- Botón Subir a Tarima -->
-            <button onclick="setArtistAsLiveNow(${act.id})" class="px-3 py-2 rounded-xl text-xs font-black transition ${
-              isLive 
-                ? 'bg-red-600 text-white shadow-lg shadow-red-600/40 cursor-default' 
-                : 'bg-slate-800 hover:bg-red-600 text-slate-200 hover:text-white border border-slate-700'
-            }">
-              ${isLive ? '🔴 Tocando' : 'Subir Ahora'}
-            </button>
+            <!-- Controles de Horarios y Acciones -->
+            <div class="flex items-center gap-2 flex-wrap md:flex-nowrap shrink-0">
+              
+              <!-- Inputs directos: Inicio y Fin independientes -->
+              <div class="flex items-center gap-1 bg-slate-950 p-1.5 rounded-xl border border-slate-800 text-xs">
+                <input 
+                  type="text" 
+                  value="${(act.time || '').split('-')[0]?.trim() || ''}" 
+                  onchange="updateArtistSingleTime(${act.id}, 'start', this.value)"
+                  title="Hora de Inicio"
+                  class="w-14 bg-transparent text-amber-400 font-mono font-bold text-center outline-none"
+                />
+                <span class="text-slate-500 font-bold">-</span>
+                <input 
+                  type="text" 
+                  value="${(act.time || '').split('-')[1]?.trim() || ''}" 
+                  onchange="updateArtistSingleTime(${act.id}, 'end', this.value)"
+                  title="Hora de Término"
+                  class="w-14 bg-transparent text-amber-400 font-mono font-bold text-center outline-none"
+                />
+              </div>
 
-            <!-- Reordenar arriba / abajo -->
-            <div class="flex gap-1">
-              <button onclick="moveArtistOrder(${idx}, -1)" ${idx === 0 ? 'disabled' : ''} class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 disabled:opacity-30">⬆️</button>
-              <button onclick="moveArtistOrder(${idx}, 1)" ${idx === stageSchedule.length - 1 ? 'disabled' : ''} class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 disabled:opacity-30">⬇️</button>
+              <!-- Botón Subir Ahora -->
+              <button onclick="setArtistAsLiveNow(${act.id})" class="px-3 py-2 rounded-xl text-xs font-black transition ${
+                isLive 
+                  ? 'bg-red-600 text-white shadow-lg shadow-red-600/40 cursor-default' 
+                  : 'bg-slate-800 hover:bg-red-600 text-slate-200 hover:text-white border border-slate-700'
+              }">
+                ${isLive ? '🔴 Tocando' : 'Subir Ahora'}
+              </button>
+
+              <!-- Reordenar -->
+              <div class="flex gap-1">
+                <button onclick="moveArtistOrder(${idx}, -1)" ${idx === 0 ? 'disabled' : ''} class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 disabled:opacity-30">⬆️</button>
+                <button onclick="moveArtistOrder(${idx}, 1)" ${idx === stageSchedule.length - 1 ? 'disabled' : ''} class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 disabled:opacity-30">⬇️</button>
+              </div>
+
+              <button onclick="editArtistModal(${act.id})" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs text-blue-400" title="Editar foto y biografía">✏️</button>
+              <button onclick="deleteArtist(${act.id})" class="p-2 rounded-xl bg-slate-800 hover:bg-red-900/60 text-xs text-red-400" title="Eliminar">🗑️</button>
+
             </div>
-
-            <!-- Editar y Eliminar -->
-            <button onclick="editArtistModal(${act.id})" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs text-blue-400" title="Editar detalles">✏️</button>
-            <button onclick="deleteArtist(${act.id})" class="p-2 rounded-xl bg-slate-800 hover:bg-red-900/60 text-xs text-red-400" title="Eliminar show">🗑️</button>
-
           </div>
         `;
 
@@ -523,7 +621,36 @@
       });
     }
 
-    // Poner artista en vivo (con opción inteligente de ajustar su horario a la hora real de Chile)
+    function getMinutesDiff(timeStr1, timeStr2) {
+      const [h1, m1] = timeStr1.split(':').map(Number);
+      const [h2, m2] = timeStr2.split(':').map(Number);
+      return (h2 * 60 + m2) - (h1 * 60 + m1);
+    }
+
+    function eliminateDeadTime(idx, targetTime) {
+      const act = stageSchedule[idx];
+      if (act && act.time.includes('-')) {
+        const parts = act.time.split('-').map(t => t.trim());
+        const duration = getMinutesDiff(parts[0], parts[1]);
+        const newStart = targetTime;
+        const newEnd = addMinutesToTime(newStart, duration > 0 ? duration : 60);
+        act.time = `${newStart} - ${newEnd}`;
+        saveAndBroadcast();
+        renderAdminArtists();
+      }
+    }
+
+    function updateArtistSingleTime(id, type, val) {
+      const act = stageSchedule.find(s => s.id === id);
+      if (act && act.time.includes('-')) {
+        const parts = act.time.split('-').map(t => t.trim());
+        if (type === 'start') act.time = `${val.trim()} - ${parts[1]}`;
+        else act.time = `${parts[0]} - ${val.trim()}`;
+        saveAndBroadcast();
+        renderAdminArtists();
+      }
+    }
+
     function setArtistAsLiveNow(id) {
       const now = new Date();
       const chileStr = now.toLocaleTimeString("es-CL", { timeZone: "America/Santiago", hour12: false });
@@ -535,24 +662,19 @@
 
       const adjust = confirm(
         `¿Deseas sincronizar el horario de "${targetAct.artist}" para que comience AHORA MISMO a las ${curStart} hrs?\n\n` +
-        `• Presiona [Aceptar] para poner inicio a las ${curStart} hrs.\n` +
-        `• Presiona [Cancelar] para mantener su horario programado original (${targetAct.time}).`
+        `• [Aceptar]: Se ajustará su inicio a las ${curStart} hrs en las pantallas de los asistentes.\n` +
+        `• [Cancelar]: Mantener el horario que tenía programado (${targetAct.time}).`
       );
 
       if (adjust) {
-        // Calcular duración original
         let durationMin = 60;
         if (targetAct.time.includes('-')) {
           const parts = targetAct.time.split('-').map(t => t.trim());
           const [sH, sM] = parts[0].split(':').map(Number);
           const [eH, eM] = parts[1].split(':').map(Number);
-          durationMin = Math.max(20, (eH * 60 + eM) - (sH * 60 + sM));
+          durationMin = Math.max(15, (eH * 60 + eM) - (sH * 60 + sM));
         }
-
-        const newEndMin = Number(curH) * 60 + Number(curM) + durationMin;
-        const endH = String(Math.floor(newEndMin / 60) % 24).padStart(2, '0');
-        const endM = String(newEndMin % 60).padStart(2, '0');
-        targetAct.time = `${curStart} - ${endH}:${endM}`;
+        targetAct.time = `${curStart} - ${addMinutesToTime(curStart, durationMin)}`;
       }
 
       stageSchedule.forEach(s => {
@@ -563,15 +685,36 @@
 
       saveAndBroadcast();
       renderAdminArtists();
-      alert(`⚡ ¡EN VIVO! "${targetAct.artist}" ahora está en tarima (${targetAct.time}). Los clientes ya lo ven.`);
+      alert(`⚡ ¡EN VIVO! "${targetAct.artist}" en tarima (${targetAct.time}).`);
     }
 
-    function updateArtistTimeQuick(id, newTime) {
-      const act = stageSchedule.find(s => s.id === id);
-      if (act) {
-        act.time = newTime;
-        saveAndBroadcast();
+    function shiftUpcomingSchedule(minutes) {
+      stageSchedule.forEach(act => {
+        if (act.status !== 'finished' && act.time && act.time.includes('-')) {
+          const parts = act.time.split('-').map(t => t.trim());
+          act.time = `${addMinutesToTime(parts[0], minutes)} - ${addMinutesToTime(parts[1], minutes)}`;
+        }
+      });
+      saveAndBroadcast();
+      renderAdminArtists();
+    }
+
+    function applyCustomDelay() {
+      const val = parseInt(document.getElementById('customDelayInput').value) || 0;
+      if (val !== 0) {
+        shiftUpcomingSchedule(val);
+        alert(`Se reprogramaron todos los shows pendientes con ${val > 0 ? '+' : ''}${val} minutos.`);
       }
+    }
+
+    function addMinutesToTime(timeStr, mins) {
+      if (!timeStr || !timeStr.includes(':')) return timeStr;
+      const [h, m] = timeStr.split(':').map(Number);
+      let total = h * 60 + m + mins;
+      while (total < 0) total += 24 * 60;
+      const newH = String(Math.floor(total / 60) % 24).padStart(2, '0');
+      const newM = String(total % 60).padStart(2, '0');
+      return `${newH}:${newM}`;
     }
 
     function moveArtistOrder(idx, delta) {
@@ -584,52 +727,66 @@
       renderAdminArtists();
     }
 
-    function shiftUpcomingSchedule(minutes) {
-      stageSchedule.forEach(act => {
-        if (act.status !== 'finished' && act.time.includes('-')) {
-          const parts = act.time.split('-').map(t => t.trim());
-          act.time = `${addMinutesToTime(parts[0], minutes)} - ${addMinutesToTime(parts[1], minutes)}`;
-        }
-      });
-      saveAndBroadcast();
-      renderAdminArtists();
-      alert(`Horarios desplazados ${minutes > 0 ? '+' : ''}${minutes} minutos con éxito.`);
-    }
-
-    function addMinutesToTime(timeStr, mins) {
-      const [h, m] = timeStr.split(':').map(Number);
-      const total = h * 60 + m + mins;
-      const newH = String(Math.floor(total / 60) % 24).padStart(2, '0');
-      const newM = String(total % 60).padStart(2, '0');
-      return `${newH}:${newM}`;
-    }
-
-    // Modal Crear/Editar Artista
-    function openAddArtistModal() {
-      document.getElementById('artistModalTitle').textContent = 'Agregar Nuevo Show / Animación';
+    // Modal Artista / Tiempo Muerto
+    function openAddArtistModal(presetType = 'show') {
+      document.getElementById('artistModalTitle').textContent = presetType === 'intermission' ? 'Agregar Tiempo Muerto / Pausa Técnica' : 'Agregar Show al Escenario';
       document.getElementById('editArtistId').value = '';
-      document.getElementById('artName').value = '';
-      document.getElementById('artGenre').value = '';
-      document.getElementById('artStart').value = '';
-      document.getElementById('artEnd').value = '';
-      document.getElementById('artImage').value = '';
-      document.getElementById('artDesc').value = '';
+      document.getElementById('artType').value = presetType === 'intermission' ? 'intermission' : 'music';
+      
+      if (presetType === 'intermission') {
+        document.getElementById('artName').value = 'Pausa Técnica & Prueba de Sonido';
+        document.getElementById('artGenre').value = 'Ajuste de monitores e instrumentos';
+        document.getElementById('artImage').value = 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800&auto=format&fit=crop&q=80';
+        document.getElementById('artDesc').value = 'Intermedio entre grupos musicales con música ambiental.';
+      } else {
+        document.getElementById('artName').value = '';
+        document.getElementById('artGenre').value = '';
+        document.getElementById('artImage').value = 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=800&auto=format&fit=crop&q=80';
+        document.getElementById('artDesc').value = '';
+      }
+
+      // Proponer hora siguiente automática
+      if (stageSchedule.length > 0) {
+        const lastAct = stageSchedule[stageSchedule.length - 1];
+        if (lastAct.time && lastAct.time.includes('-')) {
+          const lastEnd = lastAct.time.split('-')[1].trim();
+          document.getElementById('artStart').value = lastEnd;
+          document.getElementById('artEnd').value = addMinutesToTime(lastEnd, presetType === 'intermission' ? 20 : 60);
+        }
+      }
+
+      updateArtistPreview(document.getElementById('artImage').value);
       document.getElementById('artistModal').classList.remove('hidden');
     }
 
     function editArtistModal(id) {
       const act = stageSchedule.find(s => s.id === id);
       if (!act) return;
-      document.getElementById('artistModalTitle').textContent = `Editar Show: ${act.artist}`;
+      document.getElementById('artistModalTitle').textContent = `Editar: ${act.artist}`;
       document.getElementById('editArtistId').value = act.id;
+      document.getElementById('artType').value = act.type || 'music';
       document.getElementById('artName').value = act.artist;
       document.getElementById('artGenre').value = act.genre;
-      const parts = act.time.split('-').map(t => t.trim());
+      const parts = (act.time || '').split('-').map(t => t.trim());
       document.getElementById('artStart').value = parts[0] || '';
       document.getElementById('artEnd').value = parts[1] || '';
       document.getElementById('artImage').value = act.image || '';
       document.getElementById('artDesc').value = act.desc || '';
+      updateArtistPreview(act.image);
       document.getElementById('artistModal').classList.remove('hidden');
+    }
+
+    function updateArtistPreview(url) {
+      const box = document.getElementById('artPreviewImg');
+      if (url) box.style.backgroundImage = `url('${url}')`;
+      else box.style.backgroundImage = 'none';
+    }
+
+    function toggleArtistTypeFields(type) {
+      if (type === 'intermission') {
+        if (!document.getElementById('artName').value) document.getElementById('artName').value = 'Pausa Técnica & Intermedio';
+        if (!document.getElementById('artGenre').value) document.getElementById('artGenre').value = 'Prueba de Sonido';
+      }
     }
 
     function closeArtistModal() {
@@ -638,19 +795,20 @@
 
     function saveArtist() {
       const id = document.getElementById('editArtistId').value;
+      const type = document.getElementById('artType').value;
       const name = document.getElementById('artName').value.trim();
       const genre = document.getElementById('artGenre').value.trim() || 'Show en Vivo';
       const start = document.getElementById('artStart').value.trim() || '18:00';
       const end = document.getElementById('artEnd').value.trim() || '19:00';
-      const image = document.getElementById('artImage').value.trim() || 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=600';
+      const image = document.getElementById('artImage').value.trim() || 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=800';
       const desc = document.getElementById('artDesc').value.trim();
 
-      if (!name) return alert('Debes ingresar el nombre del artista o show.');
+      if (!name) return alert('Debes ingresar el nombre del show.');
 
       if (id) {
-        // Editar existente
         const act = stageSchedule.find(s => s.id === Number(id));
         if (act) {
+          act.type = type;
           act.artist = name;
           act.genre = genre;
           act.time = `${start} - ${end}`;
@@ -658,10 +816,10 @@
           act.desc = desc;
         }
       } else {
-        // Crear nuevo
         const newId = stageSchedule.length > 0 ? Math.max(...stageSchedule.map(s => s.id)) + 1 : 1;
         stageSchedule.push({
           id: newId,
+          type: type,
           artist: name,
           genre: genre,
           time: `${start} - ${end}`,
@@ -677,7 +835,7 @@
     }
 
     function deleteArtist(id) {
-      if (confirm('¿Estás seguro de eliminar este show de la parrilla?')) {
+      if (confirm('¿Eliminar este show de la programación?')) {
         stageSchedule = stageSchedule.filter(s => s.id !== id);
         saveAndBroadcast();
         renderAdminArtists();
@@ -685,34 +843,32 @@
     }
 
     // ========================================================
-    // 2. MÓDULO PUESTOS Y GESTIÓN DE PRODUCTOS
+    // 2. MÓDULO PUESTOS, FOOD TRUCKS, LOGOS Y PRODUCTOS
     // ========================================================
     function renderAdminStandsList(filter = '') {
       const container = document.getElementById('adminStandsListContainer');
       container.innerHTML = '';
 
-      const commercialStands = stands.filter(s => s.category !== 'service');
-      document.getElementById('standsCountBadge').textContent = commercialStands.length;
+      const commercial = stands.filter(s => s.category !== 'service');
+      document.getElementById('standsCountBadge').textContent = commercial.length;
 
-      commercialStands.forEach(stand => {
+      commercial.forEach(stand => {
         if (filter && !stand.name.toLowerCase().includes(filter.toLowerCase()) && !stand.desc.toLowerCase().includes(filter.toLowerCase())) return;
 
         const card = document.createElement('div');
         card.className = 'bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-lg space-y-4';
 
-        // Renderizado de productos de este local
-        let prodHtml = '';
+        let prodRows = '';
         if (stand.products && stand.products.length > 0) {
           stand.products.forEach((prod, pIdx) => {
-            prodHtml += `
+            prodRows += `
               <div class="flex items-center justify-between bg-slate-950 p-2.5 rounded-xl border border-slate-800 gap-3 text-xs">
-                
                 <div class="flex items-center gap-2 flex-1 min-w-0">
                   <input 
                     type="checkbox" 
                     ${prod.inStock ? 'checked' : ''} 
                     onchange="toggleProductStockAdmin(${stand.id}, ${pIdx}, this.checked)"
-                    title="Desmarca para indicar 'Sin Stock / Agotado'"
+                    title="Desmarca para 'Sin Stock / Agotado'"
                     class="w-4 h-4 text-orange-600 rounded cursor-pointer"
                   />
                   <input 
@@ -724,7 +880,6 @@
                   ${!prod.inStock ? '<span class="text-[9px] bg-red-950 border border-red-800 text-red-400 px-1.5 rounded font-black shrink-0">AGOTADO</span>' : ''}
                 </div>
 
-                <!-- Precio editable directo -->
                 <div class="flex items-center gap-1 shrink-0">
                   <span class="text-[10px] text-slate-500 font-bold">Precio:</span>
                   <input 
@@ -733,26 +888,31 @@
                     onchange="updateProductPriceAdmin(${stand.id}, ${pIdx}, this.value)"
                     class="w-20 bg-slate-900 border border-slate-700 rounded px-2 py-1 text-orange-400 font-extrabold text-xs text-right outline-none"
                   />
-                  <button onclick="deleteProductFromStand(${stand.id}, ${pIdx})" class="text-slate-500 hover:text-red-400 text-xs p-1" title="Eliminar producto">✕</button>
+                  <button onclick="deleteProductFromStand(${stand.id}, ${pIdx})" class="text-slate-500 hover:text-red-400 text-xs p-1" title="Eliminar plato">✕</button>
                 </div>
-
               </div>
             `;
           });
         } else {
-          prodHtml = '<p class="text-xs text-slate-500 italic p-2 bg-slate-950 rounded-xl">No hay productos cargados en este local.</p>';
+          prodRows = '<p class="text-xs text-slate-500 italic p-2 bg-slate-950 rounded-xl">No hay productos cargados.</p>';
         }
+
+        // Thumbnail de logo real
+        const logoRender = stand.logoUrl 
+          ? `<img src="${stand.logoUrl}" class="w-full h-full object-cover rounded-2xl" alt="${stand.name}">`
+          : `<span class="text-2xl">${stand.icon}</span>`;
 
         card.innerHTML = `
           <div class="flex items-start justify-between gap-4 flex-wrap">
-            <div class="flex items-center gap-3">
-              <div class="w-12 h-12 rounded-2xl bg-orange-500/20 border border-orange-500/40 text-2xl flex items-center justify-center shrink-0">
-                ${stand.icon}
+            <div class="flex items-center gap-3.5">
+              <div class="w-14 h-14 rounded-2xl bg-slate-800 border border-slate-700 shrink-0 flex items-center justify-center overflow-hidden shadow-inner">
+                ${logoRender}
               </div>
               <div>
                 <div class="flex items-center gap-2">
                   <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-orange-600 text-white">${stand.categoryName}</span>
-                  <span class="text-xs text-slate-500 font-bold">${stand.number}</span>
+                  <span class="text-xs text-slate-500 font-mono font-bold">${stand.number}</span>
+                  ${stand.logoUrl ? '<span class="text-[9px] bg-emerald-950 text-emerald-400 border border-emerald-500/30 px-1.5 rounded font-bold">Foto Real</span>' : ''}
                 </div>
                 <h3 class="text-base font-black text-white font-display mt-0.5">${stand.name}</h3>
                 <p class="text-xs text-slate-400">${stand.desc}</p>
@@ -763,19 +923,19 @@
               <button onclick="openProductModalForStand(${stand.id})" class="px-3 py-1.5 rounded-xl bg-orange-600/20 hover:bg-orange-600 text-orange-300 hover:text-white border border-orange-500/30 text-xs font-bold transition flex items-center gap-1">
                 <span>➕</span> Producto
               </button>
-              <button onclick="editStandModal(${stand.id})" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-blue-400 text-xs" title="Editar puesto">✏️</button>
-              <button onclick="deleteStand(${stand.id})" class="p-2 rounded-xl bg-slate-800 hover:bg-red-900/60 text-red-400 text-xs" title="Eliminar puesto">🗑️</button>
+              <button onclick="editStandModal(${stand.id})" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-blue-400 text-xs" title="Editar puesto y logo">✏️</button>
+              <button onclick="deleteStand(${stand.id})" class="p-2 rounded-xl bg-slate-800 hover:bg-red-900/60 text-red-400 text-xs" title="Eliminar">🗑️</button>
             </div>
           </div>
 
           <!-- Carta de Productos -->
           <div class="space-y-2 pt-2 border-t border-slate-800">
             <div class="flex items-center justify-between text-xs">
-              <span class="font-black uppercase tracking-wider text-slate-400 text-[10px]">Productos en Carta (Haz clic en precio o nombre para editar en vivo):</span>
-              <span class="text-slate-500 text-[10px]">${stand.products ? stand.products.length : 0} ítems</span>
+              <span class="font-black uppercase tracking-wider text-slate-400 text-[10px]">Productos & Precios (Modifica precio o nombre en vivo):</span>
+              <span class="text-slate-500 text-[10px]">${stand.products ? stand.products.length : 0} platos/tragos</span>
             </div>
             <div class="space-y-1.5">
-              ${prodHtml}
+              ${prodRows}
             </div>
           </div>
         `;
@@ -833,7 +993,7 @@
       const name = document.getElementById('newProdName').value.trim();
       const price = document.getElementById('newProdPrice').value.trim() || '$0';
 
-      if (!name) return alert('Debes escribir el nombre del producto.');
+      if (!name) return alert('Ingresa el nombre del producto.');
       const stand = stands.find(s => s.id === standId);
       if (stand) {
         if (!stand.products) stand.products = [];
@@ -844,32 +1004,58 @@
       }
     }
 
-    // Modal Crear / Editar Puesto
+    // Modal Puesto con Logos
+    const LOGO_PRESETS = {
+      burger: "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=300&h=300&fit=crop",
+      beer: "https://images.unsplash.com/photo-1538488881522-4326c36660df?w=300&h=300&fit=crop",
+      bbq: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=300&h=300&fit=crop",
+      waffle: "https://images.unsplash.com/photo-1562376552-0d160a2f238d?w=300&h=300&fit=crop",
+      craft: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=300&h=300&fit=crop"
+    };
+
+    function setStandPresetLogo(key) {
+      const url = LOGO_PRESETS[key] || '';
+      document.getElementById('stLogoUrl').value = url;
+      updateStandLogoPreview(url);
+    }
+
+    function updateStandLogoPreview(url) {
+      const box = document.getElementById('stLogoPreviewBox');
+      if (url) {
+        box.innerHTML = `<img src="${url}" class="w-full h-full object-cover">`;
+      } else {
+        box.innerHTML = document.getElementById('stIcon').value || '🏪';
+      }
+    }
+
     function openAddStandModal() {
-      document.getElementById('standModalTitle').textContent = 'Crear Nuevo Puesto en la Cancha';
+      document.getElementById('standModalTitle').textContent = 'Crear Nuevo Puesto o Food Truck';
       document.getElementById('editStandId').value = '';
       document.getElementById('stName').value = '';
       document.getElementById('stNumber').value = `P-${String(stands.length + 1).padStart(2, '0')}`;
       document.getElementById('stCat').value = 'food';
-      document.getElementById('stIcon').value = '🏪';
+      document.getElementById('stIcon').value = '🍔';
+      document.getElementById('stLogoUrl').value = '';
       document.getElementById('stDesc').value = '';
       document.getElementById('stWp').value = '';
       document.getElementById('stBank').value = '';
       document.getElementById('stAccount').value = '';
       document.getElementById('stHolder').value = '';
       document.getElementById('stEmail').value = '';
+      updateStandLogoPreview('');
       document.getElementById('standModal').classList.remove('hidden');
     }
 
     function editStandModal(id) {
       const s = stands.find(x => x.id === id);
       if (!s) return;
-      document.getElementById('standModalTitle').textContent = `Editar Puesto: ${s.name}`;
+      document.getElementById('standModalTitle').textContent = `Editar: ${s.name}`;
       document.getElementById('editStandId').value = s.id;
       document.getElementById('stName').value = s.name;
       document.getElementById('stNumber').value = s.number;
       document.getElementById('stCat').value = s.category;
       document.getElementById('stIcon').value = s.icon;
+      document.getElementById('stLogoUrl').value = s.logoUrl || '';
       document.getElementById('stDesc').value = s.desc;
       document.getElementById('stWp').value = s.whatsapp || '';
       
@@ -879,6 +1065,7 @@
       document.getElementById('stHolder').value = b.holderName || '';
       document.getElementById('stEmail').value = b.email || '';
 
+      updateStandLogoPreview(s.logoUrl);
       document.getElementById('standModal').classList.remove('hidden');
     }
 
@@ -892,6 +1079,7 @@
       const number = document.getElementById('stNumber').value.trim() || 'P-XX';
       const cat = document.getElementById('stCat').value;
       const icon = document.getElementById('stIcon').value.trim() || '🏪';
+      const logoUrl = document.getElementById('stLogoUrl').value.trim();
       const desc = document.getElementById('stDesc').value.trim();
       const wp = document.getElementById('stWp').value.trim();
 
@@ -905,7 +1093,7 @@
       const catNames = { food: 'Comidas', beer: 'Cervezas & Tragos', sweets: 'Postres & Dulces', crafts: 'Artesanías', service: 'Servicios' };
       const catColors = { food: '#ea580c', beer: '#f59e0b', sweets: '#ec4899', crafts: '#059669', service: '#2563eb' };
 
-      if (!name) return alert('Debes escribir el nombre del puesto.');
+      if (!name) return alert('Ingresa el nombre del local.');
 
       if (id) {
         const s = stands.find(x => x.id === Number(id));
@@ -916,6 +1104,7 @@
           s.categoryName = catNames[cat] || 'General';
           s.color = catColors[cat] || '#f97316';
           s.icon = icon;
+          s.logoUrl = logoUrl;
           s.desc = desc;
           s.whatsapp = wp;
           s.bankData = bankData;
@@ -930,6 +1119,7 @@
           categoryName: catNames[cat] || 'General',
           color: catColors[cat] || '#f97316',
           icon: icon,
+          logoUrl: logoUrl,
           desc: desc,
           latOffset: (Math.random() - 0.5) * 0.0004,
           lngOffset: (Math.random() - 0.5) * 0.0004,
@@ -945,7 +1135,7 @@
     }
 
     function deleteStand(id) {
-      if (confirm('¿Estás seguro de eliminar este local y toda su carta de productos?')) {
+      if (confirm('¿Eliminar este puesto y toda su carta?')) {
         stands = stands.filter(s => s.id !== id);
         saveAndBroadcast();
         renderAdminStandsList();
@@ -953,7 +1143,7 @@
     }
 
     // ========================================================
-    // 3. MÓDULO SERVICIOS (BAÑOS, ESCENARIO, ACCESOS)
+    // 3. SERVICIOS (BAÑOS, ESCENARIO, SEGURIDAD)
     // ========================================================
     function renderAdminServices() {
       const container = document.getElementById('adminServicesContainer');
@@ -962,7 +1152,7 @@
 
       services.forEach(serv => {
         const row = document.createElement('div');
-        row.className = 'p-3 bg-slate-950 rounded-2xl border border-slate-800 flex items-center justify-between gap-3 text-xs';
+        row.className = 'p-3.5 bg-slate-950 rounded-2xl border border-slate-800 flex items-center justify-between gap-3 text-xs';
         row.innerHTML = `
           <div class="flex items-center gap-3">
             <span class="text-2xl">${serv.icon}</span>
@@ -979,8 +1169,14 @@
       });
     }
 
+    function openAddServiceModal() {
+      openAddStandModal();
+      document.getElementById('stCat').value = 'service';
+      document.getElementById('stIcon').value = '🚻';
+    }
+
     // ========================================================
-    // 4. PERSISTENCIA & SINCRONIZACIÓN MAESTRA
+    // 4. PERSISTENCIA Y EMISIÓN
     // ========================================================
     function saveAndBroadcast() {
       localStorage.setItem('festival_admin_schedule', JSON.stringify(stageSchedule));
@@ -994,13 +1190,13 @@
     }
 
     function broadcastAnnouncement() {
-      const msg = prompt('Escribe el mensaje de anuncio masivo para los teléfonos de todos los asistentes:', '¡Atención! En 15 minutos sube Américo al escenario principal.');
+      const msg = prompt('Escribe el mensaje de anuncio masivo para los teléfonos de los asistentes:', '¡Atención! En 15 minutos se presenta Américo en el Escenario Principal.');
       if (msg) {
         eventChannel.postMessage({
           type: 'ANNOUNCEMENT',
           message: msg
         });
-        alert('📢 Notificación enviada a las pantallas de los asistentes.');
+        alert('📢 Notificación enviada a todos los clientes.');
       }
     }
 
@@ -1015,7 +1211,7 @@
     }
 
     function resetDefaultData() {
-      if (confirm('¿Restablecer toda la configuración original del festival? Se perderán las modificaciones personalizadas.')) {
+      if (confirm('¿Restablecer toda la configuración original?')) {
         localStorage.removeItem('festival_admin_schedule');
         localStorage.removeItem('festival_admin_stands');
         stageSchedule = JSON.parse(JSON.stringify(DEFAULT_SCHEDULE));
@@ -1028,7 +1224,6 @@
       }
     }
 
-    // Inicializar renders
     renderAdminArtists();
     renderAdminStandsList();
     renderAdminServices();
