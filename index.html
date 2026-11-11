@@ -970,10 +970,19 @@
     // ========================================================
     // 3. SINCRONIZACIÓN EN VIVO CON EL ADMINISTRADOR
     // ========================================================
-    // Usamos BroadcastChannel y localStorage para reflejar cambios del admin en tiempo real
     const eventChannel = new BroadcastChannel('festival_live_sync');
     eventChannel.onmessage = (event) => {
-      if (event.data.type === 'STAGE_UPDATED') {
+      if (event.data.type === 'SYNC_ALL') {
+        stageSchedule = event.data.schedule;
+        stands = event.data.stands;
+        renderLiveHero();
+        renderScheduleList();
+        renderStandsFeed();
+        renderStandsOnMap();
+        showLiveToast(`⚡ Cambios del administrador aplicados en vivo`);
+      } else if (event.data.type === 'ANNOUNCEMENT') {
+        showLiveToast(`📢 AVISO: ${event.data.message}`);
+      } else if (event.data.type === 'STAGE_UPDATED') {
         stageSchedule = event.data.schedule;
         renderLiveHero();
         renderScheduleList();
@@ -985,6 +994,16 @@
         showLiveToast(`📦 Se actualizaron los precios y stock de locales`);
       }
     };
+
+    // Escuchar cambios de localStorage entre pestañas
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'festival_admin_schedule' && e.newValue) {
+        try { stageSchedule = JSON.parse(e.newValue); renderLiveHero(); renderScheduleList(); } catch (err) {}
+      }
+      if (e.key === 'festival_admin_stands' && e.newValue) {
+        try { stands = JSON.parse(e.newValue); renderStandsFeed(); renderStandsOnMap(); } catch (err) {}
+      }
+    });
 
     // Cargar si el admin guardó cambios previos en este navegador
     const savedSchedule = localStorage.getItem('festival_admin_schedule');
