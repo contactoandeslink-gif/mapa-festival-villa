@@ -139,9 +139,15 @@
         </div>
         <div class="hidden sm:block">
           <h1 class="text-sm font-extrabold leading-tight font-display tracking-tight text-white">FESTIVAL VILLA 2026</h1>
-          <p class="text-[10px] text-amber-400 font-bold uppercase tracking-wider flex items-center gap-1">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> En Vivo Ahora
-          </p>
+          <div class="flex items-center gap-1.5 mt-0.5">
+            <span class="text-[10px] text-amber-400 font-bold uppercase tracking-wider flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> En Vivo
+            </span>
+            <span class="text-slate-600 text-[10px]">•</span>
+            <span id="headerChileClock" class="text-[10px] font-mono font-bold text-emerald-400 bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700/80">
+              🇨🇱 17:26 hrs
+            </span>
+          </div>
         </div>
       </div>
 
@@ -185,21 +191,33 @@
         <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent"></div>
 
         <div class="relative p-6 flex flex-col justify-end min-h-[320px]">
-          <div class="flex items-center gap-2 mb-2">
+          <div class="flex items-center gap-2 mb-2 flex-wrap">
             <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-red-600 text-white shadow-lg shadow-red-600/40 animate-pulse">
               <span class="w-2 h-2 rounded-full bg-white"></span> EN VIVO AHORA
+            </span>
+            <span id="liveChileClock" class="text-xs font-mono font-bold text-emerald-400 bg-slate-900/90 border border-emerald-500/40 px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow">
+              🇨🇱 17:26:00 hrs
             </span>
             <span id="liveTimeBadge" class="text-xs font-bold text-amber-300 bg-amber-950/60 border border-amber-500/30 px-2.5 py-0.5 rounded-full">
               17:00 - 18:30 hrs
             </span>
           </div>
 
-          <h2 id="liveArtistName" class="text-3xl sm:text-4xl font-black font-display text-white tracking-tight leading-none mb-2">
+          <h2 id="liveArtistName" class="text-3xl sm:text-4xl font-black font-display text-white tracking-tight leading-none mb-1">
             Américo
           </h2>
           <p id="liveArtistGenre" class="text-xs font-bold uppercase tracking-wider text-orange-400 mb-2">
             El Rey de la Cumbia Tropical • Show Oficial
           </p>
+
+          <!-- Barra de Progreso del Show en Tiempo Real -->
+          <div class="w-full bg-slate-950/80 rounded-full h-2 mb-2 overflow-hidden border border-slate-700/80 shadow-inner">
+            <div id="liveProgressBar" class="bg-gradient-to-r from-orange-500 to-red-500 h-full rounded-full transition-all duration-1000" style="width: 30%;"></div>
+          </div>
+          <p id="liveShowProgressText" class="text-[11px] font-bold text-amber-300 mb-3 flex items-center gap-1.5">
+            ⏱️ Lleva 26 min en tarima • Faltan 64 min de show
+          </p>
+
           <p id="liveArtistDesc" class="text-xs text-slate-300 leading-relaxed mb-4 max-w-md">
             Concierto en vivo con todos sus grandes éxitos: "Te Vas", "Que Levante la Mano", "El Embrujo" y orquesta completa.
           </p>
@@ -1019,8 +1037,63 @@
     }
 
     // ========================================================
-    // 5. RENDERIZADO DEL ESCENARIO "EN VIVO"
+    // 5. RENDERIZADO DEL ESCENARIO "EN VIVO" & HORA DE CHILE
     // ========================================================
+    function getChileDateObj() {
+      const now = new Date();
+      const chileStr = now.toLocaleString("en-US", { timeZone: "America/Santiago" });
+      return new Date(chileStr);
+    }
+
+    function updateLiveClockAndProgress() {
+      const chileDate = getChileDateObj();
+      const h = String(chileDate.getHours()).padStart(2, '0');
+      const m = String(chileDate.getMinutes()).padStart(2, '0');
+      const s = String(chileDate.getSeconds()).padStart(2, '0');
+      const timeStr = `${h}:${m}:${s}`;
+      const shortTimeStr = `${h}:${m}`;
+
+      const headerClock = document.getElementById('headerChileClock');
+      if (headerClock) headerClock.textContent = `🇨🇱 ${shortTimeStr} hrs`;
+
+      const liveClock = document.getElementById('liveChileClock');
+      if (liveClock) liveClock.textContent = `🇨🇱 ${timeStr} hrs (Chile)`;
+
+      // Calcular progreso y tiempos del show actual
+      const liveAct = stageSchedule.find(s => s.status === 'live') || stageSchedule[2];
+      if (liveAct && liveAct.time.includes('-')) {
+        const parts = liveAct.time.split('-').map(t => t.trim());
+        const startParts = parts[0].split(':').map(Number);
+        const endParts = parts[1].split(':').map(Number);
+        
+        const startTotalMin = startParts[0] * 60 + startParts[1];
+        const endTotalMin = endParts[0] * 60 + endParts[1];
+        const currentTotalMin = chileDate.getHours() * 60 + chileDate.getMinutes();
+
+        const duration = Math.max(1, endTotalMin - startTotalMin);
+        const elapsed = Math.max(0, currentTotalMin - startTotalMin);
+        const remaining = Math.max(0, endTotalMin - currentTotalMin);
+        const progressPct = Math.min(100, Math.max(5, Math.round((elapsed / duration) * 100)));
+
+        const progBar = document.getElementById('liveProgressBar');
+        if (progBar) progBar.style.width = `${progressPct}%`;
+
+        const progText = document.getElementById('liveShowProgressText');
+        if (progText) {
+          if (currentTotalMin < startTotalMin) {
+            const startsIn = startTotalMin - currentTotalMin;
+            progText.innerHTML = `⏳ Comienza en <strong>${startsIn} min</strong> (${parts[0]} hrs)`;
+          } else if (remaining > 0) {
+            progText.innerHTML = `⏱️ ${liveAct.artist} lleva <strong>${elapsed} min</strong> en tarima • Quedan <strong>${remaining} min</strong> de show`;
+          } else {
+            progText.innerHTML = `🏁 Show en su cierre final • Próximo grupo subiendo a la tarima`;
+          }
+        }
+      }
+    }
+
+    setInterval(updateLiveClockAndProgress, 1000);
+
     function renderLiveHero() {
       const liveAct = stageSchedule.find(s => s.status === 'live') || stageSchedule[2];
       document.getElementById('liveArtistName').textContent = liveAct.artist;
@@ -1031,11 +1104,20 @@
         document.getElementById('heroLiveBg').style.backgroundImage = `url('${liveAct.image}')`;
       }
 
+      updateLiveClockAndProgress();
+
       // Siguiente artista
       const currentIdx = stageSchedule.findIndex(s => s.id === liveAct.id);
       const nextAct = stageSchedule[currentIdx + 1];
       const nextCard = document.getElementById('nextArtistCard');
       if (nextAct) {
+        const nextStartHour = nextAct.time.split('-')[0].trim();
+        const chileDate = getChileDateObj();
+        const nextParts = nextStartHour.split(':').map(Number);
+        const nextTotalMin = nextParts[0] * 60 + nextParts[1];
+        const currentTotalMin = chileDate.getHours() * 60 + chileDate.getMinutes();
+        const minUntilNext = Math.max(0, nextTotalMin - currentTotalMin);
+
         nextCard.classList.remove('hidden');
         nextCard.innerHTML = `
           <div class="flex items-center gap-3">
@@ -1043,13 +1125,13 @@
               ⚡
             </div>
             <div>
-              <span class="text-[10px] font-black uppercase tracking-wider text-amber-400">A Continuación (${nextAct.time.split('-')[0].trim()} hrs)</span>
+              <span class="text-[10px] font-black uppercase tracking-wider text-amber-400">A Continuación (${nextStartHour} hrs)</span>
               <h3 class="text-base font-black text-white font-display">${nextAct.artist}</h3>
               <p class="text-xs text-slate-400">${nextAct.genre}</p>
             </div>
           </div>
-          <span class="text-xs font-bold text-slate-300 bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700 shrink-0">
-            Próximo
+          <span class="text-xs font-bold text-amber-300 bg-amber-950/80 border border-amber-600/40 px-3 py-1.5 rounded-lg shrink-0">
+            ${minUntilNext > 0 ? `En ${minUntilNext} min` : 'Próximo'}
           </span>
         `;
       } else {
