@@ -112,8 +112,8 @@
           <div>
             <div class="flex items-center gap-1.5">
               <h1 class="text-xs sm:text-sm font-black font-display tracking-tight text-white uppercase">FESTIVAL VILLA</h1>
-              <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-red-600 text-white animate-pulse">
-                <span class="w-1.5 h-1.5 rounded-full bg-white"></span> VIVO
+              <span id="headerLiveStatusBadge" class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-black uppercase bg-amber-500/20 text-amber-300 border border-amber-500/40 transition">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> HOY 15:00
               </span>
             </div>
             <div class="flex items-center gap-1.5 mt-0.5">
@@ -206,14 +206,14 @@
             <div class="bg-slate-950/80 border border-slate-800 rounded-xl px-2.5 py-1.5 flex items-center gap-2 backdrop-blur-sm">
               <span class="text-base shrink-0">⏱️</span>
               <div class="min-w-0 flex-1">
-                <span class="text-[9px] uppercase tracking-wider text-slate-400 font-bold block leading-none mb-0.5">En Tarima</span>
+                <span id="heroStatLabelElapsed" class="text-[9px] uppercase tracking-wider text-slate-400 font-bold block leading-none mb-0.5">En Tarima</span>
                 <span id="heroStatElapsed" class="text-xs font-black text-white font-mono block truncate">-- min</span>
               </div>
             </div>
             <div class="bg-slate-950/80 border border-slate-800 rounded-xl px-2.5 py-1.5 flex items-center gap-2 backdrop-blur-sm">
               <span class="text-base shrink-0">⏳</span>
               <div class="min-w-0 flex-1">
-                <span class="text-[9px] uppercase tracking-wider text-amber-400 font-bold block leading-none mb-0.5">Restante</span>
+                <span id="heroStatLabelRemaining" class="text-[9px] uppercase tracking-wider text-amber-400 font-bold block leading-none mb-0.5">Restante</span>
                 <span id="heroStatRemaining" class="text-xs font-black text-amber-300 font-mono block truncate">-- min</span>
               </div>
             </div>
@@ -1695,50 +1695,102 @@
     }
 
     // Calcula automáticamente qué show está en vivo según la hora real de Chile
+    function formatFriendlyTime(totalMinutes) {
+      if (totalMinutes <= 0) return '0 min';
+      const hours = Math.floor(totalMinutes / 60);
+      const mins = totalMinutes % 60;
+      if (hours === 0) return `${mins} min`;
+      if (mins === 0) return `${hours} hrs`;
+      return `${hours}h ${mins}m`;
+    }
+
+    let festivalLifecycleState = 'PRE_EVENT'; // 'PRE_EVENT' | 'LIVE' | 'INTERMISSION' | 'POST_EVENT'
+    let activeFocusAct = null;
+
     function autoResolveScheduleStatus() {
       const chileDate = getChileDateObj();
       const currentTotalMin = chileDate.getHours() * 60 + chileDate.getMinutes();
       const manualLiveId = localStorage.getItem('festival_manual_live_id');
 
+      const firstAct = stageSchedule[0];
+      const firstStartMin = firstAct ? parseTimeToMinutes(firstAct.time.split('-')[0]) : 900; // 15:00 default
+      const lastAct = stageSchedule[stageSchedule.length - 1];
+      let lastEndMin = lastAct ? parseTimeToMinutes(lastAct.time.split('-')[1]) : 60; // 01:00 default
+      if (lastEndMin < 300) lastEndMin += 24 * 60; // 01:00 AM trasnoche = 25 * 60
+
+      // Si el Administrador forzó un show específico con "Subir Ahora"
+      if (manualLiveId) {
+        festivalLifecycleState = 'LIVE';
+        stageSchedule.forEach(act => {
+          if (act.id === Number(manualLiveId)) {
+            act.status = 'live';
+            activeFocusAct = act;
+          } else if (act.id < Number(manualLiveId)) {
+            act.status = 'finished';
+          } else {
+            act.status = 'upcoming';
+          }
+        });
+        return;
+      }
+
+      // 1. ANTES DE LA APERTURA (ej: 05:00 AM a 15:00 hrs)
+      if (currentTotalMin >= 300 && currentTotalMin < firstStartMin) {
+        festivalLifecycleState = 'PRE_EVENT';
+        stageSchedule.forEach(act => act.status = 'upcoming');
+        activeFocusAct = firstAct;
+        return;
+      }
+
+      // 2. DESPUÉS DEL CIERRE (ej: de 01:01 AM a 05:00 AM)
+      if (currentTotalMin >= 61 && currentTotalMin < 300) {
+        festivalLifecycleState = 'POST_EVENT';
+        stageSchedule.forEach(act => act.status = 'finished');
+        activeFocusAct = lastAct;
+        return;
+      }
+
+      // 3. DURANTE EL FESTIVAL (15:00 a 01:00 AM)
       let foundLive = false;
+      let nextUpcoming = null;
 
       stageSchedule.forEach(act => {
         if (!act.time || !act.time.includes('-')) return;
         const parts = act.time.split('-').map(t => t.trim());
         const startMin = parseTimeToMinutes(parts[0]);
         let endMin = parseTimeToMinutes(parts[1]);
-        if (endMin < startMin) endMin += 24 * 60; // Para shows que pasan la medianoche
+        if (endMin < startMin) endMin += 24 * 60;
 
-        let checkNowMin = currentTotalMin;
-        if (checkNowMin < startMin && endMin > 24 * 60) checkNowMin += 24 * 60;
+        let checkNow = currentTotalMin;
+        if (checkNow < startMin && endMin > 24 * 60) checkNow += 24 * 60;
 
-        if (manualLiveId && Number(manualLiveId) === act.id) {
+        if (checkNow >= startMin && checkNow < endMin) {
           act.status = 'live';
+          activeFocusAct = act;
           foundLive = true;
-        } else if (!manualLiveId) {
-          if (checkNowMin >= startMin && checkNowMin < endMin) {
-            act.status = 'live';
-            foundLive = true;
-          } else if (checkNowMin >= endMin) {
-            act.status = 'finished';
-          } else {
-            act.status = 'upcoming';
+        } else if (checkNow >= endMin) {
+          act.status = 'finished';
+        } else {
+          act.status = 'upcoming';
+          if (!nextUpcoming && checkNow < startMin) {
+            nextUpcoming = act;
           }
         }
       });
 
-      // Si ningún show coincide exactamente (ej: antes de las 15:00 o después de la 01:00)
-      if (!foundLive && !manualLiveId && stageSchedule.length > 0) {
-        const upcomingAct = stageSchedule.find(s => parseTimeToMinutes(s.time.split('-')[0]) > currentTotalMin);
-        if (upcomingAct) {
-          upcomingAct.status = 'live';
-        } else {
-          stageSchedule[stageSchedule.length - 1].status = 'live';
-        }
+      if (foundLive) {
+        festivalLifecycleState = 'LIVE';
+      } else if (nextUpcoming) {
+        festivalLifecycleState = 'INTERMISSION';
+        activeFocusAct = nextUpcoming;
+      } else {
+        festivalLifecycleState = 'POST_EVENT';
+        activeFocusAct = lastAct;
       }
     }
 
     let lastActiveActId = null;
+    let lastLifecycleState = null;
 
     function updateLiveClockAndProgress() {
       const chileDate = getChileDateObj();
@@ -1754,18 +1806,71 @@
       const liveClock = document.getElementById('liveChileClock');
       if (liveClock) liveClock.textContent = `🇨🇱 ${timeStr} hrs (Chile)`;
 
-      // Recalcular estado según reloj
+      // Recalcular estado del evento
       autoResolveScheduleStatus();
 
-      const liveAct = stageSchedule.find(s => s.status === 'live') || stageSchedule[0];
-      if (liveAct && liveAct.id !== lastActiveActId) {
-        lastActiveActId = liveAct.id;
+      const actId = activeFocusAct ? activeFocusAct.id : null;
+      if (actId !== lastActiveActId || festivalLifecycleState !== lastLifecycleState) {
+        lastActiveActId = actId;
+        lastLifecycleState = festivalLifecycleState;
         renderLiveHero();
         renderScheduleList();
       }
 
-      if (liveAct && liveAct.time && liveAct.time.includes('-')) {
-        const parts = liveAct.time.split('-').map(t => t.trim());
+      // Actualizar insignia del encabezado
+      const headerBadge = document.getElementById('headerLiveStatusBadge');
+      if (headerBadge) {
+        if (festivalLifecycleState === 'PRE_EVENT') {
+          headerBadge.className = 'inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-black uppercase bg-amber-500/20 text-amber-300 border border-amber-500/40 transition';
+          headerBadge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> HOY 15:00';
+        } else if (festivalLifecycleState === 'POST_EVENT') {
+          headerBadge.className = 'inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-black uppercase bg-slate-800 text-slate-300 border border-slate-700 transition';
+          headerBadge.innerHTML = '🏁 FINALIZADO';
+        } else if (festivalLifecycleState === 'INTERMISSION') {
+          headerBadge.className = 'inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-black uppercase bg-amber-500 text-black font-black transition';
+          headerBadge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-black"></span> PAUSA';
+        } else {
+          headerBadge.className = 'inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-black uppercase bg-red-600 text-white animate-pulse transition';
+          headerBadge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-white"></span> VIVO';
+        }
+      }
+
+      // Actualizar tarjeta de estadísticas según la fase del festival
+      const statLabelElapsed = document.getElementById('heroStatLabelElapsed');
+      const statElapsed = document.getElementById('heroStatElapsed');
+      const statLabelRemaining = document.getElementById('heroStatLabelRemaining');
+      const statRemaining = document.getElementById('heroStatRemaining');
+      const summaryText = document.getElementById('liveProgressSummaryText');
+      const progBar = document.getElementById('liveProgressBar');
+
+      const currentTotalMin = chileDate.getHours() * 60 + chileDate.getMinutes();
+
+      if (festivalLifecycleState === 'PRE_EVENT') {
+        const firstStart = activeFocusAct ? parseTimeToMinutes(activeFocusAct.time.split('-')[0]) : 900;
+        const startsIn = Math.max(0, firstStart - currentTotalMin);
+        
+        if (statLabelElapsed) statLabelElapsed.textContent = 'Apertura Cancha';
+        if (statElapsed) statElapsed.textContent = '15:00 hrs (Hoy)';
+        if (statLabelRemaining) statLabelRemaining.textContent = 'Cuenta Regresiva';
+        if (statRemaining) statRemaining.textContent = `Faltan ${formatFriendlyTime(startsIn)}`;
+        if (summaryText) summaryText.textContent = `🎪 Las puertas de la cancha abren hoy a las 15:00 hrs con este show`;
+        if (progBar) progBar.style.width = '0%';
+        return;
+      }
+
+      if (festivalLifecycleState === 'POST_EVENT') {
+        if (statLabelElapsed) statLabelElapsed.textContent = 'Estado';
+        if (statElapsed) statElapsed.textContent = 'Concluido con Éxito';
+        if (statLabelRemaining) statLabelRemaining.textContent = 'Comunidad';
+        if (statRemaining) statRemaining.textContent = '¡Hasta el 2027!';
+        if (summaryText) summaryText.textContent = '🎉 ¡Muchas gracias por acompañarnos en esta fiesta de la villa!';
+        if (progBar) progBar.style.width = '100%';
+        return;
+      }
+
+      // Si está en vivo o intervalo durante el evento
+      if (activeFocusAct && activeFocusAct.time && activeFocusAct.time.includes('-')) {
+        const parts = activeFocusAct.time.split('-').map(t => t.trim());
         const startParts = parts[0].split(':').map(Number);
         const endParts = parts[1].split(':').map(Number);
         
@@ -1773,52 +1878,56 @@
         let endTotalMin = endParts[0] * 60 + endParts[1];
         if (endTotalMin < startTotalMin) endTotalMin += 24 * 60;
 
-        let currentTotalMin = chileDate.getHours() * 60 + chileDate.getMinutes();
-        if (currentTotalMin < startTotalMin && endTotalMin > 24 * 60) currentTotalMin += 24 * 60;
+        let checkNow = currentTotalMin;
+        if (checkNow < startTotalMin && endTotalMin > 24 * 60) checkNow += 24 * 60;
 
         const duration = Math.max(1, endTotalMin - startTotalMin);
-        const elapsed = Math.max(0, currentTotalMin - startTotalMin);
-        const remaining = Math.max(0, endTotalMin - currentTotalMin);
+        const elapsed = Math.max(0, checkNow - startTotalMin);
+        const remaining = Math.max(0, endTotalMin - checkNow);
         const progressPct = Math.min(100, Math.max(5, Math.round((elapsed / duration) * 100)));
 
-        const progBar = document.getElementById('liveProgressBar');
         if (progBar) progBar.style.width = `${progressPct}%`;
 
-        const statElapsed = document.getElementById('heroStatElapsed');
-        const statRemaining = document.getElementById('heroStatRemaining');
-        const summaryText = document.getElementById('liveProgressSummaryText');
-        const progText = document.getElementById('liveShowProgressText');
-
-        if (currentTotalMin < startTotalMin) {
-          const startsIn = startTotalMin - currentTotalMin;
-          if (statElapsed) statElapsed.textContent = '0 min';
-          if (statRemaining) statRemaining.textContent = 'En ' + startsIn + ' min';
-          if (summaryText) summaryText.textContent = 'Comienza a las ' + parts[0] + ' hrs (en ' + startsIn + ' min)';
-          else if (progText) progText.innerHTML = '⏳ Comienza en <strong>' + startsIn + ' min</strong> (' + parts[0] + ' hrs)';
+        if (checkNow < startTotalMin) {
+          const startsIn = startTotalMin - checkNow;
+          if (statLabelElapsed) statLabelElapsed.textContent = 'Horario de Inicio';
+          if (statElapsed) statElapsed.textContent = `${parts[0]} hrs`;
+          if (statLabelRemaining) statLabelRemaining.textContent = 'Comienza en';
+          if (statRemaining) statRemaining.textContent = `Faltan ${formatFriendlyTime(startsIn)}`;
+          if (summaryText) summaryText.textContent = `⏳ Próximo show programado a las ${parts[0]} hrs`;
         } else if (remaining > 0) {
-          if (statElapsed) statElapsed.textContent = elapsed + ' min';
-          if (statRemaining) statRemaining.textContent = remaining + ' min restantes';
-          if (summaryText) summaryText.textContent = 'Show en vivo en tarima • Faltan ' + remaining + ' min';
-          else if (progText) progText.innerHTML = '⏱️ Lleva <strong>' + elapsed + ' min</strong> • Faltan <strong>' + remaining + ' min</strong>';
+          if (statLabelElapsed) statLabelElapsed.textContent = 'En Tarima';
+          if (statElapsed) statElapsed.textContent = `${elapsed} min transcurridos`;
+          if (statLabelRemaining) statLabelRemaining.textContent = 'Restante';
+          if (statRemaining) statRemaining.textContent = `Faltan ${remaining} min`;
+          if (summaryText) summaryText.textContent = `Show en vivo en la tarima central • Faltan ${remaining} min`;
         } else {
-          if (statElapsed) statElapsed.textContent = duration + ' min';
+          if (statLabelElapsed) statLabelElapsed.textContent = 'En Tarima';
+          if (statElapsed) statElapsed.textContent = `${duration} min`;
+          if (statLabelRemaining) statLabelRemaining.textContent = 'Restante';
           if (statRemaining) statRemaining.textContent = '0 min (Cierre)';
-          if (summaryText) summaryText.textContent = 'Show en su cierre final • Próximo grupo subiendo';
-          else if (progText) progText.innerHTML = '🏁 Show en su cierre final • Próximo grupo subiendo';
-        }      }
+          if (summaryText) summaryText.textContent = '🏁 Show en su cierre final • Próximo grupo subiendo a la tarima';
+        }
+      }
     }
 
     setInterval(updateLiveClockAndProgress, 1000);
 
     function renderLiveHero() {
       autoResolveScheduleStatus();
-      const liveAct = stageSchedule.find(s => s.status === 'live') || stageSchedule[0];
+      const liveAct = activeFocusAct || stageSchedule[0];
       if (!liveAct) return;
 
       const isIntermission = liveAct.type === 'intermission';
       const liveStatusBadge = document.getElementById('heroLiveStatusBadge');
       if (liveStatusBadge) {
-        if (isIntermission) {
+        if (festivalLifecycleState === 'PRE_EVENT') {
+          liveStatusBadge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 shadow-lg shadow-amber-500/30';
+          liveStatusBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-slate-950"></span> ⏳ APERTURA HOY 15:00 HRS';
+        } else if (festivalLifecycleState === 'POST_EVENT') {
+          liveStatusBadge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-slate-800 text-slate-300 border border-slate-700 shadow';
+          liveStatusBadge.innerHTML = '🏁 FESTIVAL CULMINADO';
+        } else if (isIntermission || festivalLifecycleState === 'INTERMISSION') {
           liveStatusBadge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-amber-500 text-black shadow-lg shadow-amber-500/40 animate-pulse';
           liveStatusBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-black"></span> PAUSA TÉCNICA';
         } else {
@@ -1829,7 +1938,6 @@
 
       document.getElementById('liveArtistName').textContent = liveAct.artist;
       
-      // Limpiar subtítulo para no duplicar texto
       let genreText = liveAct.genre;
       if (!genreText.toLowerCase().includes('oficial') && !isIntermission) {
         genreText += ' • Show Oficial';
@@ -1844,34 +1952,25 @@
 
       // Siguiente artista
       const currentIdx = stageSchedule.findIndex(s => s.id === liveAct.id);
-      const nextAct = stageSchedule[currentIdx + 1];
+      const nextAct = stageSchedule[currentIdx + 1] || stageSchedule[1];
       const nextCard = document.getElementById('nextArtistCard');
       if (nextAct) {
         const nextStartHour = (nextAct.time || '').split('-')[0].trim();
-        const chileDate = getChileDateObj();
-        const nextParts = nextStartHour.split(':').map(Number);
-        const nextTotalMin = (nextParts[0] || 0) * 60 + (nextParts[1] || 0);
-        const currentTotalMin = chileDate.getHours() * 60 + chileDate.getMinutes();
-        const minUntilNext = Math.max(0, nextTotalMin - currentTotalMin);
-
-        nextCard.classList.remove('hidden');
         nextCard.innerHTML = `
           <div class="flex items-center gap-3">
             <div class="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-2xl shrink-0">
-              ${nextAct.type === 'intermission' ? '⏱️' : nextAct.type === 'humor' ? '😂' : '⚡'}
+              ⚡
             </div>
             <div>
               <span class="text-[10px] font-black uppercase tracking-wider text-amber-400">A Continuación (${nextStartHour} hrs)</span>
-              <h3 class="text-base font-black text-white font-display">${nextAct.artist}</h3>
-              <p class="text-xs text-slate-400">${nextAct.genre}</p>
+              <h3 class="text-sm sm:text-base font-black text-white font-display">${nextAct.artist}</h3>
+              <p class="text-xs text-slate-400 truncate max-w-[200px] sm:max-w-xs">${nextAct.genre}</p>
             </div>
           </div>
-          <span class="text-xs font-bold text-amber-300 bg-amber-950/80 border border-amber-600/40 px-3 py-1.5 rounded-lg shrink-0">
-            ${minUntilNext > 0 ? `En ${minUntilNext} min` : 'Próximo'}
+          <span class="text-xs font-bold text-amber-300 bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700 shrink-0 font-mono">
+            ${nextStartHour} hrs
           </span>
         `;
-      } else {
-        nextCard.classList.add('hidden');
       }
     }
 
