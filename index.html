@@ -57,33 +57,65 @@
       100% { transform: scale(2.4); opacity: 0; }
     }
 
-    .stand-pin-badge {
+    .stand-pin-leaflet-icon {
+      background: transparent !important;
+      border: none !important;
+    }
+    .stand-marker-wrap {
+      width: 44px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      cursor: pointer;
+      filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.45));
+      transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .stand-marker-wrap:hover,
+    .stand-marker-wrap:active {
+      transform: scale(1.15) translateY(-4px);
+      z-index: 999 !important;
+    }
+    .stand-pin-circle {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: 2.5px solid #ffffff;
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      border: 3px solid white;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.28);
       position: relative;
-      cursor: pointer;
-      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      overflow: hidden;
+      box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.25), 0 3px 6px rgba(0, 0, 0, 0.35);
     }
-    .stand-pin-badge:hover {
-      transform: scale(1.15) translateY(-3px);
-    }
-    .stand-pin-badge::after {
-      content: '';
+    .stand-number-pill {
       position: absolute;
-      bottom: -6px;
-      left: 50%;
-      transform: translateX(-50%);
+      top: -4px;
+      right: -5px;
+      background: #0f172a;
+      color: #ffffff;
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      font-size: 9px;
+      font-weight: 900;
+      padding: 1px 5px;
+      border-radius: 9999px;
+      border: 1.5px solid #ffffff;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+      line-height: 1.1;
+      pointer-events: none;
+    }
+    .stand-pin-pointer {
       width: 0;
       height: 0;
       border-left: 6px solid transparent;
       border-right: 6px solid transparent;
-      border-top: 7px solid white;
+      border-top: 7px solid #ffffff;
+      margin-top: -1px;
+    }
+    .stage-banner-marker, .entrance-banner-marker, .aisle-floor-label {
+      background: transparent !important;
+      border: none !important;
+      pointer-events: auto;
     }
 
     .leaflet-routing-line {
@@ -286,8 +318,8 @@
         </div>
 
         <!-- Alternar Satélite vs Calles -->
-        <button id="toggleMapLayerBtn" class="bg-slate-900/90 backdrop-blur-md border border-slate-700 text-white p-2.5 rounded-xl shadow-lg pointer-events-auto hover:bg-slate-800 text-sm">
-          🛰️ Satélite
+        <button id="toggleMapLayerBtn" class="bg-slate-900/90 backdrop-blur-md border border-slate-700/80 text-white px-3 py-2 rounded-xl shadow-lg pointer-events-auto hover:bg-slate-800 text-xs font-bold flex items-center gap-1.5 transition-all">
+          🏟️ Cancha
         </button>
       </div>
 
@@ -504,7 +536,7 @@
   <!-- ======================================================== -->
   <script>
     // Limpiar caché vieja si la versión de datos cambió
-    const DATA_VERSION = '2026.02.visual_pro';
+    const DATA_VERSION = '2026.03.stadium_cancha_v1';
     if (localStorage.getItem('festival_data_version') !== DATA_VERSION) {
       localStorage.setItem('festival_data_version', DATA_VERSION);
       localStorage.removeItem('festival_admin_schedule');
@@ -620,8 +652,8 @@
     "slogan": "Cerveza fresca de barril directo a tu vaso",
     "rating": "4.9 (160 pedidos)",
     "prepTime": "3 - 5 min",
-    "latOffset": 0.00015,
-    "lngOffset": 0.0002,
+    "latOffset": 0.00025,
+    "lngOffset": 0.00018,
     "whatsapp": "56912345678",
     "bankData": {
       "bank": "Banco Estado",
@@ -663,7 +695,8 @@
         "tag": "♻️ Reutilizable",
         "inStock": true
       }
-    ]
+    ],
+    "locationNote": "Pasillo Este #1 (Frente a Tacos & Burritos)"
   },
   {
     "id": 2,
@@ -679,7 +712,7 @@
     "slogan": "Pan amasado en el momento y palta hass 100% pura",
     "rating": "4.9 (210 pedidos)",
     "prepTime": "8 - 12 min",
-    "latOffset": 8e-05,
+    "latOffset": -0.00005,
     "lngOffset": -0.00018,
     "whatsapp": "56987654321",
     "bankData": {
@@ -730,7 +763,8 @@
         "tag": "Para Compartir",
         "inStock": true
       }
-    ]
+    ],
+    "locationNote": "Pasillo Oeste #4 (Frente a Barra Terremotera)"
   },
   {
     "id": 3,
@@ -746,8 +780,8 @@
     "slogan": "Carne mechada tierna y salsas caseras de la abuela",
     "rating": "4.8 (115 pedidos)",
     "prepTime": "6 - 10 min",
-    "latOffset": -5e-05,
-    "lngOffset": -0.00025,
+    "latOffset": -0.00025,
+    "lngOffset": -0.00018,
     "whatsapp": "56955443322",
     "bankData": {
       "bank": "Banco de Chile",
@@ -781,7 +815,8 @@
         "tag": "Bien Helada",
         "inStock": true
       }
-    ]
+    ],
+    "locationNote": "Pasillo Oeste #6 (Extremo Sur Pasillo Oeste)"
   },
   {
     "id": 4,
@@ -797,8 +832,8 @@
     "slogan": "Fuego, carbón y los mejores cortes de campo",
     "rating": "4.9 (190 pedidos)",
     "prepTime": "10 - 15 min",
-    "latOffset": 0.0002,
-    "lngOffset": -0.0001,
+    "latOffset": 0.00005,
+    "lngOffset": -0.00018,
     "whatsapp": "56933221144",
     "bankData": {
       "bank": "Banco BCI",
@@ -832,7 +867,8 @@
         "tag": "Plato Fuerte",
         "inStock": true
       }
-    ]
+    ],
+    "locationNote": "Pasillo Oeste #3 (Frente a Cervecería Austral)"
   },
   {
     "id": 5,
@@ -848,7 +884,7 @@
     "slogan": "La tradición fiestera chilena en su punto justo",
     "rating": "4.9 (240 pedidos)",
     "prepTime": "2 - 4 min",
-    "latOffset": -0.00015,
+    "latOffset": -0.00005,
     "lngOffset": 0.00018,
     "whatsapp": "56966778899",
     "bankData": {
@@ -883,7 +919,8 @@
         "tag": "Reconfortante",
         "inStock": true
       }
-    ]
+    ],
+    "locationNote": "Pasillo Este #4 (Frente a Bajón Criollo)"
   },
   {
     "id": 6,
@@ -899,8 +936,8 @@
     "slogan": "Papas 100% naturales, nunca congeladas",
     "rating": "4.8 (175 pedidos)",
     "prepTime": "5 - 8 min",
-    "latOffset": 2e-05,
-    "lngOffset": -0.0003,
+    "latOffset": -0.00015,
+    "lngOffset": -0.00018,
     "whatsapp": "56944332211",
     "bankData": {
       "bank": "Banco Scotiabank",
@@ -934,7 +971,8 @@
         "tag": "Para Picar",
         "inStock": true
       }
-    ]
+    ],
+    "locationNote": "Pasillo Oeste #5 (Frente a Coctelería del Parque)"
   },
   {
     "id": 7,
@@ -950,8 +988,8 @@
     "slogan": "El toque dulce del festival recién horneado",
     "rating": "4.9 (180 pedidos)",
     "prepTime": "5 - 7 min",
-    "latOffset": -0.00018,
-    "lngOffset": -0.00015,
+    "latOffset": -0.00036,
+    "lngOffset": -0.0003,
     "whatsapp": "56999887766",
     "bankData": {
       "bank": "Banco Estado",
@@ -985,7 +1023,8 @@
         "tag": "Recién Fritos",
         "inStock": true
       }
-    ]
+    ],
+    "locationNote": "Feria Sur #1 (Sector Dulces Oeste)"
   },
   {
     "id": 8,
@@ -1001,8 +1040,8 @@
     "slogan": "Pura fruta natural en cada barquillo",
     "rating": "4.8 (130 pedidos)",
     "prepTime": "2 - 3 min",
-    "latOffset": -0.00022,
-    "lngOffset": -5e-05,
+    "latOffset": -0.00036,
+    "lngOffset": -0.0002,
     "whatsapp": "56911335577",
     "bankData": {
       "bank": "Banco Itaú",
@@ -1036,7 +1075,8 @@
         "tag": "Súper Espeso",
         "inStock": true
       }
-    ]
+    ],
+    "locationNote": "Feria Sur #2 (Sector Dulces Oeste)"
   },
   {
     "id": 9,
@@ -1052,8 +1092,8 @@
     "slogan": "El fuego y sabor del sur en tu schop",
     "rating": "4.9 (140 pedidos)",
     "prepTime": "3 - 5 min",
-    "latOffset": 0.00012,
-    "lngOffset": 0.00028,
+    "latOffset": 0.00015,
+    "lngOffset": 0.00018,
     "whatsapp": "56922446688",
     "bankData": {
       "bank": "Banco BICE",
@@ -1087,7 +1127,8 @@
         "tag": "Para Llevar",
         "inStock": true
       }
-    ]
+    ],
+    "locationNote": "Pasillo Este #2 (Frente a Pizzería Nápoles)"
   },
   {
     "id": 10,
@@ -1103,8 +1144,8 @@
     "slogan": "Masa madre a la piedra crujiente e inflada",
     "rating": "4.9 (170 pedidos)",
     "prepTime": "7 - 10 min",
-    "latOffset": 0.00025,
-    "lngOffset": -0.00022,
+    "latOffset": 0.00015,
+    "lngOffset": -0.00018,
     "whatsapp": "56933557799",
     "bankData": {
       "bank": "Banco Santander",
@@ -1138,7 +1179,8 @@
         "tag": "Receta Italiana",
         "inStock": true
       }
-    ]
+    ],
+    "locationNote": "Pasillo Oeste #2 (Frente a Cervecería Kutral)"
   },
   {
     "id": 11,
@@ -1154,8 +1196,8 @@
     "slogan": "Recetas mexicanas con cilantro, lima y guacamole casero",
     "rating": "4.8 (145 pedidos)",
     "prepTime": "6 - 9 min",
-    "latOffset": 0.00018,
-    "lngOffset": -0.0003,
+    "latOffset": 0.00025,
+    "lngOffset": -0.00018,
     "whatsapp": "56944668800",
     "bankData": {
       "bank": "Banco de Chile",
@@ -1189,7 +1231,8 @@
         "tag": "Para Picar",
         "inStock": true
       }
-    ]
+    ],
+    "locationNote": "Pasillo Oeste #1 (Frente a Cervecería El Roble)"
   },
   {
     "id": 12,
@@ -1205,8 +1248,8 @@
     "slogan": "Coctelería de autor y frescura en tu vaso",
     "rating": "4.9 (155 pedidos)",
     "prepTime": "3 - 5 min",
-    "latOffset": -0.0001,
-    "lngOffset": 0.00025,
+    "latOffset": -0.00015,
+    "lngOffset": 0.00018,
     "whatsapp": "56955779911",
     "bankData": {
       "bank": "Banco Security",
@@ -1248,7 +1291,8 @@
         "tag": "🌱 0% Alcohol",
         "inStock": true
       }
-    ]
+    ],
+    "locationNote": "Pasillo Este #5 (Frente a Papas Fritas)"
   },
   {
     "id": 13,
@@ -1264,7 +1308,7 @@
     "slogan": "Café de grano tostado y dulzura familiar",
     "rating": "4.9 (135 pedidos)",
     "prepTime": "3 - 5 min",
-    "latOffset": -0.00025,
+    "latOffset": -0.00036,
     "lngOffset": -0.0001,
     "whatsapp": "56966880022",
     "bankData": {
@@ -1299,7 +1343,8 @@
         "tag": "Recién Horneadas",
         "inStock": true
       }
-    ]
+    ],
+    "locationNote": "Feria Sur #3 (Junto al Acceso Central)"
   },
   {
     "id": 14,
@@ -1315,8 +1360,8 @@
     "slogan": "Artesanía textil chilena 100% natural",
     "rating": "4.9 (45 compras)",
     "prepTime": "Inmediato",
-    "latOffset": -8e-05,
-    "lngOffset": -0.00012,
+    "latOffset": -0.00036,
+    "lngOffset": 0.0001,
     "whatsapp": "56977991133",
     "bankData": {
       "bank": "Banco Falabella",
@@ -1342,7 +1387,8 @@
         "tag": "⭐ Más Vendida",
         "inStock": true
       }
-    ]
+    ],
+    "locationNote": "Feria Sur #4 (Junto al Acceso Central Este)"
   },
   {
     "id": 15,
@@ -1358,8 +1404,8 @@
     "slogan": "El metal noble de Chile transformado en arte",
     "rating": "4.8 (60 compras)",
     "prepTime": "Inmediato",
-    "latOffset": -0.00014,
-    "lngOffset": -8e-05,
+    "latOffset": -0.00036,
+    "lngOffset": 0.0002,
     "whatsapp": "56988002244",
     "bankData": {
       "bank": "Banco Estado",
@@ -1385,7 +1431,8 @@
         "tag": "Hecho a Mano",
         "inStock": true
       }
-    ]
+    ],
+    "locationNote": "Feria Sur #5 (Sector Artesanías Este)"
   },
   {
     "id": 16,
@@ -1401,8 +1448,8 @@
     "slogan": "Greda cocida de tradición campesina",
     "rating": "4.9 (50 compras)",
     "prepTime": "Inmediato",
-    "latOffset": -0.00018,
-    "lngOffset": 2e-05,
+    "latOffset": -0.00036,
+    "lngOffset": 0.0003,
     "whatsapp": "56999113355",
     "bankData": {
       "bank": "Banco BCI",
@@ -1428,7 +1475,8 @@
         "tag": "Juego Familiar",
         "inStock": true
       }
-    ]
+    ],
+    "locationNote": "Feria Sur #6 (Sector Artesanías Este)"
   },
   {
     "id": 17,
@@ -1444,8 +1492,8 @@
     "slogan": "Botánica pura, orgánica y libre de químicos",
     "rating": "4.9 (75 compras)",
     "prepTime": "Inmediato",
-    "latOffset": -0.00022,
-    "lngOffset": 8e-05,
+    "latOffset": -0.00026,
+    "lngOffset": 0.0003,
     "whatsapp": "56911224466",
     "bankData": {
       "bank": "Banco Santander",
@@ -1471,7 +1519,8 @@
         "tag": "Regeneradora",
         "inStock": true
       }
-    ]
+    ],
+    "locationNote": "Feria Sur #7 (Sector Cosmética & Cuidado)"
   },
   {
     "id": 18,
@@ -1487,8 +1536,8 @@
     "slogan": "La frescura del fin del mundo en tu vaso",
     "rating": "4.9 (165 pedidos)",
     "prepTime": "3 - 5 min",
-    "latOffset": 5e-05,
-    "lngOffset": 0.00032,
+    "latOffset": 0.00005,
+    "lngOffset": 0.00018,
     "whatsapp": "56922335577",
     "bankData": {
       "bank": "Banco de Chile",
@@ -1514,7 +1563,8 @@
         "tag": "Refrescante",
         "inStock": true
       }
-    ]
+    ],
+    "locationNote": "Pasillo Este #3 (Frente a Asados & Brasas)"
   },
   {
     "id": 19,
@@ -1530,11 +1580,12 @@
     "slogan": "Sonido, luces y música en vivo",
     "rating": "Tarima Central",
     "prepTime": "En Vivo",
-    "latOffset": 0.00028,
-    "lngOffset": 0.0,
+    "latOffset": 0.00044,
+    "lngOffset": 0,
     "whatsapp": "",
     "bankData": null,
-    "products": []
+    "products": [],
+    "locationNote": "Cabecera Norte de la Cancha (Escenario Principal)"
   },
   {
     "id": 20,
@@ -1550,11 +1601,12 @@
     "slogan": "Punto de higiene y asistencia",
     "rating": "Servicios",
     "prepTime": "24 hrs",
-    "latOffset": -0.00024,
-    "lngOffset": 0.00022,
+    "latOffset": -0.00046,
+    "lngOffset": 0.00032,
     "whatsapp": "",
     "bankData": null,
-    "products": []
+    "products": [],
+    "locationNote": "Costado Sureste (Salida y Servicios)"
   }
 ];
 
@@ -2293,27 +2345,258 @@
     const map = L.map('map', {
       zoomControl: false,
       maxZoom: 22,
-      minZoom: 15
+      minZoom: 16
     }).setView(DEFAULT_CENTER, 19);
 
     L.control.zoom({ position: 'bottomleft' }).addTo(map);
 
-    const streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 22, maxNativeZoom: 19 }).addTo(map);
-    const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 22, maxNativeZoom: 19 });
+    // 1. Capas Base: Por defecto Dark NoLabels (elimina números de casas y calles residenciales)
+    const darkNoLabelsLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
+      maxZoom: 22,
+      maxNativeZoom: 19,
+      attribution: '&copy; CartoDB &copy; OpenStreetMap'
+    }).addTo(map);
 
-    let isSatellite = false;
-    document.getElementById('toggleMapLayerBtn').addEventListener('click', () => {
-      if (isSatellite) {
-        map.removeLayer(satelliteLayer);
-        map.addLayer(streetLayer);
-        document.getElementById('toggleMapLayerBtn').textContent = '🛰️ Satélite';
-      } else {
-        map.removeLayer(streetLayer);
-        map.addLayer(satelliteLayer);
-        document.getElementById('toggleMapLayerBtn').textContent = '🗺️ Calles';
-      }
-      isSatellite = !isSatellite;
+    const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      maxZoom: 22,
+      maxNativeZoom: 19,
+      attribution: '&copy; Esri'
     });
+
+    const streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 22,
+      maxNativeZoom: 19,
+      attribution: '&copy; OpenStreetMap'
+    });
+
+    // 2. RECINTO DEL ESTADIO & CANCHA DEPORTIVA DEL FESTIVAL (Capa Vectorial)
+    const stadiumGroup = L.layerGroup().addTo(map);
+
+    const cLat = DEFAULT_CENTER[0];
+    const cLng = DEFAULT_CENTER[1];
+
+    // A. Recinto Exterior y Pista Atlética de Tartán (Concourse / Running Track)
+    const stadiumOuterBounds = [
+      [cLat - 0.00058, cLng - 0.00044],
+      [cLat + 0.00058, cLng + 0.00044]
+    ];
+    L.rectangle(stadiumOuterBounds, {
+      color: '#334155',
+      weight: 2,
+      fillColor: '#0f172a',
+      fillOpacity: 0.95
+    }).addTo(stadiumGroup);
+
+    // Borde de pista perimetral
+    const trackBounds = [
+      [cLat - 0.00053, cLng - 0.00040],
+      [cLat + 0.00053, cLng + 0.00040]
+    ];
+    L.rectangle(trackBounds, {
+      color: '#b91c1c',
+      weight: 3,
+      dashArray: '6, 6',
+      fillColor: '#881337',
+      fillOpacity: 0.28
+    }).addTo(stadiumGroup);
+
+    // B. Césped Verde de la Cancha de Fútbol (Pitch Turf)
+    const pitchNorth = cLat + 0.00034;
+    const pitchSouth = cLat - 0.00048;
+    const pitchWest  = cLng - 0.00036;
+    const pitchEast  = cLng + 0.00036;
+
+    // Pasto base verde profundo
+    L.rectangle([[pitchSouth, pitchWest], [pitchNorth, pitchEast]], {
+      color: '#15803d',
+      weight: 2,
+      fillColor: '#166534',
+      fillOpacity: 0.96
+    }).addTo(stadiumGroup);
+
+    // Franjas de corte de césped alternadas (Lawn Stripes de estadio profesional)
+    const numStripes = 6;
+    const stripeHeight = (pitchNorth - pitchSouth) / numStripes;
+    for (let i = 0; i < numStripes; i++) {
+      if (i % 2 === 1) {
+        const sSouth = pitchSouth + i * stripeHeight;
+        const sNorth = sSouth + stripeHeight;
+        L.rectangle([[sSouth, pitchWest], [sNorth, pitchEast]], {
+          stroke: false,
+          fillColor: '#15803d',
+          fillOpacity: 0.65
+        }).addTo(stadiumGroup);
+      }
+    }
+
+    // C. Líneas Reglamentarias Blancas de la Cancha
+    // Línea perimetral de cal blanca
+    L.rectangle([[pitchSouth, pitchWest], [pitchNorth, pitchEast]], {
+      color: '#ffffff',
+      weight: 2,
+      opacity: 0.55,
+      fill: false
+    }).addTo(stadiumGroup);
+
+    // Línea central de mitad de cancha
+    const pitchCenterLat = (pitchNorth + pitchSouth) / 2;
+    L.polyline([[pitchCenterLat, pitchWest], [pitchCenterLat, pitchEast]], {
+      color: '#ffffff',
+      weight: 2,
+      opacity: 0.55
+    }).addTo(stadiumGroup);
+
+    // Círculo central reglamentario
+    L.circle([pitchCenterLat, cLng], {
+      radius: 9.15,
+      color: '#ffffff',
+      weight: 2,
+      opacity: 0.55,
+      fill: false
+    }).addTo(stadiumGroup);
+
+    // Punto central de saque
+    L.circle([pitchCenterLat, cLng], {
+      radius: 0.9,
+      color: '#ffffff',
+      fillColor: '#ffffff',
+      fillOpacity: 0.85,
+      weight: 1
+    }).addTo(stadiumGroup);
+
+    // Áreas de penal norte y sur
+    L.rectangle([[pitchNorth - 0.00014, cLng - 0.00018], [pitchNorth, cLng + 0.00018]], {
+      color: '#ffffff',
+      weight: 1.5,
+      opacity: 0.45,
+      fill: false
+    }).addTo(stadiumGroup);
+    L.rectangle([[pitchSouth, cLng - 0.00018], [pitchSouth + 0.00014, cLng + 0.00018]], {
+      color: '#ffffff',
+      weight: 1.5,
+      opacity: 0.45,
+      fill: false
+    }).addTo(stadiumGroup);
+
+    // D. Bulevar Central Peatonal de la Feria (Conecta Entrada con Escenario)
+    const walkWest = cLng - 0.000065;
+    const walkEast = cLng + 0.000065;
+    L.rectangle([[pitchSouth - 0.00005, walkWest], [pitchNorth, walkEast]], {
+      color: '#f59e0b',
+      weight: 2,
+      dashArray: '3, 4',
+      opacity: 0.7,
+      fillColor: '#334155',
+      fillOpacity: 0.90
+    }).addTo(stadiumGroup);
+
+    // Guirnaldas de luces festivas en los bordes del bulevar central
+    const festoonStep = 0.00007;
+    for (let fLat = pitchSouth; fLat <= pitchNorth - 0.00004; fLat += festoonStep) {
+      L.circleMarker([fLat, walkWest], { radius: 2.5, color: '#fbbf24', fillColor: '#fef08a', fillOpacity: 0.95, weight: 1 }).addTo(stadiumGroup);
+      L.circleMarker([fLat, walkEast], { radius: 2.5, color: '#fbbf24', fillColor: '#fef08a', fillOpacity: 0.95, weight: 1 }).addTo(stadiumGroup);
+    }
+
+    // E. Escenario Principal Gigante (Cabecera Norte de la Cancha)
+    const stageBounds = [
+      [pitchNorth, cLng - 0.00020],
+      [cLat + 0.00054, cLng + 0.00020]
+    ];
+    L.rectangle(stageBounds, {
+      color: '#e11d48',
+      weight: 2.5,
+      fillColor: '#09090b',
+      fillOpacity: 0.98
+    }).addTo(stadiumGroup);
+
+    // Torres de sonido Line Array (izquierda y derecha del escenario)
+    L.rectangle([[pitchNorth + 0.00002, cLng - 0.00023], [pitchNorth + 0.00010, cLng - 0.00019]], {
+      color: '#eab308',
+      weight: 1.5,
+      fillColor: '#18181b',
+      fillOpacity: 1
+    }).addTo(stadiumGroup);
+    L.rectangle([[pitchNorth + 0.00002, cLng + 0.00019], [pitchNorth + 0.00010, cLng + 0.00023]], {
+      color: '#eab308',
+      weight: 1.5,
+      fillColor: '#18181b',
+      fillOpacity: 1
+    }).addTo(stadiumGroup);
+
+    // Banner interactivo del Escenario Principal
+    const stageBannerIcon = L.divIcon({
+      className: 'stage-banner-marker',
+      html: `
+        <div class="px-3 py-1.5 rounded-full bg-gradient-to-r from-red-600 via-rose-500 to-amber-500 text-white text-[11px] font-black shadow-xl border border-white/60 flex items-center gap-1.5 whitespace-nowrap cursor-pointer transform hover:scale-105 transition-transform animate-pulse">
+          <span>🎸</span> ESCENARIO PRINCIPAL
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+        </div>
+      `,
+      iconAnchor: [80, 16]
+    });
+    const stageMarker = L.marker([cLat + 0.00045, cLng], { icon: stageBannerIcon, zIndexOffset: 800 }).addTo(stadiumGroup);
+    stageMarker.on('click', () => {
+      const stageStand = stands.find(s => s.id === 19 || s.number === 'ESC');
+      if (stageStand) openBottomSheet(stageStand);
+      else {
+        const liveTab = document.getElementById('tabLiveBtn');
+        if (liveTab) liveTab.click();
+      }
+    });
+
+    // F. Acceso Principal / Control de Entrada (Sur)
+    const entranceBannerIcon = L.divIcon({
+      className: 'entrance-banner-marker',
+      html: `
+        <div class="px-2.5 py-1 rounded-full bg-slate-900/95 text-amber-400 text-[10px] font-black border border-amber-400/60 shadow flex items-center gap-1 whitespace-nowrap">
+          <span>🎟️</span> ACCESO & CONTROL
+        </div>
+      `,
+      iconAnchor: [65, 12]
+    });
+    L.marker([pitchSouth - 0.00006, cLng], { icon: entranceBannerIcon, zIndexOffset: 800 }).addTo(stadiumGroup);
+
+    // G. Rótulos en el suelo para orientar en los pasillos
+    const westAisleLabel = L.divIcon({
+      className: 'aisle-floor-label',
+      html: `<div class="text-[9px] font-black text-emerald-300 tracking-wider uppercase bg-emerald-950/80 px-2.5 py-0.5 rounded-full border border-emerald-500/50 whitespace-nowrap shadow">🍔 Pasillo Food Trucks</div>`,
+      iconAnchor: [65, 8]
+    });
+    L.marker([cLat, cLng - 0.00018], { icon: westAisleLabel, zIndexOffset: 200, interactive: false }).addTo(stadiumGroup);
+
+    const eastAisleLabel = L.divIcon({
+      className: 'aisle-floor-label',
+      html: `<div class="text-[9px] font-black text-amber-300 tracking-wider uppercase bg-amber-950/80 px-2.5 py-0.5 rounded-full border border-amber-500/50 whitespace-nowrap shadow">🍺 Pasillo Cervecerías</div>`,
+      iconAnchor: [65, 8]
+    });
+    L.marker([cLat, cLng + 0.00018], { icon: eastAisleLabel, zIndexOffset: 200, interactive: false }).addTo(stadiumGroup);
+
+    // 3. Conmutador de Capas (Cancha -> Satélite -> Calles)
+    let currentMapMode = 0; // 0: Cancha, 1: Satelite, 2: Calles
+    const layerBtn = document.getElementById('toggleMapLayerBtn');
+    if (layerBtn) {
+      layerBtn.textContent = '🏟️ Cancha';
+      layerBtn.addEventListener('click', () => {
+        currentMapMode = (currentMapMode + 1) % 3;
+        if (currentMapMode === 0) {
+          map.removeLayer(streetLayer);
+          map.removeLayer(satelliteLayer);
+          map.addLayer(darkNoLabelsLayer);
+          if (!map.hasLayer(stadiumGroup)) map.addLayer(stadiumGroup);
+          layerBtn.textContent = '🏟️ Cancha';
+        } else if (currentMapMode === 1) {
+          map.removeLayer(darkNoLabelsLayer);
+          map.removeLayer(streetLayer);
+          map.addLayer(satelliteLayer);
+          layerBtn.textContent = '🛰️ Satélite';
+        } else {
+          map.removeLayer(darkNoLabelsLayer);
+          map.removeLayer(satelliteLayer);
+          map.addLayer(streetLayer);
+          layerBtn.textContent = '🗺️ Calles';
+        }
+      });
+    }
 
     let userLocation = null;
     let userMarker = null;
@@ -2473,11 +2756,13 @@
           userLocation = [e.target.getLatLng().lat, e.target.getLatLng().lng];
           if (activeNavStand) updateNavigationDistance();
         });
-        userAccuracyCircle = L.circle(userLocation, { radius: accuracy, color: '#3b82f6', fillColor: '#60a5fa', fillOpacity: 0.15, weight: 1 }).addTo(map);
+        const displayRadius = Math.min(accuracy || 4, 12);
+        userAccuracyCircle = L.circle(userLocation, { radius: displayRadius, color: '#3b82f6', fillColor: '#60a5fa', fillOpacity: 0.10, weight: 1.5 }).addTo(map);
       } else {
         userMarker.setLatLng(userLocation);
+        const displayRadius = Math.min(accuracy || 4, 12);
         userAccuracyCircle.setLatLng(userLocation);
-        userAccuracyCircle.setRadius(accuracy);
+        userAccuracyCircle.setRadius(displayRadius);
       }
 
       // Asegurar que el cono tenga el ángulo actual aplicado
@@ -2524,18 +2809,37 @@
       mapMarkers = [];
 
       stands.forEach(stand => {
-        const pinContent = stand.logoUrl 
-          ? `<img src="${stand.logoUrl}" class="w-full h-full rounded-full object-cover p-0.5" alt="${stand.name}" onerror="this.onerror=null;this.outerHTML='<span class=\'text-xl\'>${stand.icon}</span>';">`
-          : `<span class="text-xl">${stand.icon}</span>`;
+        // El escenario principal ya tiene su cartel interactivo gigante en la cabecera norte
+        if (stand.number === 'ESC' || stand.id === 19) return;
+
+        const categoryColor = stand.category === 'beer' ? '#f59e0b'
+          : stand.category === 'food' ? '#10b981'
+          : stand.category === 'sweets' ? '#ec4899'
+          : stand.category === 'crafts' ? '#8b5cf6'
+          : '#3b82f6';
+
+        const photoOrIcon = stand.photoUrl
+          ? `<img src="${stand.photoUrl}" class="w-full h-full rounded-full object-cover p-0.5" alt="${stand.name}">`
+          : `<span class="text-xl select-none filter drop-shadow">${stand.icon}</span>`;
+
+        const iconHtml = `
+          <div class="stand-marker-wrap relative group" data-id="${stand.id}" title="${stand.name}">
+            <div class="stand-pin-circle" style="background: radial-gradient(circle, ${categoryColor} 10%, #0f172a 100%);">
+              ${photoOrIcon}
+              <span class="stand-number-pill">${stand.number}</span>
+            </div>
+            <div class="stand-pin-pointer"></div>
+          </div>
+        `;
 
         const icon = L.divIcon({
-          className: 'stand-pin-container',
-          html: `<div class="stand-pin-badge" style="background-color: ${stand.color}">${pinContent}</div>`,
-          iconSize: [44, 44],
-          iconAnchor: [22, 44]
+          className: 'stand-pin-leaflet-icon',
+          html: iconHtml,
+          iconSize: [44, 52],
+          iconAnchor: [22, 50]
         });
 
-        const m = L.marker([stand.lat, stand.lng], { icon: icon }).addTo(map);
+        const m = L.marker([stand.lat, stand.lng], { icon: icon, zIndexOffset: 300 }).addTo(map);
         m.on('click', () => openBottomSheet(stand));
         mapMarkers.push(m);
       });
