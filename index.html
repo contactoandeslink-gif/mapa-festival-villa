@@ -1545,18 +1545,7 @@
   }
 ];
 
-            // Limpiar caché vieja si la versión de datos cambió
-    const DATA_VERSION = '2026.02.visual_pro';
-    if (localStorage.getItem('festival_data_version') !== DATA_VERSION) {
-      localStorage.setItem('festival_data_version', DATA_VERSION);
-      localStorage.removeItem('festival_admin_schedule');
-      localStorage.removeItem('festival_admin_stands');
-      localStorage.removeItem('festival_manual_live_id');
-    }
-
-    // Cargar del localStorage o inicializar
-
-    // Cargar del localStorage o inicializar con los nuevos defaults profesionales
+            // Cargar del localStorage o inicializar con los nuevos defaults profesionales
     let stageSchedule = JSON.parse(localStorage.getItem('festival_admin_schedule') || 'null') || DEFAULT_SCHEDULE;
     let stands = JSON.parse(localStorage.getItem('festival_admin_stands') || 'null') || DEFAULT_STANDS;
 
