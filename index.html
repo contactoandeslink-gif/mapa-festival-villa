@@ -42,48 +42,19 @@
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-    /* GPS Pulso & Haz de Brújula */
-    .user-gps-container { position: relative; }
-    .user-gps-pulse {
-      width: 20px;
-      height: 20px;
-      background-color: #2563eb;
-      border: 3.5px solid #ffffff;
-      border-radius: 50%;
-      box-shadow: 0 0 14px rgba(37, 99, 235, 0.85);
+    /* GPS Pulso & Haz de Brújula estilo Google Maps */
+    .user-gps-container {
       position: relative;
-      z-index: 20;
-    }
-    .user-gps-pulse::after {
-      content: '';
-      position: absolute;
-      top: -11px;
-      left: -11px;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: rgba(37, 99, 235, 0.35);
-      animation: pulse-ring 2s infinite ease-out;
-    }
-    .user-heading-cone {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 0;
-      height: 0;
-      border-left: 28px solid transparent;
-      border-right: 28px solid transparent;
-      border-top: 75px solid rgba(37, 99, 235, 0.35);
-      transform-origin: 50% 0;
-      transform: translate(-50%, -75px) rotate(0deg);
+      overflow: visible;
       pointer-events: none;
-      z-index: 10;
-      filter: drop-shadow(0 0 10px rgba(37, 99, 235, 0.4));
-      transition: transform 0.12s ease-out;
     }
-    @keyframes pulse-ring {
-      0% { transform: scale(0.6); opacity: 1; }
-      100% { transform: scale(1.8); opacity: 0; }
+    .user-gps-radar-ring {
+      transform-origin: 40px 40px;
+      animation: gps-pulse-anim 2s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+    }
+    @keyframes gps-pulse-anim {
+      0% { transform: scale(0.6); opacity: 0.9; }
+      100% { transform: scale(2.4); opacity: 0; }
     }
 
     .stand-pin-badge {
@@ -2255,11 +2226,34 @@
     const userGpsIcon = L.divIcon({
       className: 'user-gps-container',
       html: `
-        <div id="userHeadingCone" class="user-heading-cone" style="transform: translate(-50%, -75px) rotate(0deg);"></div>
-        <div class="user-gps-pulse"></div>
+        <svg viewBox="0 0 80 80" width="80" height="80" xmlns="http://www.w3.org/2000/svg" style="display:block; overflow:visible;">
+          <defs>
+            <radialGradient id="gpsBeamGrad" cx="40" cy="40" r="36" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#2563eb" stop-opacity="0.8" />
+              <stop offset="35%" stop-color="#3b82f6" stop-opacity="0.5" />
+              <stop offset="70%" stop-color="#60a5fa" stop-opacity="0.18" />
+              <stop offset="100%" stop-color="#93c5fd" stop-opacity="0" />
+            </radialGradient>
+            <filter id="gpsGlow" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-color="#000000" flood-opacity="0.35" />
+            </filter>
+          </defs>
+          <!-- Cono y flecha de dirección (Rotan desde el centro exacto 40, 40) -->
+          <g class="user-heading-cone" style="transform-origin: 40px 40px; transform: rotate(0deg); transition: transform 0.12s ease-out;">
+            <!-- Haz de linterna radial Google Maps -->
+            <path d="M 40 40 L 22 8.8 A 36 36 0 0 1 58 8.8 Z" fill="url(#gpsBeamGrad)" />
+            <!-- Flecha direccional blanca/azul nítida -->
+            <polygon points="40,10 34,23 40,20 46,23" fill="#2563eb" stroke="#ffffff" stroke-width="1.8" stroke-linejoin="round" filter="url(#gpsGlow)" />
+          </g>
+          <!-- Halo radar animado -->
+          <circle cx="40" cy="40" r="10" class="user-gps-radar-ring" fill="rgba(37, 99, 235, 0.28)" />
+          <!-- Punto azul con borde blanco y relieve 3D -->
+          <circle cx="40" cy="40" r="7.5" fill="#ffffff" filter="url(#gpsGlow)" />
+          <circle cx="40" cy="40" r="5" fill="#2563eb" />
+        </svg>
       `,
-      iconSize: [20, 20],
-      iconAnchor: [10, 10]
+      iconSize: [80, 80],
+      iconAnchor: [40, 40]
     });
 
     let currentHeadingAngle = 0;
@@ -2269,11 +2263,11 @@
       currentHeadingAngle = degrees;
       const cones = document.querySelectorAll('.user-heading-cone');
       cones.forEach(cone => {
-        cone.style.transform = `translate(-50%, -75px) rotate(${degrees}deg)`;
+        cone.style.transform = `rotate(${degrees}deg)`;
       });
     }
 
-    // Cálculo matemático de rumbo (Bearing) entre 2 coordenadas
+        // Cálculo matemático de rumbo (Bearing) entre 2 coordenadas
     function calculateBearing(lat1, lon1, lat2, lon2) {
       const toRad = deg => deg * Math.PI / 180;
       const toDeg = rad => rad * 180 / Math.PI;
