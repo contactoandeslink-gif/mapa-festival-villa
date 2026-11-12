@@ -490,991 +490,15 @@
   <!-- SCRIPT: BASE DE DATOS MASIVA (20 LOCALES & 10 ARTISTAS)  -->
   <!-- ======================================================== -->
   <script>
-    // ----------------------------------------------------
-    // BASE DE DATOS INICIAL CON FOTOS REALES Y HORARIOS
-    // ----------------------------------------------------
-    const DEFAULT_SCHEDULE = [
-      { id: 1, type: "music", artist: "Dj Set Bienvenida & Warm Up", genre: "Música Chill Out & Éxitos", time: "15:00 - 16:00", status: "finished", desc: "Música ambiental para recibir a las familias en la cancha.", image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&auto=format&fit=crop&q=80" },
-      { id: 2, type: "intermission", artist: "Prueba de Sonido & Pausa Técnica", genre: "Técnica de Audio y Micrófonos", time: "16:00 - 16:15", status: "finished", desc: "Ajuste de monitores e instrumentos en tarima.", image: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800&auto=format&fit=crop&q=80" },
-      { id: 3, type: "music", artist: "Ballet Folclórico de la Villa", genre: "Cuecas, Sau Sau y Tradición", time: "16:15 - 17:15", status: "finished", desc: "Presentación oficial de 30 bailarines con trajes típicos chilenos.", image: "https://images.unsplash.com/photo-1547153760-18fc86324498?w=800&auto=format&fit=crop&q=80" },
-      { id: 4, type: "intermission", artist: "Animación de Bienvenida & Concursos", genre: "Premios al público en la cancha", time: "17:15 - 17:30", status: "finished", desc: "Concursos familiares con el animador oficial.", image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&auto=format&fit=crop&q=80" },
-      { id: 5, type: "music", artist: "Américo", genre: "El Rey de la Cumbia Tropical • Show Oficial", time: "17:30 - 19:00", status: "live", desc: "Show estelar con orquesta completa: Te Vas, Que Levante la Mano, El Embrujo.", image: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=800&auto=format&fit=crop&q=80" },
-      { id: 6, type: "intermission", artist: "Intermedio / Cambio de Batería e Instrumentos", genre: "Pausa Técnica de Escenario", time: "19:00 - 19:20", status: "upcoming", desc: "Montaje de amplificadores para la banda de rock.", image: "https://images.unsplash.com/photo-1465847899084-d164df4dedc6?w=800&auto=format&fit=crop&q=80" },
-      { id: 7, type: "tribute", artist: "Guns N' Roses Experience", genre: "Banda Tributo Oficial Sudamericano", time: "19:20 - 20:45", status: "upcoming", desc: "Sweet Child O' Mine, Welcome to the Jungle y November Rain en vivo.", image: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=800&auto=format&fit=crop&q=80" },
-      { id: 8, type: "humor", artist: "Stand Up Comedy: Los Vecinos Ríen", genre: "Humor Costumbrista", time: "20:45 - 21:20", status: "upcoming", desc: "Monólogo humorístico sobre anécdotas de barrio y ferias libres.", image: "https://images.unsplash.com/photo-1585699324551-f6c309eedeca?w=800&auto=format&fit=crop&q=80" },
-      { id: 9, type: "tribute", artist: "Santaferia (Tributo Casero)", genre: "Cumbia Casera & Viento Metales", time: "21:30 - 22:45", status: "upcoming", desc: "El huracán bailable de la cumbia chilena para saltar en la cancha.", image: "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=800&auto=format&fit=crop&q=80" },
-      { id: 10, type: "music", artist: "Dj Cierre Fiesta de las Luces", genre: "Electrónica, Pachanga & Old School", time: "23:00 - 01:00", status: "upcoming", desc: "Fiesta de cierre del festival con cañón de confeti y show de iluminación.", image: "https://images.unsplash.com/photo-1498038432885-c6f3f1b912ee?w=800&auto=format&fit=crop&q=80" }
-    ];
-
-    const DEFAULT_STANDS = [
-      { id: 1, number: "P-01", name: "Cervecería El Roble", category: "beer", categoryName: "Cervezas & Tragos", icon: "🍺", logoUrl: "https://images.unsplash.com/photo-1538488881522-4326c36660df?w=300&h=300&fit=crop", color: "#f59e0b", desc: "Schops artesanales directos de barril: IPA, Amber Ale y Stout.", latOffset: 0.00015, lngOffset: 0.00020, whatsapp: "56912345678", bankData: { bank: "Banco Estado", accountType: "Cuenta RUT", accountNumber: "15.432.890-K", holderName: "Cervecería El Roble", email: "pagos@roble.cl" }, products: [ { name: "Schop IPA Artesanal 500cc", price: "$4.000", inStock: true }, { name: "Schop Amber Ale 500cc", price: "$4.000", inStock: true }, { name: "Michelada Tradicional", price: "$4.500", inStock: true }, { name: "Vaso Coleccionable Festival", price: "$1.000", inStock: true } ] },
-      { id: 2, number: "P-02", name: "Food Truck Bajón Criollo", category: "food", categoryName: "Comidas", icon: "🍔", logoUrl: "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=300&h=300&fit=crop", color: "#ea580c", desc: "Completos gigantes en pan amasado, churrascos italianos y papas rústicas.", latOffset: 0.00008, lngOffset: -0.00018, whatsapp: "56987654321", bankData: { bank: "Banco Santander", accountType: "Cuenta Corriente", accountNumber: "000-7654321-9", holderName: "Bajón Criollo SpA", email: "pedidos@bajoncriollo.cl" }, products: [ { name: "Completo Italiano Gigante", price: "$2.500", inStock: true }, { name: "Completo Alemán (Chucrut/Tomate/Mayo)", price: "$2.800", inStock: true }, { name: "Churrasco Italiano en Marraqueta", price: "$5.500", inStock: true }, { name: "Empanada de Pino al Horno", price: "$2.500", inStock: true }, { name: "Papas Rústicas con Cheddar", price: "$3.500", inStock: true } ] },
-      { id: 3, number: "P-03", name: "El Rincón del Sabor", category: "food", categoryName: "Comidas", icon: "🌭", logoUrl: "https://images.unsplash.com/photo-1619740455993-9e612b1af08a?w=300&h=300&fit=crop", color: "#ea580c", desc: "Completos dinámicos, sándwiches de mechada y bebidas heladas.", latOffset: -0.00005, lngOffset: -0.00025, whatsapp: "56955443322", bankData: { bank: "Banco de Chile", accountType: "Cuenta Vista", accountNumber: "12345678", holderName: "Marta Gómez", email: "marta@sabor.cl" }, products: [ { name: "Completo Dinámico Especial", price: "$2.700", inStock: true }, { name: "Sándwich Mechada Italiana", price: "$5.800", inStock: true }, { name: "Bebida en Lata 350cc", price: "$1.500", inStock: true } ] },
-      { id: 4, number: "P-04", name: "Asados & Brasas del Sur", category: "food", categoryName: "Comidas", icon: "🥩", logoUrl: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=300&h=300&fit=crop", color: "#dc2626", desc: "Carnes a la parrilla, anticuchos de lomo y choripanes con pebre.", latOffset: 0.00020, lngOffset: -0.00010, whatsapp: "56933221144", bankData: { bank: "Banco BCI", accountType: "Cuenta Corriente", accountNumber: "555-12345-6", holderName: "Brasas del Sur", email: "asados@brasas.cl" }, products: [ { name: "Anticucho Mixto Lomo y Cerdo (40cm)", price: "$4.500", inStock: true }, { name: "Choripán Artesanal con Pebre", price: "$2.500", inStock: true }, { name: "Plato Parrillero con Ensalada", price: "$7.500", inStock: true } ] },
-      { id: 5, number: "P-05", name: "La Barra Terremotera", category: "beer", categoryName: "Cervezas & Tragos", icon: "🍷", logoUrl: "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=300&h=300&fit=crop", color: "#f59e0b", desc: "Terremotos tradicionales con pipeño campesino, helado de piña y granadina.", latOffset: -0.00015, lngOffset: 0.00018, whatsapp: "56966778899", bankData: { bank: "Banco Estado", accountType: "Cuenta RUT", accountNumber: "18.990.112-4", holderName: "Barra Terremotera", email: "barra@terremoto.cl" }, products: [ { name: "Terremoto Tradicional 1/2 Litro", price: "$3.500", inStock: true }, { name: "Terremoto Infantil (Sin alcohol)", price: "$2.500", inStock: true }, { name: "Vino Navegado Calentito", price: "$3.000", inStock: true } ] },
-      { id: 6, number: "P-06", name: "Papas Fritas El Cono Loco", category: "food", categoryName: "Comidas", icon: "🍟", logoUrl: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=300&h=300&fit=crop", color: "#ea580c", desc: "Conos gigantes de papas fritas naturales con más de 10 salsas caseras.", latOffset: 0.00002, lngOffset: -0.00030, whatsapp: "56944332211", bankData: { bank: "Banco Scotiabank", accountType: "Cuenta Corriente", accountNumber: "77665544", holderName: "El Cono Loco", email: "papas@conoloco.cl" }, products: [ { name: "Cono Gigante de Papas Naturales", price: "$3.500", inStock: true }, { name: "Papas con Tocino Crispy y Queso", price: "$4.500", inStock: true }, { name: "Nuggets de Pollo Caseros (8 un)", price: "$3.000", inStock: true } ] },
-      { id: 7, number: "P-07", name: "Waffles & Crepes Dulce Antojo", category: "sweets", categoryName: "Postres & Dulces", icon: "🧇", logoUrl: "https://images.unsplash.com/photo-1562376552-0d160a2f238d?w=300&h=300&fit=crop", color: "#ec4899", desc: "Waffles belgas recién horneados, crepes con manjar, frutillas y nutella.", latOffset: -0.00018, lngOffset: -0.00015, whatsapp: "56999887766", bankData: { bank: "Banco Estado", accountType: "Cuenta RUT", accountNumber: "19.334.556-7", holderName: "Dulce Antojo", email: "waffles@antojo.cl" }, products: [ { name: "Waffle con Frutillas, Manjar y Crema", price: "$3.800", inStock: true }, { name: "Crepe de Nutella y Plátano", price: "$3.500", inStock: true }, { name: "Churros Rellenos con Manjar (5 un)", price: "$2.500", inStock: true } ] },
-      { id: 8, number: "P-08", name: "Helados Artesanales La Nieve", category: "sweets", categoryName: "Postres & Dulces", icon: "🍦", logoUrl: "https://images.unsplash.com/photo-1501443762994-82bd5dace89a?w=300&h=300&fit=crop", color: "#ec4899", desc: "Helados artesanales 100% de fruta natural: Lúcuma, Frambuesa, Maracuyá.", latOffset: -0.00022, lngOffset: -0.00005, whatsapp: "56911335577", bankData: { bank: "Banco Itaú", accountType: "Cuenta Corriente", accountNumber: "11223344", holderName: "La Nieve Helados", email: "helados@lanieve.cl" }, products: [ { name: "Copa Helado 2 Sabores Artesanales", price: "$2.800", inStock: true }, { name: "Paleta Rellena de Leche Condensada", price: "$2.000", inStock: true }, { name: "Milkshake Clásico Espeso", price: "$3.500", inStock: true } ] },
-      { id: 9, number: "P-09", name: "Cervecería Artesanal Kutral", category: "beer", categoryName: "Cervezas & Tragos", icon: "🍺", logoUrl: "https://images.unsplash.com/photo-1575037614876-c38a4d44f5b8?w=300&h=300&fit=crop", color: "#f59e0b", desc: "Cervezas campesinas ahumadas, Golden Ale y Red Ale.", latOffset: 0.00012, lngOffset: 0.00028, whatsapp: "56922446688", bankData: { bank: "Banco BICE", accountType: "Cuenta Corriente", accountNumber: "88990011", holderName: "Kutral Cervezas", email: "kutral@cerveza.cl" }, products: [ { name: "Schop Golden Ale 500cc", price: "$3.800", inStock: true }, { name: "Schop Red Ale Ahumada 500cc", price: "$4.200", inStock: true }, { name: "Pack 3 Botellas de Colección", price: "$8.500", inStock: true } ] },
-      { id: 10, number: "P-10", name: "Pizzería Nápoles al Paso", category: "food", categoryName: "Comidas", icon: "🍕", logoUrl: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=300&h=300&fit=crop", color: "#ea580c", desc: "Pizzas individuales a la piedra con masa madre e ingredientes frescos.", latOffset: 0.00025, lngOffset: -0.00022, whatsapp: "56933557799", bankData: { bank: "Banco Santander", accountType: "Cuenta Corriente", accountNumber: "99887711", holderName: "Nápoles al Paso", email: "pizza@napoles.cl" }, products: [ { name: "Pizza Margarita Individual Masa Madre", price: "$4.500", inStock: true }, { name: "Pizza Pepperoni y Queso Fundido", price: "$5.000", inStock: true }, { name: "Trozos de Focaccia con Romero", price: "$2.000", inStock: true } ] },
-      { id: 11, number: "P-11", name: "Sabor Mexicano: Tacos & Burritos", category: "food", categoryName: "Comidas", icon: "🌮", logoUrl: "https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=300&h=300&fit=crop", color: "#ea580c", desc: "Tacos al pastor, quesadillas con guacamole y totopos con salsa.", latOffset: 0.00018, lngOffset: -0.00030, whatsapp: "56944668800", bankData: { bank: "Banco de Chile", accountType: "Cuenta Corriente", accountNumber: "33445566", holderName: "Sabor Mexicano", email: "tacos@mexicano.cl" }, products: [ { name: "Trío de Tacos al Pastor con Guacamole", price: "$4.800", inStock: true }, { name: "Quesadilla Gigante de Queso y Pollo", price: "$4.200", inStock: true }, { name: "Porción de Totopos con Queso y Salsa", price: "$2.800", inStock: true } ] },
-      { id: 12, number: "P-12", name: "La Coctelería del Parque", category: "beer", categoryName: "Cervezas & Tragos", icon: "🍸", logoUrl: "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=300&h=300&fit=crop", color: "#8b5cf6", desc: "Mojitos cubanos tradicionales, Aperol Spritz, Pisco Sour artesanal y Mocktails.", latOffset: -0.00010, lngOffset: 0.00025, whatsapp: "56955779911", bankData: { bank: "Banco Security", accountType: "Cuenta Corriente", accountNumber: "55667788", holderName: "Coctelería del Parque", email: "tragos@parque.cl" }, products: [ { name: "Mojito Cubano Menta Fresca 500cc", price: "$4.500", inStock: true }, { name: "Aperol Spritz Clásico", price: "$5.000", inStock: true }, { name: "Pisco Sour Valle del Elqui", price: "$4.000", inStock: true }, { name: "Mocktail Frutos Rojos (Sin alcohol)", price: "$3.000", inStock: true } ] },
-      { id: 13, number: "P-13", name: "Cafetería & Pastelería de la Abuela", category: "sweets", categoryName: "Postres & Dulces", icon: "☕", logoUrl: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=300&h=300&fit=crop", color: "#ec4899", desc: "Café de grano recién molido, tortas caseras de milhojas y medialunas.", latOffset: -0.00025, lngOffset: -0.00010, whatsapp: "56966880022", bankData: { bank: "Banco Estado", accountType: "Cuenta RUT", accountNumber: "14.223.445-8", holderName: "Pastelería Abuela", email: "cafe@abuela.cl" }, products: [ { name: "Café Cappuccino de Grano 300cc", price: "$2.500", inStock: true }, { name: "Porción Torta Milhojas con Manjar", price: "$3.500", inStock: true }, { name: "Par de Medialunas Artesanales", price: "$1.800", inStock: true } ] },
-      { id: 14, number: "P-14", name: "Tejidos & Lana Natural del Valle", category: "crafts", categoryName: "Artesanías", icon: "🧶", logoUrl: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=300&h=300&fit=crop", color: "#059669", desc: "Prendas tejidas a mano en telar y palillo con lana de oveja virgen.", latOffset: -0.00008, lngOffset: -0.00012, whatsapp: "56977991133", bankData: { bank: "Banco Falabella", accountType: "Cuenta Corriente", accountNumber: "66778899", holderName: "Tejidos del Valle", email: "tejidos@valle.cl" }, products: [ { name: "Gorro a Telar Lana de Oveja", price: "$8.000", inStock: true }, { name: "Bufanda Infinita Pura Lana", price: "$12.000", inStock: true }, { name: "Zapatillas de Estar en Casa Lana", price: "$9.500", inStock: true } ] },
-      { id: 15, number: "P-15", name: "Orfebrería en Cobre & Cuero", category: "crafts", categoryName: "Artesanías", icon: "💍", logoUrl: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=300&h=300&fit=crop", color: "#059669", desc: "Joyas artesanales forjadas en cobre chileno y pulseras de cuero trenzado.", latOffset: -0.00014, lngOffset: -0.00008, whatsapp: "56988002244", bankData: { bank: "Banco Estado", accountType: "Cuenta RUT", accountNumber: "16.778.899-2", holderName: "Cobre & Cuero", email: "joyas@cobre.cl" }, products: [ { name: "Aros de Cobre Esmaltado a Fuego", price: "$5.000", inStock: true }, { name: "Colgante Árbol de la Vida en Cobre", price: "$7.500", inStock: true }, { name: "Pulsera de Cuero con Broche Metálico", price: "$4.000", inStock: true } ] },
-      { id: 16, number: "P-16", name: "Cerámica & Alfarería Tradicional", category: "crafts", categoryName: "Artesanías", icon: "🏺", logoUrl: "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=300&h=300&fit=crop", color: "#059669", desc: "Macetas, vasijas y pocillos hechos en greda cocida y esmalte.", latOffset: -0.00018, lngOffset: 0.00002, whatsapp: "56999113355", bankData: { bank: "Banco BCI", accountType: "Cuenta Corriente", accountNumber: "77889900", holderName: "Cerámica Tradición", email: "greda@ceramica.cl" }, products: [ { name: "Pocillo Greda Esmaltada para Pebre", price: "$3.000", inStock: true }, { name: "Maceta Decorativa Rústica", price: "$6.000", inStock: true }, { name: "Juego 4 Vasos de Greda Campesinos", price: "$8.000", inStock: true } ] },
-      { id: 17, number: "P-17", name: "Cosmética Natural & Aceites Esenciales", category: "crafts", categoryName: "Artesanías", icon: "🌿", logoUrl: "https://images.unsplash.com/photo-1608248597359-0a648e4b8577?w=300&h=300&fit=crop", color: "#059669", desc: "Jabones biodegradables, cremas de caléndula y aceites de aromaterapia.", latOffset: -0.00022, lngOffset: 0.00008, whatsapp: "56911224466", bankData: { bank: "Banco Santander", accountType: "Cuenta Corriente", accountNumber: "44556677", holderName: "Cosmética Natural", email: "natural@eco.cl" }, products: [ { name: "Jabón Artesanal de Avena y Miel", price: "$3.000", inStock: true }, { name: "Crema Facial de Rosa Mosqueta", price: "$7.000", inStock: true }, { name: "Roll-on Aceite Esencial Lavanda", price: "$4.500", inStock: true } ] },
-      { id: 18, number: "P-18", name: "Cervecería Austral Valle", category: "beer", categoryName: "Cervezas & Tragos", icon: "🍺", logoUrl: "https://images.unsplash.com/photo-1608270586620-248524c67de9?w=300&h=300&fit=crop", color: "#f59e0b", desc: "Cervezas rubias livianas lager y calafate austral.", latOffset: 0.00005, lngOffset: 0.00032, whatsapp: "56922335577", bankData: { bank: "Banco de Chile", accountType: "Cuenta Corriente", accountNumber: "88776655", holderName: "Austral Valle", email: "cerveza@austral.cl" }, products: [ { name: "Schop Calafate Austral 500cc", price: "$4.500", inStock: true }, { name: "Schop Lager Rubia Refrescante", price: "$3.800", inStock: true } ] }
-    ];
-
-    const DEFAULT_SERVICES = [
-      { id: 19, number: "ESC", name: "Escenario Principal", category: "service", categoryName: "Escenario", icon: "🎸", logoUrl: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=300&h=300&fit=crop", color: "#dc2626", desc: "Tarima principal donde se presentan los shows del festival.", latOffset: 0.00028, lngOffset: 0.00000, whatsapp: "", bankData: null, products: [] },
-      { id: 20, number: "WC", name: "Batería de Baños Químicos", category: "service", categoryName: "Servicios", icon: "🚻", logoUrl: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=300&h=300&fit=crop", color: "#2563eb", desc: "Servicios higiénicos, lavamanos con jabón, primeros auxilios y punto limpio.", latOffset: -0.00024, lngOffset: 0.00022, whatsapp: "", bankData: null, products: [] }
-    ];
-
-    // Cargar del localStorage o inicializar con defaults
-    let stageSchedule = JSON.parse(localStorage.getItem('festival_admin_schedule') || 'null') || DEFAULT_SCHEDULE;
-    let stands = JSON.parse(localStorage.getItem('festival_admin_stands') || 'null') || [...DEFAULT_STANDS, ...DEFAULT_SERVICES];
-
-    // ========================================================
-    // 3. SINCRONIZACIÓN EN VIVO CON EL ADMINISTRADOR
-    // ========================================================
-    const eventChannel = new BroadcastChannel('festival_live_sync');
-    eventChannel.onmessage = (event) => {
-      if (event.data.type === 'SYNC_ALL') {
-        stageSchedule = event.data.schedule;
-        stands = event.data.stands;
-        renderLiveHero();
-        renderScheduleList();
-        renderStandsFeed();
-        renderStandsOnMap();
-        showLiveToast(`⚡ Cambios del administrador aplicados en vivo`);
-      } else if (event.data.type === 'ANNOUNCEMENT') {
-        showLiveToast(`📢 AVISO: ${event.data.message}`);
-      } else if (event.data.type === 'STAGE_UPDATED') {
-        stageSchedule = event.data.schedule;
-        renderLiveHero();
-        renderScheduleList();
-        showLiveToast(`⚡ El administrador actualizó el escenario en vivo: ${event.data.liveArtist}`);
-      } else if (event.data.type === 'STANDS_UPDATED') {
-        stands = event.data.stands;
-        renderStandsFeed();
-        renderStandsOnMap();
-        showLiveToast(`📦 Se actualizaron los precios y stock de locales`);
-      }
-    };
-
-    // Escuchar cambios de localStorage entre pestañas
-    window.addEventListener('storage', (e) => {
-      if (e.key === 'festival_admin_schedule' && e.newValue) {
-        try { stageSchedule = JSON.parse(e.newValue); renderLiveHero(); renderScheduleList(); } catch (err) {}
-      }
-      if (e.key === 'festival_admin_stands' && e.newValue) {
-        try { stands = JSON.parse(e.newValue); renderStandsFeed(); renderStandsOnMap(); } catch (err) {}
-      }
-    });
-
-    // Cargar si el admin guardó cambios previos en este navegador
-    const savedSchedule = localStorage.getItem('festival_admin_schedule');
-    if (savedSchedule) {
-      try { stageSchedule = JSON.parse(savedSchedule); } catch (e) {}
-    }
-    const savedStands = localStorage.getItem('festival_admin_stands');
-    if (savedStands) {
-      try { stands = JSON.parse(savedStands); } catch (e) {}
+    // Limpiar caché vieja si la versión de datos cambió
+    const DATA_VERSION = '2026.02.visual_pro';
+    if (localStorage.getItem('festival_data_version') !== DATA_VERSION) {
+      localStorage.setItem('festival_data_version', DATA_VERSION);
+      localStorage.removeItem('festival_admin_schedule');
+      localStorage.removeItem('festival_admin_stands');
+      localStorage.removeItem('festival_manual_live_id');
     }
 
-    function showLiveToast(msg) {
-      const toast = document.createElement('div');
-      toast.className = 'fixed top-16 left-1/2 -translate-x-1/2 z-50 bg-red-600 text-white font-bold text-xs px-4 py-2 rounded-full shadow-2xl animate-bounce';
-      toast.textContent = msg;
-      document.body.appendChild(toast);
-      setTimeout(() => toast.remove(), 4000);
-    }
-
-    // ========================================================
-    // 4. CONTROL DE PESTAÑAS (TABS)
-    // ========================================================
-    let currentTab = 'live';
-
-    function switchTab(tab) {
-      currentTab = tab;
-      
-      document.getElementById('view-live').classList.add('hidden');
-      document.getElementById('view-map').classList.add('hidden');
-      document.getElementById('view-stands').classList.add('hidden');
-
-      const tabs = ['live', 'map', 'stands'];
-      tabs.forEach(t => {
-        const btn = document.getElementById(`tab-btn-${t}`);
-        if (t === tab) {
-          btn.className = 'flex flex-col items-center gap-1 text-orange-500 font-extrabold text-[11px] transition';
-        } else {
-          btn.className = 'flex flex-col items-center gap-1 text-slate-400 hover:text-white font-bold text-[11px] transition';
-        }
-      });
-
-      if (tab === 'live') {
-        document.getElementById('view-live').classList.remove('hidden');
-      } else if (tab === 'map') {
-        document.getElementById('view-map').classList.remove('hidden');
-        setTimeout(() => map.invalidateSize(), 150);
-      } else if (tab === 'stands') {
-        document.getElementById('view-stands').classList.remove('hidden');
-      }
-    }
-
-    // ========================================================
-    // 5. MOTOR INTELIGENTE DE HORARIOS EN VIVO (HORA DE CHILE)
-    // ========================================================
-    function getChileDateObj() {
-      const now = new Date();
-      const chileStr = now.toLocaleString("en-US", { timeZone: "America/Santiago" });
-      return new Date(chileStr);
-    }
-
-    function parseTimeToMinutes(timeStr) {
-      if (!timeStr || !timeStr.includes(':')) return 0;
-      const [h, m] = timeStr.trim().split(':').map(Number);
-      return (h || 0) * 60 + (m || 0);
-    }
-
-    // Calcula automáticamente qué show está en vivo según la hora real de Chile
-    function autoResolveScheduleStatus() {
-      const chileDate = getChileDateObj();
-      const currentTotalMin = chileDate.getHours() * 60 + chileDate.getMinutes();
-      const manualLiveId = localStorage.getItem('festival_manual_live_id');
-
-      let foundLive = false;
-
-      stageSchedule.forEach(act => {
-        if (!act.time || !act.time.includes('-')) return;
-        const parts = act.time.split('-').map(t => t.trim());
-        const startMin = parseTimeToMinutes(parts[0]);
-        let endMin = parseTimeToMinutes(parts[1]);
-        if (endMin < startMin) endMin += 24 * 60; // Para shows que pasan la medianoche
-
-        let checkNowMin = currentTotalMin;
-        if (checkNowMin < startMin && endMin > 24 * 60) checkNowMin += 24 * 60;
-
-        if (manualLiveId && Number(manualLiveId) === act.id) {
-          act.status = 'live';
-          foundLive = true;
-        } else if (!manualLiveId) {
-          if (checkNowMin >= startMin && checkNowMin < endMin) {
-            act.status = 'live';
-            foundLive = true;
-          } else if (checkNowMin >= endMin) {
-            act.status = 'finished';
-          } else {
-            act.status = 'upcoming';
-          }
-        }
-      });
-
-      // Si ningún show coincide exactamente (ej: antes de las 15:00 o después de la 01:00)
-      if (!foundLive && !manualLiveId && stageSchedule.length > 0) {
-        const upcomingAct = stageSchedule.find(s => parseTimeToMinutes(s.time.split('-')[0]) > currentTotalMin);
-        if (upcomingAct) {
-          upcomingAct.status = 'live';
-        } else {
-          stageSchedule[stageSchedule.length - 1].status = 'live';
-        }
-      }
-    }
-
-    let lastActiveActId = null;
-
-    function updateLiveClockAndProgress() {
-      const chileDate = getChileDateObj();
-      const h = String(chileDate.getHours()).padStart(2, '0');
-      const m = String(chileDate.getMinutes()).padStart(2, '0');
-      const s = String(chileDate.getSeconds()).padStart(2, '0');
-      const timeStr = `${h}:${m}:${s}`;
-      const shortTimeStr = `${h}:${m}`;
-
-      const headerClock = document.getElementById('headerChileClock');
-      if (headerClock) headerClock.textContent = `🇨🇱 ${shortTimeStr} hrs`;
-
-      const liveClock = document.getElementById('liveChileClock');
-      if (liveClock) liveClock.textContent = `🇨🇱 ${timeStr} hrs (Chile)`;
-
-      // Recalcular estado según reloj
-      autoResolveScheduleStatus();
-
-      const liveAct = stageSchedule.find(s => s.status === 'live') || stageSchedule[0];
-      if (liveAct && liveAct.id !== lastActiveActId) {
-        lastActiveActId = liveAct.id;
-        renderLiveHero();
-        renderScheduleList();
-      }
-
-      if (liveAct && liveAct.time && liveAct.time.includes('-')) {
-        const parts = liveAct.time.split('-').map(t => t.trim());
-        const startParts = parts[0].split(':').map(Number);
-        const endParts = parts[1].split(':').map(Number);
-        
-        const startTotalMin = startParts[0] * 60 + startParts[1];
-        let endTotalMin = endParts[0] * 60 + endParts[1];
-        if (endTotalMin < startTotalMin) endTotalMin += 24 * 60;
-
-        let currentTotalMin = chileDate.getHours() * 60 + chileDate.getMinutes();
-        if (currentTotalMin < startTotalMin && endTotalMin > 24 * 60) currentTotalMin += 24 * 60;
-
-        const duration = Math.max(1, endTotalMin - startTotalMin);
-        const elapsed = Math.max(0, currentTotalMin - startTotalMin);
-        const remaining = Math.max(0, endTotalMin - currentTotalMin);
-        const progressPct = Math.min(100, Math.max(5, Math.round((elapsed / duration) * 100)));
-
-        const progBar = document.getElementById('liveProgressBar');
-        if (progBar) progBar.style.width = `${progressPct}%`;
-
-        const progText = document.getElementById('liveShowProgressText');
-        if (progText) {
-          if (currentTotalMin < startTotalMin) {
-            const startsIn = startTotalMin - currentTotalMin;
-            progText.innerHTML = `⏳ Comienza en <strong>${startsIn} min</strong> (${parts[0]} hrs)`;
-          } else if (remaining > 0) {
-            progText.innerHTML = `⏱️ ${liveAct.artist} lleva <strong>${elapsed} min</strong> en tarima • Faltan <strong>${remaining} min</strong> de show`;
-          } else {
-            progText.innerHTML = `🏁 Show en su cierre final • Próximo grupo subiendo a la tarima`;
-          }
-        }
-      }
-    }
-
-    setInterval(updateLiveClockAndProgress, 1000);
-
-    function renderLiveHero() {
-      autoResolveScheduleStatus();
-      const liveAct = stageSchedule.find(s => s.status === 'live') || stageSchedule[0];
-      if (!liveAct) return;
-
-      const isIntermission = liveAct.type === 'intermission';
-      const liveStatusBadge = document.getElementById('heroLiveStatusBadge');
-      if (liveStatusBadge) {
-        if (isIntermission) {
-          liveStatusBadge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-amber-500 text-black shadow-lg shadow-amber-500/40 animate-pulse';
-          liveStatusBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-black"></span> PAUSA TÉCNICA';
-        } else {
-          liveStatusBadge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-red-600 text-white shadow-lg shadow-red-600/40 animate-pulse';
-          liveStatusBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-white"></span> EN VIVO AHORA';
-        }
-      }
-
-      document.getElementById('liveArtistName').textContent = liveAct.artist;
-      
-      // Limpiar subtítulo para no duplicar texto
-      let genreText = liveAct.genre;
-      if (!genreText.toLowerCase().includes('oficial') && !isIntermission) {
-        genreText += ' • Show Oficial';
-      }
-      document.getElementById('liveArtistGenre').textContent = genreText;
-      document.getElementById('liveArtistDesc').textContent = liveAct.desc;
-      document.getElementById('liveTimeBadge').textContent = `${liveAct.time} hrs`;
-
-      if (liveAct.image) {
-        document.getElementById('heroLiveBg').style.backgroundImage = `url('${liveAct.image}')`;
-      }
-
-      // Siguiente artista
-      const currentIdx = stageSchedule.findIndex(s => s.id === liveAct.id);
-      const nextAct = stageSchedule[currentIdx + 1];
-      const nextCard = document.getElementById('nextArtistCard');
-      if (nextAct) {
-        const nextStartHour = (nextAct.time || '').split('-')[0].trim();
-        const chileDate = getChileDateObj();
-        const nextParts = nextStartHour.split(':').map(Number);
-        const nextTotalMin = (nextParts[0] || 0) * 60 + (nextParts[1] || 0);
-        const currentTotalMin = chileDate.getHours() * 60 + chileDate.getMinutes();
-        const minUntilNext = Math.max(0, nextTotalMin - currentTotalMin);
-
-        nextCard.classList.remove('hidden');
-        nextCard.innerHTML = `
-          <div class="flex items-center gap-3">
-            <div class="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-2xl shrink-0">
-              ${nextAct.type === 'intermission' ? '⏱️' : nextAct.type === 'humor' ? '😂' : '⚡'}
-            </div>
-            <div>
-              <span class="text-[10px] font-black uppercase tracking-wider text-amber-400">A Continuación (${nextStartHour} hrs)</span>
-              <h3 class="text-base font-black text-white font-display">${nextAct.artist}</h3>
-              <p class="text-xs text-slate-400">${nextAct.genre}</p>
-            </div>
-          </div>
-          <span class="text-xs font-bold text-amber-300 bg-amber-950/80 border border-amber-600/40 px-3 py-1.5 rounded-lg shrink-0">
-            ${minUntilNext > 0 ? `En ${minUntilNext} min` : 'Próximo'}
-          </span>
-        `;
-      } else {
-        nextCard.classList.add('hidden');
-      }
-    }
-
-    function renderScheduleList() {
-      const container = document.getElementById('fullScheduleContainer');
-      container.innerHTML = '';
-
-      stageSchedule.forEach(act => {
-        const item = document.createElement('div');
-        const isLive = act.status === 'live';
-        const isFinished = act.status === 'finished';
-        const isIntermission = act.type === 'intermission';
-
-        if (isIntermission) {
-          item.className = `p-3.5 rounded-2xl border transition flex items-center justify-between ${
-            isLive 
-              ? 'bg-amber-950/50 border-amber-500 ring-2 ring-amber-500/70 shadow-lg' 
-              : isFinished 
-              ? 'bg-slate-900/40 border-slate-800 opacity-60' 
-              : 'bg-amber-950/20 border-amber-700/30'
-          }`;
-          item.innerHTML = `
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-lg shrink-0">
-                ⏱️
-              </div>
-              <div>
-                <div class="flex items-center gap-2">
-                  <h4 class="text-xs font-bold text-amber-300">${act.artist}</h4>
-                  <span class="text-[9px] bg-amber-500 text-black font-black uppercase px-2 py-0.5 rounded-full">PAUSA</span>
-                  ${isLive ? '<span class="text-[9px] bg-red-600 text-white font-black uppercase px-2 py-0.5 rounded-full animate-pulse">EN ESTE MOMENTO</span>' : ''}
-                </div>
-                <p class="text-[11px] text-slate-400 mt-0.5">${act.genre}</p>
-              </div>
-            </div>
-            <div class="text-right shrink-0">
-              <span class="text-xs font-mono font-bold text-amber-400">${act.time}</span>
-              <span class="text-[10px] text-slate-500 block">${isLive ? 'En curso' : isFinished ? 'Finalizado' : 'Programado'}</span>
-            </div>
-          `;
-        } else {
-          item.className = `p-3.5 rounded-2xl border transition flex items-center justify-between ${
-            isLive 
-              ? 'bg-red-950/40 border-red-500/60 ring-1 ring-red-500 shadow-lg shadow-red-950/30' 
-              : isFinished 
-              ? 'bg-slate-900/40 border-slate-800 opacity-50' 
-              : 'bg-slate-900 border-slate-800 hover:border-slate-700'
-          }`;
-          item.innerHTML = `
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-lg shrink-0 overflow-hidden">
-                ${act.image 
-                  ? `<img src="${act.image}" class="w-full h-full object-cover" onerror="this.onerror=null;this.parentElement.innerHTML='${isLive ? '🔴' : isFinished ? '✓' : '🎸'}';">` 
-                  : (isLive ? '🔴' : isFinished ? '✓' : '🎸')}
-              </div>
-              <div>
-                <div class="flex items-center gap-2">
-                  <h4 class="text-xs font-black text-white">${act.artist}</h4>
-                  ${isLive ? '<span class="text-[9px] bg-red-600 text-white font-black uppercase px-2 py-0.5 rounded-full animate-pulse">EN VIVO</span>' : ''}
-                  ${act.type === 'tribute' ? '<span class="text-[9px] bg-purple-900/80 text-purple-300 border border-purple-500/30 px-1.5 py-0.5 rounded font-bold">Tributo</span>' : ''}
-                  ${act.type === 'humor' ? '<span class="text-[9px] bg-yellow-900/80 text-yellow-300 border border-yellow-500/30 px-1.5 py-0.5 rounded font-bold">Humor</span>' : ''}
-                </div>
-                <p class="text-[11px] text-slate-400 mt-0.5">${act.genre}</p>
-              </div>
-            </div>
-            <div class="text-right shrink-0">
-              <span class="text-xs font-extrabold ${isLive ? 'text-red-400' : 'text-slate-400'}">${act.time}</span>
-              <span class="text-[10px] text-slate-500 block">${isLive ? 'Tarima Central' : isFinished ? 'Finalizado' : 'En espera'}</span>
-            </div>
-          `;
-        }
-        container.appendChild(item);
-      });
-    }
-
-    renderLiveHero();
-    renderScheduleList();
-
-    function goToStageOnMap() {
-      switchTab('map');
-      const stageStand = stands.find(s => s.number === 'ESC');
-      if (stageStand) {
-        startNavigation(stageStand);
-      }
-    }
-
-    function shareArtist() {
-      const liveAct = stageSchedule.find(s => s.status === 'live');
-      if (navigator.share) {
-        navigator.share({
-          title: `¡${liveAct.artist} está tocando en vivo!`,
-          text: `Vente a la cancha, está tocando ${liveAct.artist} en el Festival de la Villa.`,
-          url: window.location.href
-        });
-      } else {
-        alert(`¡Copiado! Avísale a tus amigos: ${liveAct.artist} está tocando ahora en el escenario.`);
-      }
-    }
-
-    // ========================================================
-    // 6. RENDERIZADO DE FOOD TRUCKS CON SHOWCASE Y PLATOS CON FOTOS
-    // ========================================================
-    function renderStandsFeed(filterCat = 'all') {
-      const container = document.getElementById('standsListGrid');
-      container.innerHTML = '';
-
-      const commercial = stands.filter(s => s.category !== 'service');
-
-      commercial.forEach(stand => {
-        if (filterCat !== 'all' && stand.category !== filterCat) return;
-
-        const card = document.createElement('div');
-        card.className = 'bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-3xl overflow-hidden shadow-2xl transition duration-300 flex flex-col justify-between';
-        
-        // Render de 2 platos destacados con foto, descripción y precio
-        let prodsHtml = '';
-        if (stand.products && stand.products.length > 0) {
-          prodsHtml = '<div class="space-y-2 pt-2 border-t border-slate-800">';
-          prodsHtml += `<span class="text-[10px] font-black uppercase tracking-wider text-amber-400 flex items-center gap-1">
-            <span>🔥</span> Lo Más Pedido en este Food Truck:
-          </span>`;
-          prodsHtml += '<div class="grid grid-cols-1 sm:grid-cols-2 gap-2">';
-          
-          stand.products.slice(0, 2).forEach(p => {
-            prodsHtml += `
-              <div class="bg-slate-950/80 rounded-2xl p-2.5 border border-slate-800 flex items-center gap-3">
-                <div class="w-16 h-16 rounded-xl bg-slate-800 shrink-0 overflow-hidden border border-slate-700">
-                  <img src="${p.image}" class="w-full h-full object-cover" alt="${p.name}" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=200';">
-                </div>
-                <div class="min-w-0 flex-1">
-                  <div class="flex items-center gap-1 mb-0.5">
-                    ${p.tag ? `<span class="text-[8px] bg-amber-500/20 text-amber-300 border border-amber-500/40 px-1 py-0.2 rounded font-black truncate">${p.tag}</span>` : ''}
-                  </div>
-                  <h5 class="text-xs font-black text-white truncate">${p.name}</h5>
-                  <p class="text-[10px] text-slate-400 line-clamp-1">${p.desc || ''}</p>
-                  <span class="text-xs font-extrabold text-orange-400 block mt-1">${p.price}</span>
-                </div>
-              </div>
-            `;
-          });
-          
-          prodsHtml += '</div>';
-          if (stand.products.length > 2) {
-            prodsHtml += `<p class="text-[10px] text-slate-500 text-center font-bold pt-1">+ ${stand.products.length - 2} productos más en la carta oficial...</p>`;
-          }
-          prodsHtml += '</div>';
-        }
-
-        const bannerImage = stand.bannerUrl || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800';
-
-        card.innerHTML = `
-          <!-- Portada del Food Truck con rating y badge -->
-          <div class="relative h-28 w-full overflow-hidden bg-slate-950">
-            <img src="${bannerImage}" class="w-full h-full object-cover brightness-[0.70] hover:scale-105 transition duration-500" alt="${stand.name}">
-            <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent"></div>
-            
-            <div class="absolute top-2.5 right-2.5 bg-black/70 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-black text-amber-300 border border-amber-500/40 flex items-center gap-1 shadow">
-              <span>⭐ ${stand.rating || '4.9'}</span>
-              <span class="text-slate-400 font-normal">• ${stand.prepTime || '10 min'}</span>
-            </div>
-          </div>
-
-          <!-- Cuerpo de la tarjeta con logo flotante -->
-          <div class="p-4 pt-0 relative space-y-3 flex-1 flex flex-col justify-between">
-            <div>
-              <div class="flex items-end justify-between -mt-8 mb-2">
-                <div class="w-16 h-16 rounded-2xl bg-slate-900 border-2 border-amber-500/40 shadow-2xl overflow-hidden p-0.5 shrink-0">
-                  <img src="${stand.logoUrl}" class="w-full h-full object-contain rounded-xl" alt="${stand.name}">
-                </div>
-                <div class="flex items-center gap-1.5">
-                  <span class="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-lg bg-orange-600 text-white shadow">
-                    ${stand.categoryName}
-                  </span>
-                  <span class="text-xs text-slate-400 font-mono font-bold bg-slate-800 px-2 py-1 rounded-lg border border-slate-700">
-                    ${stand.number}
-                  </span>
-                </div>
-              </div>
-
-              <h3 class="text-base font-black text-white font-display">${stand.name}</h3>
-              <p class="text-xs text-slate-300 leading-relaxed mt-0.5">${stand.desc}</p>
-            </div>
-
-            ${prodsHtml}
-
-            <!-- Botones de Acción -->
-            <div class="grid grid-cols-2 gap-2 pt-2">
-              <button onclick="viewStandOnMap(${stand.id})" class="py-2.5 px-3 rounded-xl bg-orange-600 hover:bg-orange-500 text-white font-extrabold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-orange-600/30 active:scale-98 transition">
-                <span>🧭</span> ¿Cómo llegar?
-              </button>
-              <button onclick="openBottomSheetById(${stand.id})" class="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-xs flex items-center justify-center gap-1.5 border border-slate-700 transition">
-                <span>📋</span> Ver Carta Completa
-              </button>
-            </div>
-          </div>
-        `;
-
-        container.appendChild(card);
-      });
-    }
-
-    function filterStandsCategory(cat) {
-      document.querySelectorAll('.cat-pill').forEach(btn => {
-        btn.classList.remove('bg-orange-600', 'text-white');
-        btn.classList.add('bg-slate-800', 'text-slate-300');
-      });
-      event.target.classList.add('bg-orange-600', 'text-white');
-      event.target.classList.remove('bg-slate-800', 'text-slate-300');
-
-      renderStandsFeed(cat);
-    }
-
-    renderStandsFeed();
-
-    function viewStandOnMap(standId) {
-      const stand = stands.find(s => s.id === standId);
-      if (stand) {
-        switchTab('map');
-        startNavigation(stand);
-      }
-    }
-
-    function openBottomSheetById(standId) {
-      const stand = stands.find(s => s.id === standId);
-      if (stand) openBottomSheet(stand);
-    }
-
-    // ========================================================
-    // 7. BUSCADOR INTELIGENTE EN EL HEADER (COMPLETOS, ASADOS...)
-    // ========================================================
-    const searchInput = document.getElementById('globalSearchInput');
-    const searchDropdown = document.getElementById('searchDropdown');
-    const clearSearchBtn = document.getElementById('clearSearchBtn');
-
-    searchInput.addEventListener('input', (e) => {
-      const q = e.target.value.trim().toLowerCase();
-      clearSearchBtn.classList.toggle('hidden', q.length === 0);
-
-      if (q.length < 2) {
-        searchDropdown.classList.add('hidden');
-        return;
-      }
-
-      let html = '';
-      let matches = 0;
-
-      stands.forEach(stand => {
-        const matchStandName = stand.name.toLowerCase().includes(q) || stand.categoryName.toLowerCase().includes(q);
-        const matchProducts = (stand.products || []).filter(p => p.name.toLowerCase().includes(q));
-
-        if (matchStandName || matchProducts.length > 0) {
-          matches++;
-          html += `
-            <div class="p-3 hover:bg-slate-800 rounded-xl cursor-pointer transition border border-transparent hover:border-slate-700" onclick="selectFromGlobalSearch(${stand.id})">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2.5">
-                  <div class="w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 overflow-hidden shrink-0 flex items-center justify-center">
-                    ${stand.logoUrl 
-                      ? `<img src="${stand.logoUrl}" class="w-full h-full object-cover" onerror="this.onerror=null;this.parentElement.innerHTML='${stand.icon}';">` 
-                      : `<span class="text-base">${stand.icon}</span>`}
-                  </div>
-                  <div>
-                    <div class="flex items-center gap-1.5">
-                      <span class="font-bold text-xs text-white">${stand.name}</span>
-                      <span class="text-[9px] bg-slate-800 text-slate-400 px-1 py-0.5 rounded font-mono font-bold">${stand.number}</span>
-                    </div>
-                    <span class="text-[10px] text-orange-400 font-semibold">${stand.categoryName}</span>
-                  </div>
-                </div>
-                <span class="text-[10px] text-orange-400 font-extrabold uppercase">Ver Local ➔</span>
-              </div>
-          `;
-
-          if (matchProducts.length > 0) {
-            html += `<div class="mt-2 space-y-1 pl-6">`;
-            matchProducts.forEach(prod => {
-              html += `
-                <div class="flex items-center justify-between text-xs bg-slate-950/80 p-1.5 rounded-lg border border-slate-800">
-                  <span class="text-slate-300 font-medium">${prod.name}</span>
-                  <span class="font-extrabold text-orange-400">${prod.price}</span>
-                </div>
-              `;
-            });
-            html += `</div>`;
-          }
-
-          html += `</div>`;
-        }
-      });
-
-      if (matches === 0) {
-        html = `<div class="p-4 text-center text-xs text-slate-400">No encontramos ningún local ni producto con "${q}".</div>`;
-      }
-
-      searchDropdown.innerHTML = html;
-      searchDropdown.classList.remove('hidden');
-    });
-
-    function selectFromGlobalSearch(standId) {
-      searchDropdown.classList.add('hidden');
-      searchInput.value = '';
-      clearSearchBtn.classList.add('hidden');
-      const stand = stands.find(s => s.id === standId);
-      if (stand) {
-        openBottomSheet(stand);
-      }
-    }
-
-    clearSearchBtn.addEventListener('click', () => {
-      searchInput.value = '';
-      clearSearchBtn.classList.add('hidden');
-      searchDropdown.classList.add('hidden');
-    });
-
-    // ========================================================
-    // 8. MAPA LEAFLET, GPS & NAVEGACIÓN
-    // ========================================================
-    const DEFAULT_CENTER = [-33.4500, -70.6600];
-    const map = L.map('map', {
-      zoomControl: false,
-      maxZoom: 22,
-      minZoom: 15
-    }).setView(DEFAULT_CENTER, 19);
-
-    L.control.zoom({ position: 'bottomleft' }).addTo(map);
-
-    const streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 22, maxNativeZoom: 19 }).addTo(map);
-    const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 22, maxNativeZoom: 19 });
-
-    let isSatellite = false;
-    document.getElementById('toggleMapLayerBtn').addEventListener('click', () => {
-      if (isSatellite) {
-        map.removeLayer(satelliteLayer);
-        map.addLayer(streetLayer);
-        document.getElementById('toggleMapLayerBtn').textContent = '🛰️ Satélite';
-      } else {
-        map.removeLayer(streetLayer);
-        map.addLayer(satelliteLayer);
-        document.getElementById('toggleMapLayerBtn').textContent = '🗺️ Calles';
-      }
-      isSatellite = !isSatellite;
-    });
-
-    let userLocation = null;
-    let userMarker = null;
-    let userAccuracyCircle = null;
-    let isSimulating = false;
-    let isAdjusting = false;
-    let activeNavStand = null;
-    let navRoutePolyline = null;
-
-    const userGpsIcon = L.divIcon({
-      className: 'user-gps-container',
-      html: `
-        <div id="userHeadingCone" class="user-heading-cone" style="transform: translate(-50%, -75px) rotate(0deg);"></div>
-        <div class="user-gps-pulse"></div>
-      `,
-      iconSize: [20, 20],
-      iconAnchor: [10, 10]
-    });
-
-    function setHeadingAngle(degrees) {
-      const cone = document.getElementById('userHeadingCone');
-      if (cone) cone.style.transform = `translate(-50%, -75px) rotate(${degrees}deg)`;
-    }
-
-    if (window.DeviceOrientationEvent) {
-      window.addEventListener('deviceorientationabsolute' in window ? 'deviceorientationabsolute' : 'deviceorientation', (e) => {
-        let heading = null;
-        if (typeof e.webkitCompassHeading !== 'undefined') heading = e.webkitCompassHeading;
-        else if (e.alpha !== null) heading = (360 - e.alpha) % 360;
-        if (heading !== null) setHeadingAngle(Math.round(heading));
-      }, true);
-    }
-
-    function updateUserPosition(lat, lng, accuracy = 4) {
-      userLocation = [lat, lng];
-      const accBadge = document.getElementById('mapGpsAccuracy');
-      if (accBadge) accBadge.textContent = `GPS Activo (±${Math.round(accuracy)}m)`;
-
-      if (!userMarker) {
-        userMarker = L.marker(userLocation, { icon: userGpsIcon, zIndexOffset: 1000, draggable: true }).addTo(map);
-        userMarker.on('dragend', (e) => {
-          userLocation = [e.target.getLatLng().lat, e.target.getLatLng().lng];
-          if (activeNavStand) updateNavigationDistance();
-        });
-        userAccuracyCircle = L.circle(userLocation, { radius: accuracy, color: '#3b82f6', fillColor: '#60a5fa', fillOpacity: 0.15, weight: 1 }).addTo(map);
-      } else {
-        userMarker.setLatLng(userLocation);
-        userAccuracyCircle.setLatLng(userLocation);
-        userAccuracyCircle.setRadius(accuracy);
-      }
-
-      if (activeNavStand) updateNavigationDistance();
-    }
-
-    function initGps() {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (pos) => {
-            updateUserPosition(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy);
-            map.setView([pos.coords.latitude, pos.coords.longitude], 19);
-            recenterStands(pos.coords.latitude, pos.coords.longitude);
-          },
-          () => updateUserPosition(DEFAULT_CENTER[0], DEFAULT_CENTER[1], 6),
-          { enableHighAccuracy: true }
-        );
-        navigator.geolocation.watchPosition(
-          (pos) => { if (!isSimulating && !isAdjusting) updateUserPosition(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy); },
-          null,
-          { enableHighAccuracy: true, maximumAge: 3000, timeout: 5000 }
-        );
-      }
-    }
-    initGps();
-
-    function recenterStands(cLat, cLng) {
-      stands.forEach(s => {
-        s.lat = cLat + s.latOffset;
-        s.lng = cLng + s.lngOffset;
-      });
-      renderStandsOnMap();
-    }
-    stands.forEach(s => {
-      s.lat = DEFAULT_CENTER[0] + s.latOffset;
-      s.lng = DEFAULT_CENTER[1] + s.lngOffset;
-    });
-
-    let mapMarkers = [];
-    function renderStandsOnMap() {
-      mapMarkers.forEach(m => map.removeLayer(m));
-      mapMarkers = [];
-
-      stands.forEach(stand => {
-        const pinContent = stand.logoUrl 
-          ? `<img src="${stand.logoUrl}" class="w-full h-full rounded-full object-cover p-0.5" alt="${stand.name}" onerror="this.onerror=null;this.outerHTML='<span class=\'text-xl\'>${stand.icon}</span>';">`
-          : `<span class="text-xl">${stand.icon}</span>`;
-
-        const icon = L.divIcon({
-          className: 'stand-pin-container',
-          html: `<div class="stand-pin-badge" style="background-color: ${stand.color}">${pinContent}</div>`,
-          iconSize: [44, 44],
-          iconAnchor: [22, 44]
-        });
-
-        const m = L.marker([stand.lat, stand.lng], { icon: icon }).addTo(map);
-        m.on('click', () => openBottomSheet(stand));
-        mapMarkers.push(m);
-      });
-    }
-    renderStandsOnMap();
-
-    document.getElementById('mapCenterGpsBtn').addEventListener('click', () => {
-      if (userLocation) map.flyTo(userLocation, 19);
-      else initGps();
-    });
-
-    const simBtn = document.getElementById('mapSimGpsBtn');
-    simBtn.addEventListener('click', () => {
-      isSimulating = !isSimulating;
-      simBtn.classList.toggle('ring-4', isSimulating);
-      simBtn.classList.toggle('ring-purple-400', isSimulating);
-      alert(isSimulating ? '🚶 Haz clic en el mapa para moverte virtualmente' : 'GPS real activado');
-    });
-
-    function activateManualAdjust() {
-      isAdjusting = true;
-      alert('🎯 Haz clic en el mapa sobre tu puesto exacto para calibrar tu posición.');
-    }
-
-    map.on('click', (e) => {
-      if (isAdjusting) {
-        updateUserPosition(e.latlng.lat, e.latlng.lng, 1);
-        isAdjusting = false;
-        alert('Posición calibrada con 0m de error 🎯');
-      } else if (isSimulating) {
-        updateUserPosition(e.latlng.lat, e.latlng.lng, 4);
-      }
-    });
-
-    function calculateDistance(lat1, lon1, lat2, lon2) {
-      const R = 6371e3;
-      const dLat = (lat2 - lat1) * Math.PI / 180;
-      const dLon = (lon2 - lon1) * Math.PI / 180;
-      const a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);
-      return Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
-    }
-
-    function startNavigation(stand) {
-      activeNavStand = stand;
-      closeBottomSheet();
-      if (!userLocation) updateUserPosition(DEFAULT_CENTER[0], DEFAULT_CENTER[1], 6);
-
-      document.getElementById('navHud').classList.remove('hidden');
-      document.getElementById('navTargetName').textContent = stand.name;
-
-      if (navRoutePolyline) map.removeLayer(navRoutePolyline);
-      const points = [userLocation, [stand.lat, stand.lng]];
-      navRoutePolyline = L.polyline(points, { color: '#f97316', weight: 5, opacity: 0.9, className: 'leaflet-routing-line' }).addTo(map);
-      map.fitBounds(L.latLngBounds(points), { padding: [80, 80] });
-
-      updateNavigationDistance();
-    }
-
-    function updateNavigationDistance() {
-      if (!activeNavStand || !userLocation) return;
-      const m = calculateDistance(userLocation[0], userLocation[1], activeNavStand.lat, activeNavStand.lng);
-      document.getElementById('navDistance').textContent = `A ${m} metros de distancia`;
-      if (navRoutePolyline) navRoutePolyline.setLatLngs([userLocation, [activeNavStand.lat, activeNavStand.lng]]);
-    }
-
-    function cancelNavigation() {
-      activeNavStand = null;
-      if (navRoutePolyline) { map.removeLayer(navRoutePolyline); navRoutePolyline = null; }
-      document.getElementById('navHud').classList.add('hidden');
-    }
-
-    // ========================================================
-    // 9. BOTTOM SHEET & DATOS BANCARIOS
-    // ========================================================
-    const bottomSheet = document.getElementById('bottomSheet');
-    let selectedStand = null;
-
-    function openBottomSheet(stand) {
-      selectedStand = stand;
-      const sheetLogo = document.getElementById('sheetLogo');
-      if (stand.logoUrl) {
-        sheetLogo.innerHTML = `<img src="${stand.logoUrl}" class="w-full h-full object-contain rounded-2xl" alt="${stand.name}">`;
-      } else {
-        sheetLogo.innerHTML = `<span class="text-3xl">${stand.icon}</span>`;
-      }
-      document.getElementById('sheetCategory').textContent = stand.categoryName;
-      document.getElementById('sheetNumber').textContent = stand.number;
-      document.getElementById('sheetName').textContent = stand.name;
-      document.getElementById('sheetDesc').textContent = stand.desc;
-
-      const pList = document.getElementById('sheetProductsList');
-      pList.innerHTML = '';
-      if (stand.products && stand.products.length > 0) {
-        stand.products.forEach(p => {
-          const item = document.createElement('div');
-          item.className = 'flex items-center gap-3 p-3 bg-slate-950/70 rounded-2xl border border-slate-800/90';
-          item.innerHTML = `
-            <div class="w-16 h-16 rounded-xl bg-slate-800 overflow-hidden shrink-0 border border-slate-700">
-              <img src="${p.image || 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=200'}" class="w-full h-full object-cover" alt="${p.name}" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=200';">
-            </div>
-            <div class="min-w-0 flex-1">
-              <div class="flex items-center gap-1.5 mb-0.5">
-                ${p.tag ? `<span class="text-[8px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-1.5 py-0.2 rounded font-black">${p.tag}</span>` : ''}
-                ${!p.inStock ? '<span class="text-[8px] bg-red-950 text-red-400 border border-red-800 px-1.5 rounded font-black">Agotado</span>' : ''}
-              </div>
-              <h5 class="text-xs font-black text-white leading-tight ${!p.inStock ? 'line-through text-slate-400' : ''}">${p.name}</h5>
-              <p class="text-[10px] text-slate-400 leading-snug mt-0.5">${p.desc || ''}</p>
-              <span class="text-xs font-black text-orange-400 block mt-1">${p.price}</span>
-            </div>
-          `;
-          pList.appendChild(item);
-        });
-      } else {
-        pList.innerHTML = '<p class="text-xs text-slate-500 italic p-3 text-center">Punto de servicio o sin carta activa.</p>';
-      }
-
-      const wpBtn = document.getElementById('sheetWhatsappBtn');
-      if (stand.whatsapp) {
-        wpBtn.href = `https://wa.me/${stand.whatsapp}?text=¡Hola!%20Estoy%20en%20el%20Festival%20de%20la%20Villa%20y%20quiero%20hacer%20un%20pedido%20a%20${encodeURIComponent(stand.name)}`;
-        wpBtn.classList.remove('hidden');
-      } else wpBtn.classList.add('hidden');
-
-      const bankBtn = document.getElementById('sheetBankBtn');
-      if (stand.bankData) bankBtn.classList.remove('hidden');
-      else bankBtn.classList.add('hidden');
-
-      bottomSheet.classList.remove('translate-y-full');
-      map.panTo([stand.lat, stand.lng]);
-    }
-
-    function closeBottomSheet() {
-      bottomSheet.classList.add('translate-y-full');
-      selectedStand = null;
-    }
-
-    document.getElementById('sheetRouteBtn').addEventListener('click', () => {
-      if (selectedStand) {
-        switchTab('map');
-        startNavigation(selectedStand);
-      }
-    });
-
-    const bankModal = document.getElementById('bankModal');
-    function openBankModalForCurrentStand() {
-      if (!selectedStand || !selectedStand.bankData) return;
-      const b = selectedStand.bankData;
-      document.getElementById('bankModalStandTitle').textContent = `Puesto: ${selectedStand.name} (${selectedStand.number})`;
-      
-      const fields = document.getElementById('bankDataFields');
-      fields.innerHTML = `
-        <div class="flex items-center justify-between p-2.5 bg-slate-900 rounded-xl border border-slate-700">
-          <div>
-            <span class="text-[10px] text-slate-400 font-bold uppercase block">Banco:</span>
-            <span class="font-bold text-white">${b.bank}</span>
-          </div>
-          <button onclick="copyBankText('${b.bank}')" class="text-blue-400 bg-blue-950/80 border border-blue-500/30 font-bold px-2.5 py-1 rounded-lg text-xs">Copiar</button>
-        </div>
-        <div class="flex items-center justify-between p-2.5 bg-slate-900 rounded-xl border border-slate-700">
-          <div>
-            <span class="text-[10px] text-slate-400 font-bold uppercase block">Cuenta:</span>
-            <span class="font-bold text-white">${b.accountType} - ${b.accountNumber}</span>
-          </div>
-          <button onclick="copyBankText('${b.accountNumber}')" class="text-blue-400 bg-blue-950/80 border border-blue-500/30 font-bold px-2.5 py-1 rounded-lg text-xs">Copiar N°</button>
-        </div>
-        <div class="flex items-center justify-between p-2.5 bg-slate-900 rounded-xl border border-slate-700">
-          <div>
-            <span class="text-[10px] text-slate-400 font-bold uppercase block">Titular:</span>
-            <span class="font-bold text-white">${b.holderName}</span>
-          </div>
-          <button onclick="copyBankText('${b.holderName}')" class="text-blue-400 bg-blue-950/80 border border-blue-500/30 font-bold px-2.5 py-1 rounded-lg text-xs">Copiar</button>
-        </div>
-        <div class="flex items-center justify-between p-2.5 bg-slate-900 rounded-xl border border-slate-700">
-          <div>
-            <span class="text-[10px] text-slate-400 font-bold uppercase block">Correo:</span>
-            <span class="font-bold text-white">${b.email}</span>
-          </div>
-          <button onclick="copyBankText('${b.email}')" class="text-blue-400 bg-blue-950/80 border border-blue-500/30 font-bold px-2.5 py-1 rounded-lg text-xs">Copiar</button>
-        </div>
-      `;
-      bankModal.classList.remove('hidden');
-    }
-
-    function closeBankModal() { bankModal.classList.add('hidden'); }
-    function copyBankText(text) {
-      navigator.clipboard.writeText(text);
-      alert(`Copiado: ${text}`);
-    }
-
-    // ========================================================
-    // 10. ESCÁNER QR
-    // ========================================================
-    const qrModal = document.getElementById('qrModal');
-    const qrStandSelect = document.getElementById('qrStandSelect');
-
-    function openQrModal() {
-      qrStandSelect.innerHTML = '';
-      stands.forEach(s => {
-        const opt = document.createElement('option');
-        opt.value = s.id;
-        opt.textContent = `${s.icon} ${s.number}: ${s.name} (${s.categoryName})`;
-        qrStandSelect.appendChild(opt);
-      });
-      qrModal.classList.remove('hidden');
-    }
-    function closeQrModal() { qrModal.classList.add('hidden'); }
-
-    function simulateScanSelected() {
-      const standId = parseInt(qrStandSelect.value);
-      const stand = stands.find(s => s.id === standId);
-      if (stand) {
-        closeQrModal();
-        updateUserPosition(stand.lat, stand.lng, 1);
-        switchTab('stands');
-        openBottomSheet(stand);
-        showLiveToast(`📍 ¡Estás aquí! Frente a ${stand.name}`);
-      }
-    }
-  </script>
-</body>
-</html>// ----------------------------------------------------
-    // BASE DE DATOS INICIAL CON LOGOS REALES Y PRODUCTOS GOURMET
-    // ----------------------------------------------------
     const DEFAULT_SCHEDULE = [
   {
     "id": 1,
@@ -2521,7 +1545,7 @@
   }
 ];
 
-    // Limpiar caché vieja si la versión de datos cambió
+            // Limpiar caché vieja si la versión de datos cambió
     const DATA_VERSION = '2026.02.visual_pro';
     if (localStorage.getItem('festival_data_version') !== DATA_VERSION) {
       localStorage.setItem('festival_data_version', DATA_VERSION);
@@ -2530,8 +1554,946 @@
       localStorage.removeItem('festival_manual_live_id');
     }
 
+    // Cargar del localStorage o inicializar
+
     // Cargar del localStorage o inicializar con los nuevos defaults profesionales
     let stageSchedule = JSON.parse(localStorage.getItem('festival_admin_schedule') || 'null') || DEFAULT_SCHEDULE;
     let stands = JSON.parse(localStorage.getItem('festival_admin_stands') || 'null') || DEFAULT_STANDS;
 
-    
+    // ========================================================
+    // 3. SINCRONIZACIÓN EN VIVO CON EL ADMINISTRADOR
+    // ========================================================
+    const eventChannel = new BroadcastChannel('festival_live_sync');
+    eventChannel.onmessage = (event) => {
+      if (event.data.type === 'SYNC_ALL') {
+        stageSchedule = event.data.schedule;
+        stands = event.data.stands;
+        renderLiveHero();
+        renderScheduleList();
+        renderStandsFeed();
+        renderStandsOnMap();
+        showLiveToast(`⚡ Cambios del administrador aplicados en vivo`);
+      } else if (event.data.type === 'ANNOUNCEMENT') {
+        showLiveToast(`📢 AVISO: ${event.data.message}`);
+      } else if (event.data.type === 'STAGE_UPDATED') {
+        stageSchedule = event.data.schedule;
+        renderLiveHero();
+        renderScheduleList();
+        showLiveToast(`⚡ El administrador actualizó el escenario en vivo: ${event.data.liveArtist}`);
+      } else if (event.data.type === 'STANDS_UPDATED') {
+        stands = event.data.stands;
+        renderStandsFeed();
+        renderStandsOnMap();
+        showLiveToast(`📦 Se actualizaron los precios y stock de locales`);
+      }
+    };
+
+    // Escuchar cambios de localStorage entre pestañas
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'festival_admin_schedule' && e.newValue) {
+        try { stageSchedule = JSON.parse(e.newValue); renderLiveHero(); renderScheduleList(); } catch (err) {}
+      }
+      if (e.key === 'festival_admin_stands' && e.newValue) {
+        try { stands = JSON.parse(e.newValue); renderStandsFeed(); renderStandsOnMap(); } catch (err) {}
+      }
+    });
+
+    // Cargar si el admin guardó cambios previos en este navegador
+    const savedSchedule = localStorage.getItem('festival_admin_schedule');
+    if (savedSchedule) {
+      try { stageSchedule = JSON.parse(savedSchedule); } catch (e) {}
+    }
+    const savedStands = localStorage.getItem('festival_admin_stands');
+    if (savedStands) {
+      try { stands = JSON.parse(savedStands); } catch (e) {}
+    }
+
+    function showLiveToast(msg) {
+      const toast = document.createElement('div');
+      toast.className = 'fixed top-16 left-1/2 -translate-x-1/2 z-50 bg-red-600 text-white font-bold text-xs px-4 py-2 rounded-full shadow-2xl animate-bounce';
+      toast.textContent = msg;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 4000);
+    }
+
+    // ========================================================
+    // 4. CONTROL DE PESTAÑAS (TABS)
+    // ========================================================
+    let currentTab = 'live';
+
+    function switchTab(tab) {
+      currentTab = tab;
+      
+      document.getElementById('view-live').classList.add('hidden');
+      document.getElementById('view-map').classList.add('hidden');
+      document.getElementById('view-stands').classList.add('hidden');
+
+      const tabs = ['live', 'map', 'stands'];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`tab-btn-${t}`);
+        if (t === tab) {
+          btn.className = 'flex flex-col items-center gap-1 text-orange-500 font-extrabold text-[11px] transition';
+        } else {
+          btn.className = 'flex flex-col items-center gap-1 text-slate-400 hover:text-white font-bold text-[11px] transition';
+        }
+      });
+
+      if (tab === 'live') {
+        document.getElementById('view-live').classList.remove('hidden');
+      } else if (tab === 'map') {
+        document.getElementById('view-map').classList.remove('hidden');
+        setTimeout(() => map.invalidateSize(), 150);
+      } else if (tab === 'stands') {
+        document.getElementById('view-stands').classList.remove('hidden');
+      }
+    }
+
+    // ========================================================
+    // 5. MOTOR INTELIGENTE DE HORARIOS EN VIVO (HORA DE CHILE)
+    // ========================================================
+    function getChileDateObj() {
+      const now = new Date();
+      const chileStr = now.toLocaleString("en-US", { timeZone: "America/Santiago" });
+      return new Date(chileStr);
+    }
+
+    function parseTimeToMinutes(timeStr) {
+      if (!timeStr || !timeStr.includes(':')) return 0;
+      const [h, m] = timeStr.trim().split(':').map(Number);
+      return (h || 0) * 60 + (m || 0);
+    }
+
+    // Calcula automáticamente qué show está en vivo según la hora real de Chile
+    function autoResolveScheduleStatus() {
+      const chileDate = getChileDateObj();
+      const currentTotalMin = chileDate.getHours() * 60 + chileDate.getMinutes();
+      const manualLiveId = localStorage.getItem('festival_manual_live_id');
+
+      let foundLive = false;
+
+      stageSchedule.forEach(act => {
+        if (!act.time || !act.time.includes('-')) return;
+        const parts = act.time.split('-').map(t => t.trim());
+        const startMin = parseTimeToMinutes(parts[0]);
+        let endMin = parseTimeToMinutes(parts[1]);
+        if (endMin < startMin) endMin += 24 * 60; // Para shows que pasan la medianoche
+
+        let checkNowMin = currentTotalMin;
+        if (checkNowMin < startMin && endMin > 24 * 60) checkNowMin += 24 * 60;
+
+        if (manualLiveId && Number(manualLiveId) === act.id) {
+          act.status = 'live';
+          foundLive = true;
+        } else if (!manualLiveId) {
+          if (checkNowMin >= startMin && checkNowMin < endMin) {
+            act.status = 'live';
+            foundLive = true;
+          } else if (checkNowMin >= endMin) {
+            act.status = 'finished';
+          } else {
+            act.status = 'upcoming';
+          }
+        }
+      });
+
+      // Si ningún show coincide exactamente (ej: antes de las 15:00 o después de la 01:00)
+      if (!foundLive && !manualLiveId && stageSchedule.length > 0) {
+        const upcomingAct = stageSchedule.find(s => parseTimeToMinutes(s.time.split('-')[0]) > currentTotalMin);
+        if (upcomingAct) {
+          upcomingAct.status = 'live';
+        } else {
+          stageSchedule[stageSchedule.length - 1].status = 'live';
+        }
+      }
+    }
+
+    let lastActiveActId = null;
+
+    function updateLiveClockAndProgress() {
+      const chileDate = getChileDateObj();
+      const h = String(chileDate.getHours()).padStart(2, '0');
+      const m = String(chileDate.getMinutes()).padStart(2, '0');
+      const s = String(chileDate.getSeconds()).padStart(2, '0');
+      const timeStr = `${h}:${m}:${s}`;
+      const shortTimeStr = `${h}:${m}`;
+
+      const headerClock = document.getElementById('headerChileClock');
+      if (headerClock) headerClock.textContent = `🇨🇱 ${shortTimeStr} hrs`;
+
+      const liveClock = document.getElementById('liveChileClock');
+      if (liveClock) liveClock.textContent = `🇨🇱 ${timeStr} hrs (Chile)`;
+
+      // Recalcular estado según reloj
+      autoResolveScheduleStatus();
+
+      const liveAct = stageSchedule.find(s => s.status === 'live') || stageSchedule[0];
+      if (liveAct && liveAct.id !== lastActiveActId) {
+        lastActiveActId = liveAct.id;
+        renderLiveHero();
+        renderScheduleList();
+      }
+
+      if (liveAct && liveAct.time && liveAct.time.includes('-')) {
+        const parts = liveAct.time.split('-').map(t => t.trim());
+        const startParts = parts[0].split(':').map(Number);
+        const endParts = parts[1].split(':').map(Number);
+        
+        const startTotalMin = startParts[0] * 60 + startParts[1];
+        let endTotalMin = endParts[0] * 60 + endParts[1];
+        if (endTotalMin < startTotalMin) endTotalMin += 24 * 60;
+
+        let currentTotalMin = chileDate.getHours() * 60 + chileDate.getMinutes();
+        if (currentTotalMin < startTotalMin && endTotalMin > 24 * 60) currentTotalMin += 24 * 60;
+
+        const duration = Math.max(1, endTotalMin - startTotalMin);
+        const elapsed = Math.max(0, currentTotalMin - startTotalMin);
+        const remaining = Math.max(0, endTotalMin - currentTotalMin);
+        const progressPct = Math.min(100, Math.max(5, Math.round((elapsed / duration) * 100)));
+
+        const progBar = document.getElementById('liveProgressBar');
+        if (progBar) progBar.style.width = `${progressPct}%`;
+
+        const progText = document.getElementById('liveShowProgressText');
+        if (progText) {
+          if (currentTotalMin < startTotalMin) {
+            const startsIn = startTotalMin - currentTotalMin;
+            progText.innerHTML = `⏳ Comienza en <strong>${startsIn} min</strong> (${parts[0]} hrs)`;
+          } else if (remaining > 0) {
+            progText.innerHTML = `⏱️ ${liveAct.artist} lleva <strong>${elapsed} min</strong> en tarima • Faltan <strong>${remaining} min</strong> de show`;
+          } else {
+            progText.innerHTML = `🏁 Show en su cierre final • Próximo grupo subiendo a la tarima`;
+          }
+        }
+      }
+    }
+
+    setInterval(updateLiveClockAndProgress, 1000);
+
+    function renderLiveHero() {
+      autoResolveScheduleStatus();
+      const liveAct = stageSchedule.find(s => s.status === 'live') || stageSchedule[0];
+      if (!liveAct) return;
+
+      const isIntermission = liveAct.type === 'intermission';
+      const liveStatusBadge = document.getElementById('heroLiveStatusBadge');
+      if (liveStatusBadge) {
+        if (isIntermission) {
+          liveStatusBadge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-amber-500 text-black shadow-lg shadow-amber-500/40 animate-pulse';
+          liveStatusBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-black"></span> PAUSA TÉCNICA';
+        } else {
+          liveStatusBadge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-red-600 text-white shadow-lg shadow-red-600/40 animate-pulse';
+          liveStatusBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-white"></span> EN VIVO AHORA';
+        }
+      }
+
+      document.getElementById('liveArtistName').textContent = liveAct.artist;
+      
+      // Limpiar subtítulo para no duplicar texto
+      let genreText = liveAct.genre;
+      if (!genreText.toLowerCase().includes('oficial') && !isIntermission) {
+        genreText += ' • Show Oficial';
+      }
+      document.getElementById('liveArtistGenre').textContent = genreText;
+      document.getElementById('liveArtistDesc').textContent = liveAct.desc;
+      document.getElementById('liveTimeBadge').textContent = `${liveAct.time} hrs`;
+
+      if (liveAct.image) {
+        document.getElementById('heroLiveBg').style.backgroundImage = `url('${liveAct.image}')`;
+      }
+
+      // Siguiente artista
+      const currentIdx = stageSchedule.findIndex(s => s.id === liveAct.id);
+      const nextAct = stageSchedule[currentIdx + 1];
+      const nextCard = document.getElementById('nextArtistCard');
+      if (nextAct) {
+        const nextStartHour = (nextAct.time || '').split('-')[0].trim();
+        const chileDate = getChileDateObj();
+        const nextParts = nextStartHour.split(':').map(Number);
+        const nextTotalMin = (nextParts[0] || 0) * 60 + (nextParts[1] || 0);
+        const currentTotalMin = chileDate.getHours() * 60 + chileDate.getMinutes();
+        const minUntilNext = Math.max(0, nextTotalMin - currentTotalMin);
+
+        nextCard.classList.remove('hidden');
+        nextCard.innerHTML = `
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-2xl shrink-0">
+              ${nextAct.type === 'intermission' ? '⏱️' : nextAct.type === 'humor' ? '😂' : '⚡'}
+            </div>
+            <div>
+              <span class="text-[10px] font-black uppercase tracking-wider text-amber-400">A Continuación (${nextStartHour} hrs)</span>
+              <h3 class="text-base font-black text-white font-display">${nextAct.artist}</h3>
+              <p class="text-xs text-slate-400">${nextAct.genre}</p>
+            </div>
+          </div>
+          <span class="text-xs font-bold text-amber-300 bg-amber-950/80 border border-amber-600/40 px-3 py-1.5 rounded-lg shrink-0">
+            ${minUntilNext > 0 ? `En ${minUntilNext} min` : 'Próximo'}
+          </span>
+        `;
+      } else {
+        nextCard.classList.add('hidden');
+      }
+    }
+
+    function renderScheduleList() {
+      const container = document.getElementById('fullScheduleContainer');
+      container.innerHTML = '';
+
+      stageSchedule.forEach(act => {
+        const item = document.createElement('div');
+        const isLive = act.status === 'live';
+        const isFinished = act.status === 'finished';
+        const isIntermission = act.type === 'intermission';
+
+        if (isIntermission) {
+          item.className = `p-3.5 rounded-2xl border transition flex items-center justify-between ${
+            isLive 
+              ? 'bg-amber-950/50 border-amber-500 ring-2 ring-amber-500/70 shadow-lg' 
+              : isFinished 
+              ? 'bg-slate-900/40 border-slate-800 opacity-60' 
+              : 'bg-amber-950/20 border-amber-700/30'
+          }`;
+          item.innerHTML = `
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-lg shrink-0">
+                ⏱️
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <h4 class="text-xs font-bold text-amber-300">${act.artist}</h4>
+                  <span class="text-[9px] bg-amber-500 text-black font-black uppercase px-2 py-0.5 rounded-full">PAUSA</span>
+                  ${isLive ? '<span class="text-[9px] bg-red-600 text-white font-black uppercase px-2 py-0.5 rounded-full animate-pulse">EN ESTE MOMENTO</span>' : ''}
+                </div>
+                <p class="text-[11px] text-slate-400 mt-0.5">${act.genre}</p>
+              </div>
+            </div>
+            <div class="text-right shrink-0">
+              <span class="text-xs font-mono font-bold text-amber-400">${act.time}</span>
+              <span class="text-[10px] text-slate-500 block">${isLive ? 'En curso' : isFinished ? 'Finalizado' : 'Programado'}</span>
+            </div>
+          `;
+        } else {
+          item.className = `p-3.5 rounded-2xl border transition flex items-center justify-between ${
+            isLive 
+              ? 'bg-red-950/40 border-red-500/60 ring-1 ring-red-500 shadow-lg shadow-red-950/30' 
+              : isFinished 
+              ? 'bg-slate-900/40 border-slate-800 opacity-50' 
+              : 'bg-slate-900 border-slate-800 hover:border-slate-700'
+          }`;
+          item.innerHTML = `
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-lg shrink-0 overflow-hidden">
+                ${act.image 
+                  ? `<img src="${act.image}" class="w-full h-full object-cover" onerror="this.onerror=null;this.parentElement.innerHTML='${isLive ? '🔴' : isFinished ? '✓' : '🎸'}';">` 
+                  : (isLive ? '🔴' : isFinished ? '✓' : '🎸')}
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <h4 class="text-xs font-black text-white">${act.artist}</h4>
+                  ${isLive ? '<span class="text-[9px] bg-red-600 text-white font-black uppercase px-2 py-0.5 rounded-full animate-pulse">EN VIVO</span>' : ''}
+                  ${act.type === 'tribute' ? '<span class="text-[9px] bg-purple-900/80 text-purple-300 border border-purple-500/30 px-1.5 py-0.5 rounded font-bold">Tributo</span>' : ''}
+                  ${act.type === 'humor' ? '<span class="text-[9px] bg-yellow-900/80 text-yellow-300 border border-yellow-500/30 px-1.5 py-0.5 rounded font-bold">Humor</span>' : ''}
+                </div>
+                <p class="text-[11px] text-slate-400 mt-0.5">${act.genre}</p>
+              </div>
+            </div>
+            <div class="text-right shrink-0">
+              <span class="text-xs font-extrabold ${isLive ? 'text-red-400' : 'text-slate-400'}">${act.time}</span>
+              <span class="text-[10px] text-slate-500 block">${isLive ? 'Tarima Central' : isFinished ? 'Finalizado' : 'En espera'}</span>
+            </div>
+          `;
+        }
+        container.appendChild(item);
+      });
+    }
+
+    renderLiveHero();
+    renderScheduleList();
+
+    function goToStageOnMap() {
+      switchTab('map');
+      const stageStand = stands.find(s => s.number === 'ESC');
+      if (stageStand) {
+        startNavigation(stageStand);
+      }
+    }
+
+    function shareArtist() {
+      const liveAct = stageSchedule.find(s => s.status === 'live');
+      if (navigator.share) {
+        navigator.share({
+          title: `¡${liveAct.artist} está tocando en vivo!`,
+          text: `Vente a la cancha, está tocando ${liveAct.artist} en el Festival de la Villa.`,
+          url: window.location.href
+        });
+      } else {
+        alert(`¡Copiado! Avísale a tus amigos: ${liveAct.artist} está tocando ahora en el escenario.`);
+      }
+    }
+
+    // ========================================================
+    // 6. RENDERIZADO DE FOOD TRUCKS CON SHOWCASE Y PLATOS CON FOTOS
+    // ========================================================
+    function renderStandsFeed(filterCat = 'all') {
+      const container = document.getElementById('standsListGrid');
+      container.innerHTML = '';
+
+      const commercial = stands.filter(s => s.category !== 'service');
+
+      commercial.forEach(stand => {
+        if (filterCat !== 'all' && stand.category !== filterCat) return;
+
+        const card = document.createElement('div');
+        card.className = 'bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-3xl overflow-hidden shadow-2xl transition duration-300 flex flex-col justify-between';
+        
+        // Render de 2 platos destacados con foto, descripción y precio
+        let prodsHtml = '';
+        if (stand.products && stand.products.length > 0) {
+          prodsHtml = '<div class="space-y-2 pt-2 border-t border-slate-800">';
+          prodsHtml += `<span class="text-[10px] font-black uppercase tracking-wider text-amber-400 flex items-center gap-1">
+            <span>🔥</span> Lo Más Pedido en este Food Truck:
+          </span>`;
+          prodsHtml += '<div class="grid grid-cols-1 sm:grid-cols-2 gap-2">';
+          
+          stand.products.slice(0, 2).forEach(p => {
+            prodsHtml += `
+              <div class="bg-slate-950/80 rounded-2xl p-2.5 border border-slate-800 flex items-center gap-3">
+                <div class="w-16 h-16 rounded-xl bg-slate-800 shrink-0 overflow-hidden border border-slate-700">
+                  <img src="${p.image}" class="w-full h-full object-cover" alt="${p.name}" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=200';">
+                </div>
+                <div class="min-w-0 flex-1">
+                  <div class="flex items-center gap-1 mb-0.5">
+                    ${p.tag ? `<span class="text-[8px] bg-amber-500/20 text-amber-300 border border-amber-500/40 px-1 py-0.2 rounded font-black truncate">${p.tag}</span>` : ''}
+                  </div>
+                  <h5 class="text-xs font-black text-white truncate">${p.name}</h5>
+                  <p class="text-[10px] text-slate-400 line-clamp-1">${p.desc || ''}</p>
+                  <span class="text-xs font-extrabold text-orange-400 block mt-1">${p.price}</span>
+                </div>
+              </div>
+            `;
+          });
+          
+          prodsHtml += '</div>';
+          if (stand.products.length > 2) {
+            prodsHtml += `<p class="text-[10px] text-slate-500 text-center font-bold pt-1">+ ${stand.products.length - 2} productos más en la carta oficial...</p>`;
+          }
+          prodsHtml += '</div>';
+        }
+
+        const bannerImage = stand.bannerUrl || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800';
+
+        card.innerHTML = `
+          <!-- Portada del Food Truck con rating y badge -->
+          <div class="relative h-28 w-full overflow-hidden bg-slate-950">
+            <img src="${bannerImage}" class="w-full h-full object-cover brightness-[0.70] hover:scale-105 transition duration-500" alt="${stand.name}">
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent"></div>
+            
+            <div class="absolute top-2.5 right-2.5 bg-black/70 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-black text-amber-300 border border-amber-500/40 flex items-center gap-1 shadow">
+              <span>⭐ ${stand.rating || '4.9'}</span>
+              <span class="text-slate-400 font-normal">• ${stand.prepTime || '10 min'}</span>
+            </div>
+          </div>
+
+          <!-- Cuerpo de la tarjeta con logo flotante -->
+          <div class="p-4 pt-0 relative space-y-3 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="flex items-end justify-between -mt-8 mb-2">
+                <div class="w-16 h-16 rounded-2xl bg-slate-900 border-2 border-amber-500/40 shadow-2xl overflow-hidden p-0.5 shrink-0">
+                  <img src="${stand.logoUrl}" class="w-full h-full object-contain rounded-xl" alt="${stand.name}">
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span class="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-lg bg-orange-600 text-white shadow">
+                    ${stand.categoryName}
+                  </span>
+                  <span class="text-xs text-slate-400 font-mono font-bold bg-slate-800 px-2 py-1 rounded-lg border border-slate-700">
+                    ${stand.number}
+                  </span>
+                </div>
+              </div>
+
+              <h3 class="text-base font-black text-white font-display">${stand.name}</h3>
+              <p class="text-xs text-slate-300 leading-relaxed mt-0.5">${stand.desc}</p>
+            </div>
+
+            ${prodsHtml}
+
+            <!-- Botones de Acción -->
+            <div class="grid grid-cols-2 gap-2 pt-2">
+              <button onclick="viewStandOnMap(${stand.id})" class="py-2.5 px-3 rounded-xl bg-orange-600 hover:bg-orange-500 text-white font-extrabold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-orange-600/30 active:scale-98 transition">
+                <span>🧭</span> ¿Cómo llegar?
+              </button>
+              <button onclick="openBottomSheetById(${stand.id})" class="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-xs flex items-center justify-center gap-1.5 border border-slate-700 transition">
+                <span>📋</span> Ver Carta Completa
+              </button>
+            </div>
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    function filterStandsCategory(cat) {
+      document.querySelectorAll('.cat-pill').forEach(btn => {
+        btn.classList.remove('bg-orange-600', 'text-white');
+        btn.classList.add('bg-slate-800', 'text-slate-300');
+      });
+      event.target.classList.add('bg-orange-600', 'text-white');
+      event.target.classList.remove('bg-slate-800', 'text-slate-300');
+
+      renderStandsFeed(cat);
+    }
+
+    renderStandsFeed();
+
+    function viewStandOnMap(standId) {
+      const stand = stands.find(s => s.id === standId);
+      if (stand) {
+        switchTab('map');
+        startNavigation(stand);
+      }
+    }
+
+    function openBottomSheetById(standId) {
+      const stand = stands.find(s => s.id === standId);
+      if (stand) openBottomSheet(stand);
+    }
+
+    // ========================================================
+    // 7. BUSCADOR INTELIGENTE EN EL HEADER (COMPLETOS, ASADOS...)
+    // ========================================================
+    const searchInput = document.getElementById('globalSearchInput');
+    const searchDropdown = document.getElementById('searchDropdown');
+    const clearSearchBtn = document.getElementById('clearSearchBtn');
+
+    searchInput.addEventListener('input', (e) => {
+      const q = e.target.value.trim().toLowerCase();
+      clearSearchBtn.classList.toggle('hidden', q.length === 0);
+
+      if (q.length < 2) {
+        searchDropdown.classList.add('hidden');
+        return;
+      }
+
+      let html = '';
+      let matches = 0;
+
+      stands.forEach(stand => {
+        const matchStandName = stand.name.toLowerCase().includes(q) || stand.categoryName.toLowerCase().includes(q);
+        const matchProducts = (stand.products || []).filter(p => p.name.toLowerCase().includes(q));
+
+        if (matchStandName || matchProducts.length > 0) {
+          matches++;
+          html += `
+            <div class="p-3 hover:bg-slate-800 rounded-xl cursor-pointer transition border border-transparent hover:border-slate-700" onclick="selectFromGlobalSearch(${stand.id})">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 overflow-hidden shrink-0 flex items-center justify-center">
+                    ${stand.logoUrl 
+                      ? `<img src="${stand.logoUrl}" class="w-full h-full object-cover" onerror="this.onerror=null;this.parentElement.innerHTML='${stand.icon}';">` 
+                      : `<span class="text-base">${stand.icon}</span>`}
+                  </div>
+                  <div>
+                    <div class="flex items-center gap-1.5">
+                      <span class="font-bold text-xs text-white">${stand.name}</span>
+                      <span class="text-[9px] bg-slate-800 text-slate-400 px-1 py-0.5 rounded font-mono font-bold">${stand.number}</span>
+                    </div>
+                    <span class="text-[10px] text-orange-400 font-semibold">${stand.categoryName}</span>
+                  </div>
+                </div>
+                <span class="text-[10px] text-orange-400 font-extrabold uppercase">Ver Local ➔</span>
+              </div>
+          `;
+
+          if (matchProducts.length > 0) {
+            html += `<div class="mt-2 space-y-1 pl-6">`;
+            matchProducts.forEach(prod => {
+              html += `
+                <div class="flex items-center justify-between text-xs bg-slate-950/80 p-1.5 rounded-lg border border-slate-800">
+                  <span class="text-slate-300 font-medium">${prod.name}</span>
+                  <span class="font-extrabold text-orange-400">${prod.price}</span>
+                </div>
+              `;
+            });
+            html += `</div>`;
+          }
+
+          html += `</div>`;
+        }
+      });
+
+      if (matches === 0) {
+        html = `<div class="p-4 text-center text-xs text-slate-400">No encontramos ningún local ni producto con "${q}".</div>`;
+      }
+
+      searchDropdown.innerHTML = html;
+      searchDropdown.classList.remove('hidden');
+    });
+
+    function selectFromGlobalSearch(standId) {
+      searchDropdown.classList.add('hidden');
+      searchInput.value = '';
+      clearSearchBtn.classList.add('hidden');
+      const stand = stands.find(s => s.id === standId);
+      if (stand) {
+        openBottomSheet(stand);
+      }
+    }
+
+    clearSearchBtn.addEventListener('click', () => {
+      searchInput.value = '';
+      clearSearchBtn.classList.add('hidden');
+      searchDropdown.classList.add('hidden');
+    });
+
+    // ========================================================
+    // 8. MAPA LEAFLET, GPS & NAVEGACIÓN
+    // ========================================================
+    const DEFAULT_CENTER = [-33.4500, -70.6600];
+    const map = L.map('map', {
+      zoomControl: false,
+      maxZoom: 22,
+      minZoom: 15
+    }).setView(DEFAULT_CENTER, 19);
+
+    L.control.zoom({ position: 'bottomleft' }).addTo(map);
+
+    const streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 22, maxNativeZoom: 19 }).addTo(map);
+    const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 22, maxNativeZoom: 19 });
+
+    let isSatellite = false;
+    document.getElementById('toggleMapLayerBtn').addEventListener('click', () => {
+      if (isSatellite) {
+        map.removeLayer(satelliteLayer);
+        map.addLayer(streetLayer);
+        document.getElementById('toggleMapLayerBtn').textContent = '🛰️ Satélite';
+      } else {
+        map.removeLayer(streetLayer);
+        map.addLayer(satelliteLayer);
+        document.getElementById('toggleMapLayerBtn').textContent = '🗺️ Calles';
+      }
+      isSatellite = !isSatellite;
+    });
+
+    let userLocation = null;
+    let userMarker = null;
+    let userAccuracyCircle = null;
+    let isSimulating = false;
+    let isAdjusting = false;
+    let activeNavStand = null;
+    let navRoutePolyline = null;
+
+    const userGpsIcon = L.divIcon({
+      className: 'user-gps-container',
+      html: `
+        <div id="userHeadingCone" class="user-heading-cone" style="transform: translate(-50%, -75px) rotate(0deg);"></div>
+        <div class="user-gps-pulse"></div>
+      `,
+      iconSize: [20, 20],
+      iconAnchor: [10, 10]
+    });
+
+    function setHeadingAngle(degrees) {
+      const cone = document.getElementById('userHeadingCone');
+      if (cone) cone.style.transform = `translate(-50%, -75px) rotate(${degrees}deg)`;
+    }
+
+    if (window.DeviceOrientationEvent) {
+      window.addEventListener('deviceorientationabsolute' in window ? 'deviceorientationabsolute' : 'deviceorientation', (e) => {
+        let heading = null;
+        if (typeof e.webkitCompassHeading !== 'undefined') heading = e.webkitCompassHeading;
+        else if (e.alpha !== null) heading = (360 - e.alpha) % 360;
+        if (heading !== null) setHeadingAngle(Math.round(heading));
+      }, true);
+    }
+
+    function updateUserPosition(lat, lng, accuracy = 4) {
+      userLocation = [lat, lng];
+      const accBadge = document.getElementById('mapGpsAccuracy');
+      if (accBadge) accBadge.textContent = `GPS Activo (±${Math.round(accuracy)}m)`;
+
+      if (!userMarker) {
+        userMarker = L.marker(userLocation, { icon: userGpsIcon, zIndexOffset: 1000, draggable: true }).addTo(map);
+        userMarker.on('dragend', (e) => {
+          userLocation = [e.target.getLatLng().lat, e.target.getLatLng().lng];
+          if (activeNavStand) updateNavigationDistance();
+        });
+        userAccuracyCircle = L.circle(userLocation, { radius: accuracy, color: '#3b82f6', fillColor: '#60a5fa', fillOpacity: 0.15, weight: 1 }).addTo(map);
+      } else {
+        userMarker.setLatLng(userLocation);
+        userAccuracyCircle.setLatLng(userLocation);
+        userAccuracyCircle.setRadius(accuracy);
+      }
+
+      if (activeNavStand) updateNavigationDistance();
+    }
+
+    function initGps() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            updateUserPosition(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy);
+            map.setView([pos.coords.latitude, pos.coords.longitude], 19);
+            recenterStands(pos.coords.latitude, pos.coords.longitude);
+          },
+          () => updateUserPosition(DEFAULT_CENTER[0], DEFAULT_CENTER[1], 6),
+          { enableHighAccuracy: true }
+        );
+        navigator.geolocation.watchPosition(
+          (pos) => { if (!isSimulating && !isAdjusting) updateUserPosition(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy); },
+          null,
+          { enableHighAccuracy: true, maximumAge: 3000, timeout: 5000 }
+        );
+      }
+    }
+    initGps();
+
+    function recenterStands(cLat, cLng) {
+      stands.forEach(s => {
+        s.lat = cLat + s.latOffset;
+        s.lng = cLng + s.lngOffset;
+      });
+      renderStandsOnMap();
+    }
+    stands.forEach(s => {
+      s.lat = DEFAULT_CENTER[0] + s.latOffset;
+      s.lng = DEFAULT_CENTER[1] + s.lngOffset;
+    });
+
+    let mapMarkers = [];
+    function renderStandsOnMap() {
+      mapMarkers.forEach(m => map.removeLayer(m));
+      mapMarkers = [];
+
+      stands.forEach(stand => {
+        const pinContent = stand.logoUrl 
+          ? `<img src="${stand.logoUrl}" class="w-full h-full rounded-full object-cover p-0.5" alt="${stand.name}" onerror="this.onerror=null;this.outerHTML='<span class=\'text-xl\'>${stand.icon}</span>';">`
+          : `<span class="text-xl">${stand.icon}</span>`;
+
+        const icon = L.divIcon({
+          className: 'stand-pin-container',
+          html: `<div class="stand-pin-badge" style="background-color: ${stand.color}">${pinContent}</div>`,
+          iconSize: [44, 44],
+          iconAnchor: [22, 44]
+        });
+
+        const m = L.marker([stand.lat, stand.lng], { icon: icon }).addTo(map);
+        m.on('click', () => openBottomSheet(stand));
+        mapMarkers.push(m);
+      });
+    }
+    renderStandsOnMap();
+
+    document.getElementById('mapCenterGpsBtn').addEventListener('click', () => {
+      if (userLocation) map.flyTo(userLocation, 19);
+      else initGps();
+    });
+
+    const simBtn = document.getElementById('mapSimGpsBtn');
+    simBtn.addEventListener('click', () => {
+      isSimulating = !isSimulating;
+      simBtn.classList.toggle('ring-4', isSimulating);
+      simBtn.classList.toggle('ring-purple-400', isSimulating);
+      alert(isSimulating ? '🚶 Haz clic en el mapa para moverte virtualmente' : 'GPS real activado');
+    });
+
+    function activateManualAdjust() {
+      isAdjusting = true;
+      alert('🎯 Haz clic en el mapa sobre tu puesto exacto para calibrar tu posición.');
+    }
+
+    map.on('click', (e) => {
+      if (isAdjusting) {
+        updateUserPosition(e.latlng.lat, e.latlng.lng, 1);
+        isAdjusting = false;
+        alert('Posición calibrada con 0m de error 🎯');
+      } else if (isSimulating) {
+        updateUserPosition(e.latlng.lat, e.latlng.lng, 4);
+      }
+    });
+
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+      const R = 6371e3;
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);
+      return Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
+    }
+
+    function startNavigation(stand) {
+      activeNavStand = stand;
+      closeBottomSheet();
+      if (!userLocation) updateUserPosition(DEFAULT_CENTER[0], DEFAULT_CENTER[1], 6);
+
+      document.getElementById('navHud').classList.remove('hidden');
+      document.getElementById('navTargetName').textContent = stand.name;
+
+      if (navRoutePolyline) map.removeLayer(navRoutePolyline);
+      const points = [userLocation, [stand.lat, stand.lng]];
+      navRoutePolyline = L.polyline(points, { color: '#f97316', weight: 5, opacity: 0.9, className: 'leaflet-routing-line' }).addTo(map);
+      map.fitBounds(L.latLngBounds(points), { padding: [80, 80] });
+
+      updateNavigationDistance();
+    }
+
+    function updateNavigationDistance() {
+      if (!activeNavStand || !userLocation) return;
+      const m = calculateDistance(userLocation[0], userLocation[1], activeNavStand.lat, activeNavStand.lng);
+      document.getElementById('navDistance').textContent = `A ${m} metros de distancia`;
+      if (navRoutePolyline) navRoutePolyline.setLatLngs([userLocation, [activeNavStand.lat, activeNavStand.lng]]);
+    }
+
+    function cancelNavigation() {
+      activeNavStand = null;
+      if (navRoutePolyline) { map.removeLayer(navRoutePolyline); navRoutePolyline = null; }
+      document.getElementById('navHud').classList.add('hidden');
+    }
+
+    // ========================================================
+    // 9. BOTTOM SHEET & DATOS BANCARIOS
+    // ========================================================
+    const bottomSheet = document.getElementById('bottomSheet');
+    let selectedStand = null;
+
+    function openBottomSheet(stand) {
+      selectedStand = stand;
+      const sheetLogo = document.getElementById('sheetLogo');
+      if (stand.logoUrl) {
+        sheetLogo.innerHTML = `<img src="${stand.logoUrl}" class="w-full h-full object-contain rounded-2xl" alt="${stand.name}">`;
+      } else {
+        sheetLogo.innerHTML = `<span class="text-3xl">${stand.icon}</span>`;
+      }
+      document.getElementById('sheetCategory').textContent = stand.categoryName;
+      document.getElementById('sheetNumber').textContent = stand.number;
+      document.getElementById('sheetName').textContent = stand.name;
+      document.getElementById('sheetDesc').textContent = stand.desc;
+
+      const pList = document.getElementById('sheetProductsList');
+      pList.innerHTML = '';
+      if (stand.products && stand.products.length > 0) {
+        stand.products.forEach(p => {
+          const item = document.createElement('div');
+          item.className = 'flex items-center gap-3 p-3 bg-slate-950/70 rounded-2xl border border-slate-800/90';
+          item.innerHTML = `
+            <div class="w-16 h-16 rounded-xl bg-slate-800 overflow-hidden shrink-0 border border-slate-700">
+              <img src="${p.image || 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=200'}" class="w-full h-full object-cover" alt="${p.name}" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=200';">
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-1.5 mb-0.5">
+                ${p.tag ? `<span class="text-[8px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-1.5 py-0.2 rounded font-black">${p.tag}</span>` : ''}
+                ${!p.inStock ? '<span class="text-[8px] bg-red-950 text-red-400 border border-red-800 px-1.5 rounded font-black">Agotado</span>' : ''}
+              </div>
+              <h5 class="text-xs font-black text-white leading-tight ${!p.inStock ? 'line-through text-slate-400' : ''}">${p.name}</h5>
+              <p class="text-[10px] text-slate-400 leading-snug mt-0.5">${p.desc || ''}</p>
+              <span class="text-xs font-black text-orange-400 block mt-1">${p.price}</span>
+            </div>
+          `;
+          pList.appendChild(item);
+        });
+      } else {
+        pList.innerHTML = '<p class="text-xs text-slate-500 italic p-3 text-center">Punto de servicio o sin carta activa.</p>';
+      }
+
+      const wpBtn = document.getElementById('sheetWhatsappBtn');
+      if (stand.whatsapp) {
+        wpBtn.href = `https://wa.me/${stand.whatsapp}?text=¡Hola!%20Estoy%20en%20el%20Festival%20de%20la%20Villa%20y%20quiero%20hacer%20un%20pedido%20a%20${encodeURIComponent(stand.name)}`;
+        wpBtn.classList.remove('hidden');
+      } else wpBtn.classList.add('hidden');
+
+      const bankBtn = document.getElementById('sheetBankBtn');
+      if (stand.bankData) bankBtn.classList.remove('hidden');
+      else bankBtn.classList.add('hidden');
+
+      bottomSheet.classList.remove('translate-y-full');
+      map.panTo([stand.lat, stand.lng]);
+    }
+
+    function closeBottomSheet() {
+      bottomSheet.classList.add('translate-y-full');
+      selectedStand = null;
+    }
+
+    document.getElementById('sheetRouteBtn').addEventListener('click', () => {
+      if (selectedStand) {
+        switchTab('map');
+        startNavigation(selectedStand);
+      }
+    });
+
+    const bankModal = document.getElementById('bankModal');
+    function openBankModalForCurrentStand() {
+      if (!selectedStand || !selectedStand.bankData) return;
+      const b = selectedStand.bankData;
+      document.getElementById('bankModalStandTitle').textContent = `Puesto: ${selectedStand.name} (${selectedStand.number})`;
+      
+      const fields = document.getElementById('bankDataFields');
+      fields.innerHTML = `
+        <div class="flex items-center justify-between p-2.5 bg-slate-900 rounded-xl border border-slate-700">
+          <div>
+            <span class="text-[10px] text-slate-400 font-bold uppercase block">Banco:</span>
+            <span class="font-bold text-white">${b.bank}</span>
+          </div>
+          <button onclick="copyBankText('${b.bank}')" class="text-blue-400 bg-blue-950/80 border border-blue-500/30 font-bold px-2.5 py-1 rounded-lg text-xs">Copiar</button>
+        </div>
+        <div class="flex items-center justify-between p-2.5 bg-slate-900 rounded-xl border border-slate-700">
+          <div>
+            <span class="text-[10px] text-slate-400 font-bold uppercase block">Cuenta:</span>
+            <span class="font-bold text-white">${b.accountType} - ${b.accountNumber}</span>
+          </div>
+          <button onclick="copyBankText('${b.accountNumber}')" class="text-blue-400 bg-blue-950/80 border border-blue-500/30 font-bold px-2.5 py-1 rounded-lg text-xs">Copiar N°</button>
+        </div>
+        <div class="flex items-center justify-between p-2.5 bg-slate-900 rounded-xl border border-slate-700">
+          <div>
+            <span class="text-[10px] text-slate-400 font-bold uppercase block">Titular:</span>
+            <span class="font-bold text-white">${b.holderName}</span>
+          </div>
+          <button onclick="copyBankText('${b.holderName}')" class="text-blue-400 bg-blue-950/80 border border-blue-500/30 font-bold px-2.5 py-1 rounded-lg text-xs">Copiar</button>
+        </div>
+        <div class="flex items-center justify-between p-2.5 bg-slate-900 rounded-xl border border-slate-700">
+          <div>
+            <span class="text-[10px] text-slate-400 font-bold uppercase block">Correo:</span>
+            <span class="font-bold text-white">${b.email}</span>
+          </div>
+          <button onclick="copyBankText('${b.email}')" class="text-blue-400 bg-blue-950/80 border border-blue-500/30 font-bold px-2.5 py-1 rounded-lg text-xs">Copiar</button>
+        </div>
+      `;
+      bankModal.classList.remove('hidden');
+    }
+
+    function closeBankModal() { bankModal.classList.add('hidden'); }
+    function copyBankText(text) {
+      navigator.clipboard.writeText(text);
+      alert(`Copiado: ${text}`);
+    }
+
+    // ========================================================
+    // 10. ESCÁNER QR
+    // ========================================================
+    const qrModal = document.getElementById('qrModal');
+    const qrStandSelect = document.getElementById('qrStandSelect');
+
+    function openQrModal() {
+      qrStandSelect.innerHTML = '';
+      stands.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.id;
+        opt.textContent = `${s.icon} ${s.number}: ${s.name} (${s.categoryName})`;
+        qrStandSelect.appendChild(opt);
+      });
+      qrModal.classList.remove('hidden');
+    }
+    function closeQrModal() { qrModal.classList.add('hidden'); }
+
+    function simulateScanSelected() {
+      const standId = parseInt(qrStandSelect.value);
+      const stand = stands.find(s => s.id === standId);
+      if (stand) {
+        closeQrModal();
+        updateUserPosition(stand.lat, stand.lng, 1);
+        switchTab('stands');
+        openBottomSheet(stand);
+        showLiveToast(`📍 ¡Estás aquí! Frente a ${stand.name}`);
+      }
+    }
+  </script>
+</body>
+</html>
