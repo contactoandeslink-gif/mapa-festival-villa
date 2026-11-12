@@ -370,6 +370,15 @@
     @keyframes festivalWalkDash {
       to { stroke-dashoffset: -18; }
     }
+  
+    /* ANIMACIÓN DEL MODAL ENCIMA DEL MAPA */
+    @keyframes modalSlideUp {
+      from { transform: translateY(100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .animate-modal-slide-up {
+      animation: modalSlideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
   </style>
 </head>
 <body class="bg-slate-950 text-slate-100 flex flex-col min-h-[100dvh] relative overflow-x-hidden antialiased">
@@ -550,148 +559,186 @@
     </section>
 
     <!-- PESTAÑA 2: 🗺️ MAPA INTERACTIVO & GPS (CANCHA / VILLA) -->
-    <section id="view-map" class="h-full overflow-y-auto no-scrollbar pb-32 hidden">
+    <section id="view-map" class="h-[calc(100dvh-175px)] min-h-[500px] w-full relative overflow-hidden hidden select-none">
       
-      <!-- CONTENEDOR DEL MAPA DEL RECINTO / CANCHA -->
-      <div class="px-2 pt-2 sm:px-4 max-w-xl mx-auto">
-        <div id="mapWrapper" class="h-[380px] sm:h-[420px] w-full rounded-2xl overflow-hidden border border-slate-700/80 shadow-2xl relative transition-all duration-300">
-          
-          <!-- Barra Superior Flotante del Mapa -->
-          <div class="absolute top-2.5 left-2.5 right-2.5 z-20 flex items-center justify-between pointer-events-none gap-2">
-            <!-- Badge GPS -->
-            <div id="mapGpsBadge" class="bg-slate-900/95 backdrop-blur-md border border-slate-700/80 text-white text-[11px] font-bold px-3 py-1 rounded-full shadow-lg pointer-events-auto flex items-center gap-1.5">
-              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span id="mapGpsAccuracy">GPS En Cancha</span>
-              <button onclick="activateManualAdjust()" class="text-orange-400 hover:underline text-[10px] ml-1">Calibrar</button>
-            </div>
-
-            <!-- Botones Superiores -->
-            <div class="flex items-center gap-1.5 pointer-events-auto">
-              <!-- Botón Centrar Recinto -->
-              <button onclick="resetMapView()" title="Centrar todo el recinto" class="bg-slate-900/95 backdrop-blur-md border border-amber-500/60 text-amber-300 hover:text-white px-2.5 py-1 rounded-xl shadow-lg text-[11px] font-black flex items-center gap-1 active:scale-95 transition">
-                🔄 Centrar
-              </button>
-              <!-- Botón Expandir / Reducir Pantalla Completa -->
-              <button id="toggleExpandMapBtn" onclick="toggleMapExpand()" title="Expandir pantalla completa" class="bg-slate-900/95 backdrop-blur-md border border-slate-700/80 text-white px-2.5 py-1 rounded-xl shadow-lg hover:bg-slate-800 text-[11px] font-bold flex items-center gap-1 transition">
-                ⤢ Expandir
-              </button>
-            </div>
+      <!-- Barra Superior Flotante Sobre el Mapa: GPS + Filtros Rápidos + Centrar -->
+      <div class="absolute top-2.5 left-2.5 right-2.5 z-20 flex flex-col gap-2 pointer-events-none">
+        
+        <div class="flex items-center justify-between gap-2 pointer-events-auto">
+          <!-- Badge GPS -->
+          <div id="mapGpsBadge" class="bg-slate-900/95 backdrop-blur-md border border-slate-700/80 text-white text-[11px] font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span id="mapGpsAccuracy">GPS En Cancha</span>
+            <button onclick="activateManualAdjust()" class="text-orange-400 hover:underline text-[10px] ml-1">Calibrar</button>
           </div>
 
-          <!-- Controles Laterales (Brújula, Mi Posición, Zoom) -->
-          <div class="absolute right-2.5 top-12 z-20 flex flex-col gap-1.5 pointer-events-auto">
-            <button id="mapCompassBtn" onclick="requestCompassPermission()" title="Brújula 360°" class="w-9 h-9 bg-slate-900/95 backdrop-blur-md text-orange-400 rounded-xl shadow-lg flex items-center justify-center font-bold text-base active:scale-95 transition border border-slate-700">
-              🧭
-            </button>
-            <button id="mapCenterGpsBtn" title="Centrar en mi ubicación" class="w-9 h-9 bg-slate-900/95 backdrop-blur-md text-blue-400 rounded-xl shadow-lg flex items-center justify-center font-bold text-base active:scale-95 transition border border-slate-700">
-              📍
-            </button>
-            <button onclick="map.zoomIn()" title="Acercar" class="w-9 h-9 bg-slate-900/95 backdrop-blur-md text-white rounded-xl shadow-lg flex items-center justify-center font-extrabold text-lg active:scale-95 transition border border-slate-700">
-              +
-            </button>
-            <button onclick="map.zoomOut()" title="Alejar" class="w-9 h-9 bg-slate-900/95 backdrop-blur-md text-white rounded-xl shadow-lg flex items-center justify-center font-extrabold text-lg active:scale-95 transition border border-slate-700">
-              −
-            </button>
-          </div>
-
-          <!-- HUD Superior de Ruta ("¿Cómo llegar?" Activo) -->
-          <div id="navHud" class="hidden absolute top-12 left-2.5 right-14 z-20 bg-slate-950/95 text-white backdrop-blur-md rounded-2xl px-3 py-2 shadow-2xl flex items-center justify-between border border-orange-500/70 pointer-events-auto">
-            <div class="flex items-center gap-2 min-w-0">
-              <div class="w-7 h-7 rounded-lg bg-orange-500/20 text-orange-400 flex items-center justify-center font-bold text-base flex-shrink-0 animate-pulse">
-                🚶
-              </div>
-              <div class="min-w-0">
-                <p class="text-[10px] text-slate-400 truncate">Ruta a <span id="navTargetName" class="text-white font-bold">Local</span></p>
-                <p class="text-xs font-black text-amber-400" id="navDistance">A 25 metros</p>
-              </div>
-            </div>
-            <button onclick="cancelNavigation()" class="text-xs bg-red-600 hover:bg-red-500 text-white px-2.5 py-1 rounded-lg font-bold ml-1.5 flex-shrink-0 transition">
-              ✕ Salir
-            </button>
-          </div>
-
-          <!-- MINI-CARD FLOTANTE SOBRE EL MAPA (NO TAPA LA CANCHA) -->
-          <div id="miniStandCard" class="hidden absolute bottom-3 left-2.5 right-2.5 z-30 bg-slate-950/95 text-white backdrop-blur-xl border border-slate-700/90 rounded-2xl p-2.5 shadow-2xl transition-all duration-300 pointer-events-auto">
-            <div class="flex items-center justify-between gap-2">
-              <div class="flex items-center gap-2 flex-1 min-w-0">
-                <div id="miniStandIcon" class="w-10 h-10 rounded-xl bg-orange-500/20 border border-orange-500/40 text-xl flex items-center justify-center flex-shrink-0 shadow">
-                  🍔
-                </div>
-                <div class="min-w-0 flex-1">
-                  <div class="flex items-center gap-1.5 flex-wrap">
-                    <span id="miniStandNumber" class="text-[10px] font-black uppercase px-2 py-0.2 rounded bg-amber-500 text-slate-950 shadow-sm">
-                      P-01
-                    </span>
-                    <h4 id="miniStandName" class="text-xs sm:text-sm font-black text-white truncate">
-                      Nombre del Puesto
-                    </h4>
-                  </div>
-                  <p id="miniStandLocation" class="text-[10px] text-slate-300 truncate mt-0.5 font-medium">
-                    📍 Pasillo Oeste #1
-                  </p>
-                </div>
-              </div>
-              <!-- Botón cerrar con 1 toque -->
-              <button onclick="closeMiniCard()" title="Cerrar tarjeta" class="w-6 h-6 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center text-xs font-bold flex-shrink-0 transition">
-                ✕
-              </button>
-            </div>
-
-            <!-- Botones de Acción de la Mini Card -->
-            <div class="flex items-center gap-2 mt-2 pt-1.5 border-t border-slate-800/80">
-              <button id="miniStandNavBtn" onclick="startNavigationFromMini()" class="flex-1 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-black text-xs py-1.5 px-3 rounded-xl shadow-lg flex items-center justify-center gap-1.5 active:scale-95 transition">
-                <span>🚶</span> ¿Cómo llegar? <span id="miniStandDist" class="text-[10px] font-semibold opacity-90">(25m)</span>
-              </button>
-              <button id="miniStandMenuBtn" onclick="scrollToStandCard(selectedStandForMini ? selectedStandForMini.id : null)" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs py-1.5 px-3 rounded-xl border border-slate-700 flex items-center justify-center gap-1 active:scale-95 transition flex-shrink-0">
-                <span>📋</span> Ver Menú
-              </button>
-            </div>
-          </div>
-
-          <!-- Contenedor Leaflet del Mapa -->
-          <div id="map" class="w-full h-full"></div>
-        </div>
-      </div>
-
-      <!-- BARRA DE ACCESOS RÁPIDOS 1-TOQUE (JUSTO DEBAJO DEL MAPA) -->
-      <div class="px-3 pt-3 max-w-xl mx-auto">
-        <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
-          <button onclick="mapFilterCategory('all')" id="mapPill-all" class="map-filter-chip active px-3 py-1.5 rounded-full text-xs font-black bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md whitespace-nowrap transition active:scale-95 border border-white/40">
-            ✨ Todo el Recinto
+          <!-- Botón Centrar Recinto / Volver a ver todo -->
+          <button onclick="resetMapView()" title="Ver toda la cancha" class="bg-slate-900/95 backdrop-blur-md border border-amber-500/60 text-amber-300 hover:text-white px-3 py-1.5 rounded-xl shadow-lg text-xs font-black flex items-center gap-1 active:scale-95 transition">
+            🔄 Recinto Completo
           </button>
-          <button onclick="mapFilterCategory('stage')" id="mapPill-stage" class="map-filter-chip px-3 py-1.5 rounded-full text-xs font-black bg-red-600 hover:bg-red-500 text-white shadow-md whitespace-nowrap transition active:scale-95 border border-red-300/40 flex items-center gap-1">
+        </div>
+
+        <!-- Píldoras de Acceso Rápido 1-Toque (Escenario, Baños, Comidas, Cervezas) -->
+        <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 pointer-events-auto">
+          <button onclick="mapFilterCategory('all')" id="mapPill-all" class="map-filter-chip active px-3 py-1 rounded-full text-xs font-black bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md whitespace-nowrap transition active:scale-95 border border-white/40">
+            ✨ Todo
+          </button>
+          <button onclick="mapFilterCategory('stage')" id="mapPill-stage" class="map-filter-chip px-3 py-1 rounded-full text-xs font-black bg-red-600 hover:bg-red-500 text-white shadow-md whitespace-nowrap transition active:scale-95 border border-red-300/40 flex items-center gap-1">
             🎸 Escenario
           </button>
-          <button onclick="mapFilterCategory('wc')" id="mapPill-wc" class="map-filter-chip px-3 py-1.5 rounded-full text-xs font-black bg-blue-600 hover:bg-blue-500 text-white shadow-md whitespace-nowrap transition active:scale-95 border border-blue-300/40 flex items-center gap-1">
+          <button onclick="mapFilterCategory('wc')" id="mapPill-wc" class="map-filter-chip px-3 py-1 rounded-full text-xs font-black bg-blue-600 hover:bg-blue-500 text-white shadow-md whitespace-nowrap transition active:scale-95 border border-blue-300/40 flex items-center gap-1">
             🚻 Baños
           </button>
-          <button onclick="mapFilterCategory('food')" id="mapPill-food" class="map-filter-chip px-3 py-1.5 rounded-full text-xs font-bold bg-slate-900 text-emerald-300 hover:text-white shadow whitespace-nowrap transition active:scale-95 border border-emerald-500/40 flex items-center gap-1">
-            🍔 Food Trucks (2)
+          <button onclick="mapFilterCategory('food')" id="mapPill-food" class="map-filter-chip px-3 py-1 rounded-full text-xs font-bold bg-slate-900/90 text-emerald-300 hover:text-white shadow whitespace-nowrap transition active:scale-95 border border-emerald-500/40 flex items-center gap-1">
+            🍔 Food Trucks
           </button>
-          <button onclick="mapFilterCategory('beer')" id="mapPill-beer" class="map-filter-chip px-3 py-1.5 rounded-full text-xs font-bold bg-slate-900 text-amber-300 hover:text-white shadow whitespace-nowrap transition active:scale-95 border border-amber-500/40 flex items-center gap-1">
-            🍺 Cervecerías (2)
+          <button onclick="mapFilterCategory('beer')" id="mapPill-beer" class="map-filter-chip px-3 py-1 rounded-full text-xs font-bold bg-slate-900/90 text-amber-300 hover:text-white shadow whitespace-nowrap transition active:scale-95 border border-amber-500/40 flex items-center gap-1">
+            🍺 Cervezas
           </button>
-          <button onclick="mapFilterCategory('sweets')" id="mapPill-sweets" class="map-filter-chip px-3 py-1.5 rounded-full text-xs font-bold bg-slate-900 text-pink-300 hover:text-white shadow whitespace-nowrap transition active:scale-95 border border-pink-500/40 flex items-center gap-1">
-            🍦 Dulces (1)
+          <button onclick="mapFilterCategory('sweets')" id="mapPill-sweets" class="map-filter-chip px-3 py-1 rounded-full text-xs font-bold bg-slate-900/90 text-pink-300 hover:text-white shadow whitespace-nowrap transition active:scale-95 border border-pink-500/40 flex items-center gap-1">
+            🍦 Dulces
           </button>
-        </div>
-      </div>
-
-      <!-- SECCIÓN INTEGRADA: TARJETAS DE LOS LOCALES Y SERVICIOS (SCROLL NATURAL) -->
-      <div class="px-3 pt-3 max-w-xl mx-auto space-y-3">
-        <div class="flex items-center justify-between px-1">
-          <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-400 font-display">
-            🎪 Locales & Puntos del Festival (En Terreno)
-          </h3>
-          <span class="text-[11px] text-amber-400 font-semibold">Toca para ubicar y guiar</span>
         </div>
 
-        <div id="integratedStandsFeed" class="space-y-3">
-          <!-- Renderizado dinámico de las tarjetas de los 5 puestos + Baños + Escenario -->
-        </div>
       </div>
+
+      <!-- Controles de Navegación Lateral (Brújula + Mi GPS + Agrandar/Achicar) -->
+      <div class="absolute right-3 top-28 z-20 flex flex-col gap-2 pointer-events-auto">
+        <button id="mapCompassBtn" onclick="requestCompassPermission()" title="Brújula 360°" class="w-11 h-11 bg-slate-900/95 backdrop-blur-md text-orange-400 rounded-xl shadow-xl flex items-center justify-center font-bold text-lg active:scale-95 transition border border-slate-700">
+          🧭
+        </button>
+        <button id="mapCenterGpsBtn" title="Centrar en mi ubicación" class="w-11 h-11 bg-slate-900/95 backdrop-blur-md text-blue-400 rounded-xl shadow-xl flex items-center justify-center font-bold text-lg active:scale-95 transition border border-slate-700">
+          📍
+        </button>
+        <button onclick="map.zoomIn()" title="Agrandar mapa (+)" class="w-11 h-11 bg-slate-900/95 backdrop-blur-md text-white rounded-xl shadow-xl flex items-center justify-center font-black text-2xl active:scale-95 transition border border-slate-700">
+          +
+        </button>
+        <button onclick="map.zoomOut()" title="Achicar mapa (−)" class="w-11 h-11 bg-slate-900/95 backdrop-blur-md text-white rounded-xl shadow-xl flex items-center justify-center font-black text-2xl active:scale-95 transition border border-slate-700">
+          −
+        </button>
+      </div>
+
+      <!-- HUD Superior de Ruta ("¿Cómo llegar?" Activo en Navegación) -->
+      <div id="navHud" class="hidden absolute top-28 left-3 right-16 z-20 bg-slate-950/95 text-white backdrop-blur-md rounded-2xl px-3.5 py-2.5 shadow-2xl flex items-center justify-between border border-orange-500/70 pointer-events-auto animate-bounce-short">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <div class="w-8 h-8 rounded-lg bg-orange-500/20 text-orange-400 flex items-center justify-center font-bold text-lg flex-shrink-0 animate-pulse">
+            🚶
+          </div>
+          <div class="min-w-0">
+            <p class="text-[10px] text-slate-400 truncate">Ruta activa a <span id="navTargetName" class="text-white font-bold">Local</span></p>
+            <p class="text-xs font-black text-amber-400" id="navDistance">A 25 metros caminando</p>
+          </div>
+        </div>
+        <button onclick="cancelNavigation()" class="text-xs bg-red-600 hover:bg-red-500 text-white px-2.5 py-1 rounded-lg font-bold ml-1.5 flex-shrink-0 transition">
+          ✕ Salir
+        </button>
+      </div>
+
+      <!-- CONTENEDOR LEAFLET DEL MAPA (Ocupa 100% de la sección, firme, con zoom y arrastre fluido) -->
+      <div id="map" class="w-full h-full"></div>
 
     </section>
+
+    <!-- ======================================================== -->
+    <!-- MODAL ELEGANTE ENCIMA DEL MAPA (FICHA COMPLETA DEL LOCAL) -->
+    <!-- ======================================================== -->
+    <div id="standModalOverlay" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 hidden transition-opacity duration-200">
+      
+      <!-- Fondo oscuro clickeable para salir -->
+      <div class="absolute inset-0" onclick="closeStandModal()"></div>
+
+      <!-- Tarjeta del Local Encima del Mapa -->
+      <div class="relative w-full max-w-md bg-slate-900 border-t sm:border border-slate-700/80 rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden max-h-[85vh] flex flex-col z-10 animate-modal-slide-up">
+        
+        <!-- Cabecera con Foto / Banner del Local -->
+        <div class="relative h-44 sm:h-48 w-full bg-slate-950 flex-shrink-0 overflow-hidden">
+          <img id="modalStandBanner" src="" class="w-full h-full object-cover" alt="Foto del local">
+          <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent"></div>
+
+          <!-- Barra Superior del Modal: Volver para atrás y Cerrar -->
+          <div class="absolute top-3 left-3 right-3 flex items-center justify-between">
+            <button onclick="closeStandModal()" class="px-3 py-1.5 rounded-full bg-slate-950/80 hover:bg-slate-900 text-white text-xs font-black border border-white/40 shadow-lg backdrop-blur-md flex items-center gap-1.5 active:scale-95 transition">
+              <span>⬅</span> Volver al Mapa
+            </button>
+            <button onclick="closeStandModal()" class="w-8 h-8 rounded-full bg-slate-950/80 hover:bg-slate-900 text-slate-300 hover:text-white font-black text-sm border border-white/40 shadow-lg backdrop-blur-md flex items-center justify-center transition">
+              ✕
+            </button>
+          </div>
+
+          <!-- Badge e Icono del Local sobre el Banner -->
+          <div class="absolute bottom-3 left-4 right-4 flex items-end justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <div id="modalStandIconBox" class="w-14 h-14 rounded-2xl bg-slate-900/90 border-2 border-white/80 shadow-2xl text-3xl flex items-center justify-center flex-shrink-0">
+                🍔
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span id="modalStandNumber" class="text-xs font-black uppercase px-2.5 py-0.5 rounded-full bg-amber-500 text-slate-950 shadow-md">
+                    P-01
+                  </span>
+                  <span id="modalStandCategory" class="text-xs font-extrabold text-amber-300">
+                    Comidas & Asados
+                  </span>
+                </div>
+                <h3 id="modalStandName" class="text-lg font-black text-white leading-tight mt-0.5">
+                  Nombre del Local
+                </h3>
+              </div>
+            </div>
+            <span id="modalStandPrepTime" class="text-[11px] font-extrabold text-white bg-slate-950/90 border border-slate-700 px-2.5 py-1 rounded-xl shrink-0">
+              ⏱️ 5 - 8 min
+            </span>
+          </div>
+        </div>
+
+        <!-- Contenido Desplazable del Local -->
+        <div class="p-4 overflow-y-auto no-scrollbar space-y-3.5 flex-1">
+          
+          <!-- Slogan y Ubicación en la Cancha -->
+          <div class="bg-slate-950/60 p-3 rounded-2xl border border-slate-800 space-y-1">
+            <p id="modalStandDesc" class="text-xs text-slate-300 leading-relaxed"></p>
+            <p id="modalStandLocation" class="text-xs font-extrabold text-amber-400"></p>
+          </div>
+
+          <!-- BOTÓN PRINCIPAL DESTACADO: ¿CÓMO LLEGAR? -->
+          <button id="modalStandNavBtn" onclick="startNavigationFromModal()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-500 hover:from-orange-600 hover:to-amber-600 text-slate-950 font-black text-sm shadow-xl flex items-center justify-center gap-2 active:scale-98 transition">
+            <span class="text-lg">🚶</span>
+            <span>¿CÓMO LLEGAR AHORA?</span>
+            <span id="modalStandDistance" class="bg-slate-950/80 text-amber-300 px-2 py-0.5 rounded-full text-xs font-black">
+              (A 25m)
+            </span>
+          </button>
+
+          <!-- Botones de Acción Secundaria (WhatsApp y Datos Bancarios) -->
+          <div class="grid grid-cols-2 gap-2" id="modalStandActionsRow">
+            <a id="modalStandWpBtn" href="#" target="_blank" class="py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs shadow flex items-center justify-center gap-1.5 transition">
+              <span>💬</span> Pedir por WhatsApp
+            </a>
+            <button id="modalStandBankBtn" onclick="openBankModalFromCurrentStand()" class="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs border border-slate-700 flex items-center justify-center gap-1.5 transition">
+              <span>💳</span> Datos Transferencia
+            </button>
+          </div>
+
+          <!-- Lista de Productos y Precios -->
+          <div id="modalProductsSection" class="space-y-2 pt-2 border-t border-slate-800">
+            <h4 class="text-xs font-black uppercase tracking-wider text-slate-400 font-display">
+              📋 Carta de Productos & Precios
+            </h4>
+            <div id="modalProductsList" class="space-y-2">
+              <!-- Renderizado dinámico de productos -->
+            </div>
+          </div>
+
+          <!-- Botón Volver al Mapa al final de la ficha -->
+          <button onclick="closeStandModal()" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs border border-slate-700 flex items-center justify-center gap-1 transition">
+            <span>⬅</span> Volver al Mapa General
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
 
     <!-- PESTAÑA 3: 🍔 20 LOCALES & CARTA COMPLETA -->
     <section id="view-stands" class="h-full overflow-y-auto p-3 sm:p-4 max-w-xl mx-auto space-y-4 no-scrollbar pb-28 hidden">
@@ -874,7 +921,7 @@
   <!-- ======================================================== -->
   <script>
     // Limpiar caché vieja si la versión de datos cambió
-    const DATA_VERSION = '2026.05.five_great_stands_v1';
+    const DATA_VERSION = '2026.06.steady_map_and_modal_v1';
     if (localStorage.getItem('festival_data_version') !== DATA_VERSION) {
       localStorage.setItem('festival_data_version', DATA_VERSION);
       localStorage.removeItem('festival_admin_schedule');
@@ -2008,13 +2055,13 @@
     const cLat = DEFAULT_CENTER[0];
     const cLng = DEFAULT_CENTER[1];
 
-    // Asegurar que cada puesto tenga sus coordenadas lat y lng calculadas numéricamente
+    // Asegurar que cada puesto tenga sus coordenadas lat y lng calculadas de inmediato
     stands.forEach(s => {
       s.lat = cLat + (s.latOffset || 0);
       s.lng = cLng + (s.lngOffset || 0);
     });
 
-    // Delimitación del recinto deportivo para encuadre automático
+    // Delimitación estricta del recinto para que el mapa quede firme y cómodo
     const stadiumBounds = L.latLngBounds([
       [cLat - 0.00058, cLng - 0.00042], // Entrada Sur
       [cLat + 0.00055, cLng + 0.00042]  // Escenario Norte
@@ -2025,31 +2072,22 @@
       maxZoom: 21,
       minZoom: 16,
       maxBounds: stadiumBounds.pad(0.35),
-      maxBoundsViscosity: 0.85
+      maxBoundsViscosity: 0.9,
+      bounceAtZoomLimits: true
     });
 
-    // 1. Capas Base de Fondo (Sin CartoDB ni marcas de agua)
+    // 1. Capas Base de Fondo
     const osmLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 21,
       maxNativeZoom: 19,
       attribution: '&copy; OpenStreetMap'
     });
 
-    const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-      maxZoom: 21,
-      maxNativeZoom: 19,
-      attribution: '&copy; Esri'
-    });
-
-    // 2. RECINTO DEL ESTADIO & CANCHA ILUSTRADA (Capa Vectorial)
+    // 2. RECINTO DEL ESTADIO & CANCHA ILUSTRADA (Capa Vectorial Firme)
     const stadiumGroup = L.layerGroup().addTo(map);
 
     // A. Recinto Exterior & Pista Atlética de Tartán Rojo
-    const stadiumOuterBounds = [
-      [cLat - 0.00058, cLng - 0.00042],
-      [cLat + 0.00058, cLng + 0.00042]
-    ];
-    L.rectangle(stadiumOuterBounds, {
+    L.rectangle([[cLat - 0.00058, cLng - 0.00042], [cLat + 0.00058, cLng + 0.00042]], {
       color: '#1e293b',
       weight: 2,
       fillColor: '#0b0f19',
@@ -2057,11 +2095,7 @@
     }).addTo(stadiumGroup);
 
     // Pista de atletismo terracota
-    const trackBounds = [
-      [cLat - 0.00052, cLng - 0.00038],
-      [cLat + 0.00052, cLng + 0.00038]
-    ];
-    L.rectangle(trackBounds, {
+    L.rectangle([[cLat - 0.00052, cLng - 0.00038], [cLat + 0.00052, cLng + 0.00038]], {
       color: '#ffffff',
       weight: 1.5,
       opacity: 0.35,
@@ -2105,7 +2139,6 @@
       fill: false
     }).addTo(stadiumGroup);
 
-    // Mitad de cancha
     const pitchCenterLat = (pitchNorth + pitchSouth) / 2;
     L.polyline([[pitchCenterLat, pitchWest], [pitchCenterLat, pitchEast]], {
       color: '#ffffff',
@@ -2113,7 +2146,6 @@
       opacity: 0.7
     }).addTo(stadiumGroup);
 
-    // Círculo central
     L.circle([pitchCenterLat, cLng], {
       radius: 9.15,
       color: '#ffffff',
@@ -2122,7 +2154,6 @@
       fill: false
     }).addTo(stadiumGroup);
 
-    // Punto central
     L.circle([pitchCenterLat, cLng], {
       radius: 1,
       color: '#ffffff',
@@ -2151,11 +2182,7 @@
     }
 
     // E. Escenario Principal al Norte (Concert Stage)
-    const stageBounds = [
-      [pitchNorth, cLng - 0.00020],
-      [cLat + 0.00050, cLng + 0.00020]
-    ];
-    L.rectangle(stageBounds, {
+    L.rectangle([[pitchNorth, cLng - 0.00020], [cLat + 0.00050, cLng + 0.00020]], {
       color: '#dc2626',
       weight: 2.5,
       fillColor: '#09090b',
@@ -2180,7 +2207,7 @@
     const stageBannerIcon = L.divIcon({
       className: 'stage-central-marker',
       html: `
-        <div class="px-3.5 py-1.5 rounded-full bg-gradient-to-r from-red-600 via-rose-600 to-amber-500 text-white text-[11px] font-black shadow-xl border-2 border-white flex items-center gap-1.5 whitespace-nowrap cursor-pointer hover:scale-105 transition" onclick="onStageClick()">
+        <div class="px-3.5 py-1.5 rounded-full bg-gradient-to-r from-red-600 via-rose-600 to-amber-500 text-white text-[11px] font-black shadow-xl border-2 border-white flex items-center gap-1.5 whitespace-nowrap cursor-pointer hover:scale-105 transition" onclick="onStageMarkerClick()">
           <span class="text-sm">🎸</span> ESCENARIO PRINCIPAL <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
         </div>
       `,
@@ -2200,42 +2227,23 @@
     });
     L.marker([pitchSouth - 0.00005, cLng], { icon: entranceBannerIcon, zIndexOffset: 800 }).addTo(stadiumGroup);
 
-    // Encuadre inicial del mapa
+    // Encuadre inicial automático de la cancha completa
     map.fitBounds(stadiumBounds, { padding: [15, 15] });
 
     function resetMapView() {
-      closeMiniCard();
+      closeStandModal();
       mapFilterCategory('all');
-      map.flyToBounds(stadiumBounds, { padding: [15, 15], duration: 0.7 });
+      map.flyToBounds(stadiumBounds, { padding: [15, 15], duration: 0.6 });
     }
 
-    let isMapExpanded = false;
-    function toggleMapExpand() {
-      isMapExpanded = !isMapExpanded;
-      const wrap = document.getElementById('mapWrapper');
-      const btn = document.getElementById('toggleExpandMapBtn');
-      if (wrap) {
-        if (isMapExpanded) {
-          wrap.classList.remove('h-[380px]', 'sm:h-[420px]');
-          wrap.classList.add('h-[calc(100dvh-175px)]');
-          if (btn) btn.innerHTML = '⤢ Reducir';
-        } else {
-          wrap.classList.remove('h-[calc(100dvh-175px)]');
-          wrap.classList.add('h-[380px]', 'sm:h-[420px]');
-          if (btn) btn.innerHTML = '⤢ Expandir';
-        }
-        setTimeout(() => { map.invalidateSize(); map.fitBounds(stadiumBounds, { padding: [15, 15] }); }, 320);
-      }
-    }
-
-    // 3. Usuario & GPS en Cancha
-    let userLocation = [cLat - 0.00038, cLng]; // Punto inicial visible de inmediato en la entrada
+    // 3. Usuario & GPS en Cancha (Siempre visible desde el primer instante)
+    let userLocation = [cLat - 0.00038, cLng];
     let userMarker = null;
     let userAccuracyCircle = null;
     let isAdjusting = false;
     let activeNavStand = null;
     let navRoutePolyline = null;
-    let selectedStandForMini = null;
+    let currentSelectedStand = null;
 
     const userGpsIcon = L.divIcon({
       className: 'user-gps-container',
@@ -2335,8 +2343,7 @@
       toast.id = 'mapOrientationToast';
       toast.className = 'absolute bottom-20 left-1/2 -translate-x-1/2 z-40 bg-slate-900/95 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-2xl border border-slate-700 pointer-events-none transition-opacity duration-300';
       toast.textContent = msg;
-      const wrapper = document.getElementById('mapWrapper');
-      if (wrapper) wrapper.appendChild(toast);
+      document.getElementById('view-map').appendChild(toast);
       setTimeout(() => { toast.classList.add('opacity-0'); setTimeout(() => toast.remove(), 300); }, 2200);
     }
 
@@ -2352,7 +2359,7 @@
         userMarker.on('dragend', (e) => {
           userLocation = [e.target.getLatLng().lat, e.target.getLatLng().lng];
           if (activeNavStand) updateNavigationDistance();
-          if (selectedStandForMini) updateMiniDistance(selectedStandForMini);
+          if (currentSelectedStand) updateModalDistance(currentSelectedStand);
         });
         userAccuracyCircle = L.circle(userLocation, {
           radius: displayRadius,
@@ -2370,10 +2377,10 @@
       setHeadingAngle(currentHeadingAngle);
 
       if (activeNavStand) updateNavigationDistance();
-      if (selectedStandForMini) updateMiniDistance(selectedStandForMini);
+      if (currentSelectedStand) updateModalDistance(currentSelectedStand);
     }
 
-    // Inicializar posición de inmediato para que el usuario NUNCA desaparezca
+    // Posición inicial inmediata
     updateUserPosition(userLocation[0], userLocation[1], 4);
 
     function initGps() {
@@ -2398,11 +2405,9 @@
       mapMarkers = [];
 
       stands.forEach(stand => {
-        // Asegurar que lat y lng existan
         if (stand.lat === undefined) stand.lat = cLat + (stand.latOffset || 0);
         if (stand.lng === undefined) stand.lng = cLng + (stand.lngOffset || 0);
 
-        // El escenario tiene su cartel central interactivo
         if (stand.number === 'ESC' || stand.id === 7) return;
 
         const cat = stand.category;
@@ -2445,7 +2450,7 @@
 
         const m = L.marker([stand.lat, stand.lng], { icon: icon, zIndexOffset: 450 }).addTo(map);
         m.on('click', () => {
-          showMiniStandCard(stand);
+          openStandModal(stand);
         });
         m.standData = stand;
         mapMarkers.push(m);
@@ -2453,110 +2458,11 @@
     }
     renderStandsOnMap();
 
-    // 5. Renderizado de las Tarjetas Integradas debajo del Mapa (Scroll Natural)
-    function renderIntegratedStandsFeed() {
-      const container = document.getElementById('integratedStandsFeed');
-      if (!container) return;
+    // 5. MODAL COMPLETO ENCIMA DEL MAPA (FICHA CON FOTO, MENÚ, PRECIOS Y CÓMO LLEGAR)
+    function openStandModal(stand) {
+      currentSelectedStand = stand;
 
-      container.innerHTML = '';
-      stands.forEach(stand => {
-        const isService = stand.number === 'WC' || stand.number === 'ESC';
-        const card = document.createElement('div');
-        card.id = 'stand-feed-card-' + stand.id;
-        card.className = 'bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl hover:border-slate-700 transition flex flex-col gap-3';
-
-        const productsHtml = stand.products && stand.products.length > 0 ? `
-          <div class="space-y-1.5 pt-2 border-t border-slate-800">
-            <p class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Platos & Precios Más Pedidos:</p>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
-              ${stand.products.slice(0, 3).map(p => `
-                <div class="flex items-center justify-between text-xs bg-slate-950/60 px-2.5 py-1.5 rounded-lg border border-slate-800">
-                  <span class="text-slate-200 font-medium truncate mr-2">${p.name}</span>
-                  <span class="font-black text-amber-400 shrink-0">${p.price}</span>
-                </div>
-              `).join('')}
-            </div>
-          </div>
-        ` : '';
-
-        const whatsappBtn = stand.whatsapp ? `
-          <a href="https://wa.me/${stand.whatsapp}?text=Hola%2C%20quiero%20hacer%20un%20pedido%20en%20${encodeURIComponent(stand.name)}" target="_blank" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center justify-center gap-1 shadow transition">
-            <span>💬</span> WhatsApp
-          </a>
-        ` : '';
-
-        card.innerHTML = `
-          <div class="flex items-start justify-between gap-3">
-            <div class="flex items-center gap-3">
-              <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-3xl shadow flex-shrink-0" style="background-color: ${stand.color}25; border: 1.5px solid ${stand.color};">
-                ${stand.icon}
-              </div>
-              <div>
-                <div class="flex items-center gap-2">
-                  <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-amber-500 text-slate-950 shadow-sm">
-                    ${stand.number}
-                  </span>
-                  <span class="text-xs font-bold text-slate-400">${stand.categoryName}</span>
-                </div>
-                <h4 class="text-base font-black text-white mt-0.5">${stand.name}</h4>
-              </div>
-            </div>
-            <span class="text-[11px] font-extrabold text-amber-400 bg-amber-950/60 border border-amber-500/40 px-2.5 py-1 rounded-lg shrink-0">
-              ⏱️ ${stand.prepTime}
-            </span>
-          </div>
-
-          <p class="text-xs text-slate-300 leading-relaxed">${stand.desc}</p>
-          <p class="text-xs text-amber-300/90 font-medium">📍 ${stand.locationNote || 'En la Cancha'}</p>
-
-          ${productsHtml}
-
-          <div class="flex items-center gap-2 pt-2 border-t border-slate-800 flex-wrap">
-            <button onclick="focusStandFromCard(${stand.id})" class="flex-1 min-w-[130px] px-3 py-2 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-xs font-black shadow flex items-center justify-center gap-1.5 active:scale-95 transition">
-              <span>📍</span> Ver en Cancha & Guiarme
-            </button>
-            ${whatsappBtn}
-            ${!isService ? `
-              <button onclick="openBottomSheetById(${stand.id})" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold border border-slate-700 transition">
-                📋 Carta Completa
-              </button>
-            ` : ''}
-          </div>
-        `;
-        container.appendChild(card);
-      });
-    }
-    renderIntegratedStandsFeed();
-
-    // 6. Conexión Mapa <-> Tarjetas
-    function focusStandFromCard(standId) {
-      const stand = stands.find(s => s.id === standId);
-      if (!stand) return;
-
-      // Desplazar suavemente hacia el mapa
-      const mapWrap = document.getElementById('mapWrapper');
-      if (mapWrap) mapWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-      // Centrar y abrir mini card
-      showMiniStandCard(stand);
-      startNavigation(stand);
-    }
-
-    function scrollToStandCard(standId) {
-      if (!standId) return;
-      const card = document.getElementById('stand-feed-card-' + standId);
-      if (card) {
-        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        card.classList.add('ring-2', 'ring-amber-400');
-        setTimeout(() => card.classList.remove('ring-2', 'ring-amber-400'), 2500);
-      } else {
-        openBottomSheetById(standId);
-      }
-    }
-
-    function showMiniStandCard(stand) {
-      selectedStandForMini = stand;
-
+      // Resaltar el marcador seleccionado
       document.querySelectorAll('.stand-booth-marker').forEach(el => {
         el.classList.remove('stand-selected');
         if (el.getAttribute('data-stand-id') == stand.id) {
@@ -2564,51 +2470,113 @@
         }
       });
 
-      const card = document.getElementById('miniStandCard');
-      const iconEl = document.getElementById('miniStandIcon');
-      const numEl = document.getElementById('miniStandNumber');
-      const nameEl = document.getElementById('miniStandName');
-      const locEl = document.getElementById('miniStandLocation');
+      const modal = document.getElementById('standModalOverlay');
+      const banner = document.getElementById('modalStandBanner');
+      const iconBox = document.getElementById('modalStandIconBox');
+      const numBadge = document.getElementById('modalStandNumber');
+      const catEl = document.getElementById('modalStandCategory');
+      const nameEl = document.getElementById('modalStandName');
+      const prepEl = document.getElementById('modalStandPrepTime');
+      const descEl = document.getElementById('modalStandDesc');
+      const locEl = document.getElementById('modalStandLocation');
+      const wpBtn = document.getElementById('modalStandWpBtn');
+      const bankBtn = document.getElementById('modalStandBankBtn');
+      const actionsRow = document.getElementById('modalStandActionsRow');
+      const productsSection = document.getElementById('modalProductsSection');
+      const productsList = document.getElementById('modalProductsList');
 
-      if (iconEl) iconEl.textContent = stand.icon;
-      if (numEl) numEl.textContent = stand.number;
+      if (banner) banner.src = stand.bannerUrl || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800';
+      if (iconBox) iconBox.textContent = stand.icon;
+      if (numBadge) {
+        numBadge.textContent = stand.number;
+        numBadge.style.backgroundColor = stand.color || '#f59e0b';
+      }
+      if (catEl) catEl.textContent = stand.categoryName;
       if (nameEl) nameEl.textContent = stand.name;
-      if (locEl) locEl.textContent = '📍 ' + (stand.locationNote || stand.categoryName);
+      if (prepEl) prepEl.textContent = '⏱️ ' + stand.prepTime;
+      if (descEl) descEl.textContent = stand.desc;
+      if (locEl) locEl.textContent = '📍 ' + (stand.locationNote || 'En la Cancha del Festival');
 
-      updateMiniDistance(stand);
+      updateModalDistance(stand);
 
-      if (card) card.classList.remove('hidden');
+      // WhatsApp Button
+      if (wpBtn) {
+        if (stand.whatsapp) {
+          wpBtn.href = `https://wa.me/${stand.whatsapp}?text=Hola%2C%20estoy%20en%20el%20festival%20y%20quiero%20hacer%20un%20pedido%20en%20${encodeURIComponent(stand.name)}`;
+          wpBtn.classList.remove('hidden');
+        } else {
+          wpBtn.classList.add('hidden');
+        }
+      }
 
-      map.panTo([stand.lat - 0.00007, stand.lng], { animate: true, duration: 0.5 });
+      // Bank Button & Products Section (Ocultar si es baño o servicio)
+      const isService = stand.number === 'WC' || stand.number === 'ESC';
+      if (bankBtn) {
+        if (stand.bankData && !isService) bankBtn.classList.remove('hidden');
+        else bankBtn.classList.add('hidden');
+      }
+
+      if (actionsRow) {
+        if (isService) actionsRow.classList.add('hidden');
+        else actionsRow.classList.remove('hidden');
+      }
+
+      if (productsSection && productsList) {
+        if (stand.products && stand.products.length > 0) {
+          productsSection.classList.remove('hidden');
+          productsList.innerHTML = stand.products.map(p => `
+            <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-950/80 border border-slate-800">
+              <div class="min-w-0 pr-2">
+                <p class="text-xs font-bold text-white truncate">${p.name}</p>
+                <span class="text-[10px] font-extrabold ${p.inStock ? 'text-emerald-400' : 'text-red-400'}">
+                  ${p.inStock ? '● En Stock' : '● Agotado'}
+                </span>
+              </div>
+              <span class="text-xs font-black text-amber-400 shrink-0">${p.price}</span>
+            </div>
+          `).join('');
+        } else {
+          productsSection.classList.add('hidden');
+        }
+      }
+
+      if (modal) modal.classList.remove('hidden');
     }
 
-    function closeMiniCard() {
-      selectedStandForMini = null;
-      const card = document.getElementById('miniStandCard');
-      if (card) card.classList.add('hidden');
+    function closeStandModal() {
+      currentSelectedStand = null;
+      const modal = document.getElementById('standModalOverlay');
+      if (modal) modal.classList.add('hidden');
       document.querySelectorAll('.stand-booth-marker').forEach(el => el.classList.remove('stand-selected'));
     }
 
-    function updateMiniDistance(stand) {
-      const distEl = document.getElementById('miniStandDist');
+    function updateModalDistance(stand) {
+      const distEl = document.getElementById('modalStandDistance');
       if (!distEl || !stand) return;
       const m = calculateDistanceMeters(userLocation[0], userLocation[1], stand.lat, stand.lng);
-      distEl.textContent = '(' + m + 'm)';
+      distEl.textContent = '(A ' + m + 'm)';
     }
 
-    function startNavigationFromMini() {
-      if (!selectedStandForMini) return;
-      startNavigation(selectedStandForMini);
+    function startNavigationFromModal() {
+      if (!currentSelectedStand) return;
+      const target = currentSelectedStand;
+      closeStandModal();
+      startNavigation(target);
     }
 
-    function onStageClick() {
-      const stageStand = stands.find(s => s.number === 'ESC');
-      if (stageStand) {
-        showMiniStandCard(stageStand);
-        startNavigation(stageStand);
+    function openBankModalFromCurrentStand() {
+      if (currentSelectedStand) {
+        closeStandModal();
+        openBankModal(currentSelectedStand);
       }
     }
 
+    function onStageMarkerClick() {
+      const stageStand = stands.find(s => s.number === 'ESC');
+      if (stageStand) openStandModal(stageStand);
+    }
+
+    // 6. FILTRO RÁPIDO 1-TOQUE EN EL MAPA
     function mapFilterCategory(cat) {
       document.querySelectorAll('.map-filter-chip').forEach(btn => btn.classList.remove('active', 'bg-gradient-to-r', 'from-orange-500', 'to-amber-500'));
       const activeBtn = document.getElementById('mapPill-' + cat);
@@ -2616,7 +2584,7 @@
 
       if (cat === 'all') {
         document.querySelectorAll('.stand-booth-marker').forEach(el => el.classList.remove('stand-dimmed'));
-        closeMiniCard();
+        closeStandModal();
         map.flyToBounds(stadiumBounds, { padding: [15, 15], duration: 0.6 });
         return;
       }
@@ -2624,7 +2592,7 @@
       if (cat === 'stage') {
         const stageStand = stands.find(s => s.number === 'ESC');
         map.flyTo([cLat + 0.00041, cLng], 19, { duration: 0.6 });
-        if (stageStand) showMiniStandCard(stageStand);
+        if (stageStand) openStandModal(stageStand);
         return;
       }
 
@@ -2632,7 +2600,7 @@
         const wcStand = stands.find(s => s.number === 'WC');
         if (wcStand) {
           map.flyTo([wcStand.lat, wcStand.lng], 19, { duration: 0.6 });
-          showMiniStandCard(wcStand);
+          openStandModal(wcStand);
         }
         return;
       }
@@ -2667,10 +2635,11 @@
         isAdjusting = false;
         showMapToast('✅ Ubicación GPS calibrada');
       } else {
-        closeMiniCard();
+        closeStandModal();
       }
     });
 
+    // 7. Navegación en Ruta con Línea Animada
     function startNavigation(stand) {
       activeNavStand = stand;
       if (!userLocation) {
@@ -2683,7 +2652,7 @@
 
       navRoutePolyline = L.polyline(points, {
         color: '#f97316',
-        weight: 4,
+        weight: 5,
         opacity: 0.95,
         className: 'festival-walk-route'
       }).addTo(map);
