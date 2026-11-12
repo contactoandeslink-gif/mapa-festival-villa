@@ -254,6 +254,122 @@
     @keyframes festivalWalkDash {
       to { stroke-dashoffset: -18; }
     }
+  
+    /* ESTILOS DE PUESTOS LIMPIOS Y SEÑALIZACIÓN EN CANCHA */
+    .stand-booth-marker {
+      width: 52px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      cursor: pointer;
+      filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.6));
+      transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .stand-booth-marker:hover, .stand-booth-marker:active {
+      transform: scale(1.18) translateY(-4px);
+      z-index: 999 !important;
+    }
+    .stand-booth-marker.stand-selected {
+      transform: scale(1.26) translateY(-6px);
+      z-index: 1000 !important;
+      filter: drop-shadow(0 0 16px rgba(251, 191, 36, 1)) drop-shadow(0 8px 22px rgba(0, 0, 0, 0.7));
+    }
+    .stand-booth-marker.stand-dimmed {
+      opacity: 0.3;
+      filter: grayscale(60%) drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    }
+
+    /* Toldo rayado de feria */
+    .stand-toldo {
+      width: 40px;
+      height: 11px;
+      border-radius: 6px 6px 0 0;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+      position: relative;
+      z-index: 2;
+      border: 1.5px solid #ffffff;
+      border-bottom: none;
+    }
+    .stand-toldo.toldo-food {
+      background: repeating-linear-gradient(45deg, #ef4444, #ef4444 5px, #ffffff 5px, #ffffff 10px);
+    }
+    .stand-toldo.toldo-beer {
+      background: repeating-linear-gradient(45deg, #f59e0b, #f59e0b 5px, #ffffff 5px, #ffffff 10px);
+    }
+    .stand-toldo.toldo-sweets {
+      background: repeating-linear-gradient(45deg, #ec4899, #ec4899 5px, #ffffff 5px, #ffffff 10px);
+    }
+    .stand-toldo.toldo-service {
+      background: repeating-linear-gradient(45deg, #0284c7, #0284c7 5px, #ffffff 5px, #ffffff 10px);
+    }
+
+    /* Píldora del número del puesto - NUNCA CORTADA */
+    .stand-number-badge {
+      position: absolute;
+      top: -12px;
+      right: -8px;
+      background: #0f172a;
+      color: #fbbf24;
+      font-family: 'Outfit', 'Plus Jakarta Sans', system-ui, sans-serif;
+      font-size: 10px;
+      font-weight: 900;
+      padding: 1.5px 6px;
+      border-radius: 9999px;
+      border: 1.5px solid #ffffff;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.6);
+      z-index: 20;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    /* Círculo central con icono */
+    .stand-booth-circle {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      border: 2.5px solid #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      margin-top: -2px;
+      box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.3), 0 4px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Puntero al suelo */
+    .stand-booth-pointer {
+      width: 0;
+      height: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 7px solid #ffffff;
+      margin-top: -1px;
+    }
+
+    /* Etiqueta de nombre bajo el puesto */
+    .stand-label-tag {
+      background: rgba(15, 23, 42, 0.95);
+      color: #ffffff;
+      font-size: 9px;
+      font-weight: 800;
+      padding: 1px 6px;
+      border-radius: 9999px;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+      white-space: nowrap;
+      margin-top: 2px;
+      pointer-events: none;
+    }
+
+    .festival-walk-route {
+      stroke-dasharray: 8, 10;
+      animation: festivalWalkDash 1.2s linear infinite;
+    }
+    @keyframes festivalWalkDash {
+      to { stroke-dashoffset: -18; }
+    }
   </style>
 </head>
 <body class="bg-slate-950 text-slate-100 flex flex-col min-h-[100dvh] relative overflow-x-hidden antialiased">
@@ -434,130 +550,148 @@
     </section>
 
     <!-- PESTAÑA 2: 🗺️ MAPA INTERACTIVO & GPS (CANCHA / VILLA) -->
-    <section id="view-map" class="h-[calc(100dvh-175px)] min-h-[520px] w-full hidden relative overflow-hidden">
+    <section id="view-map" class="h-full overflow-y-auto no-scrollbar pb-32 hidden">
       
-      <!-- Barra Superior Flotante: GPS + Selector de Capa + Reset -->
-      <div class="absolute top-2.5 left-2.5 right-2.5 z-20 flex items-center justify-between pointer-events-none gap-2">
-        
-        <!-- Estado de GPS -->
-        <div id="mapGpsBadge" class="bg-slate-900/95 backdrop-blur-md border border-slate-700/80 text-white text-[11px] font-bold px-3 py-1.5 rounded-full shadow-lg pointer-events-auto flex items-center gap-2">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span id="mapGpsAccuracy">GPS Activo</span>
-          <button onclick="activateManualAdjust()" class="text-orange-400 hover:underline text-[10px] ml-1">Calibrar</button>
-        </div>
-
-        <!-- Botones Superiores Derechos -->
-        <div class="flex items-center gap-1.5 pointer-events-auto">
-          <!-- Botón Volver / Vista General del Recinto -->
-          <button onclick="resetMapView()" title="Ver recinto completo" class="bg-slate-900/95 backdrop-blur-md border border-amber-500/50 text-amber-300 hover:text-white px-2.5 py-1.5 rounded-xl shadow-lg text-xs font-black flex items-center gap-1 active:scale-95 transition">
-            🔄 Recinto Completo
-          </button>
-
-          <!-- Alternador de Capa -->
-          <button id="toggleMapLayerBtn" class="bg-slate-900/95 backdrop-blur-md border border-slate-700/80 text-white px-2.5 py-1.5 rounded-xl shadow-lg hover:bg-slate-800 text-xs font-bold flex items-center gap-1 transition">
-            🏟️ Cancha
-          </button>
-        </div>
-      </div>
-
-      <!-- Barra de Filtros Rápidos (Un solo toque para encontrar todo) -->
-      <div class="absolute top-12 left-2 right-2 z-20 flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1 pointer-events-auto">
-        <button onclick="mapFilterCategory('all')" id="mapPill-all" class="map-filter-chip active px-3 py-1 rounded-full text-xs font-black bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-lg whitespace-nowrap transition-transform active:scale-95 border border-white/40">
-          ✨ Todo el Recinto
-        </button>
-        <button onclick="mapFilterCategory('stage')" id="mapPill-stage" class="map-filter-chip px-3 py-1 rounded-full text-xs font-black bg-red-600 hover:bg-red-500 text-white shadow-md whitespace-nowrap transition-transform active:scale-95 border border-red-300/40 flex items-center gap-1">
-          🎸 Escenario
-        </button>
-        <button onclick="mapFilterCategory('wc')" id="mapPill-wc" class="map-filter-chip px-3 py-1 rounded-full text-xs font-black bg-blue-600 hover:bg-blue-500 text-white shadow-md whitespace-nowrap transition-transform active:scale-95 border border-blue-300/40 flex items-center gap-1">
-          🚻 Baños
-        </button>
-        <button onclick="mapFilterCategory('food')" id="mapPill-food" class="map-filter-chip px-3 py-1 rounded-full text-xs font-bold bg-slate-900/90 text-emerald-300 hover:text-white shadow-md whitespace-nowrap transition-transform active:scale-95 border border-emerald-500/40 flex items-center gap-1">
-          🍔 Comidas (6)
-        </button>
-        <button onclick="mapFilterCategory('beer')" id="mapPill-beer" class="map-filter-chip px-3 py-1 rounded-full text-xs font-bold bg-slate-900/90 text-amber-300 hover:text-white shadow-md whitespace-nowrap transition-transform active:scale-95 border border-amber-500/40 flex items-center gap-1">
-          🍺 Cervezas (5)
-        </button>
-        <button onclick="mapFilterCategory('sweets')" id="mapPill-sweets" class="map-filter-chip px-3 py-1 rounded-full text-xs font-bold bg-slate-900/90 text-pink-300 hover:text-white shadow-md whitespace-nowrap transition-transform active:scale-95 border border-pink-500/40 flex items-center gap-1">
-          🍦 Dulces (3)
-        </button>
-        <button onclick="mapFilterCategory('crafts')" id="mapPill-crafts" class="map-filter-chip px-3 py-1 rounded-full text-xs font-bold bg-slate-900/90 text-purple-300 hover:text-white shadow-md whitespace-nowrap transition-transform active:scale-95 border border-purple-500/40 flex items-center gap-1">
-          🧶 Artesanías (4)
-        </button>
-      </div>
-
-      <!-- Controles Laterales: Brújula + Mi Ubicación + Zoom -->
-      <div class="absolute right-3 top-24 z-20 flex flex-col gap-2">
-        <button id="mapCompassBtn" onclick="requestCompassPermission()" title="Activar Brújula 360°" class="w-11 h-11 bg-slate-900/95 backdrop-blur-md text-orange-400 rounded-xl shadow-xl flex items-center justify-center font-bold text-lg active:scale-95 transition border border-slate-700">
-          🧭
-        </button>
-        <button id="mapCenterGpsBtn" title="Centrar en mi posición GPS" class="w-11 h-11 bg-slate-900/95 backdrop-blur-md text-blue-400 rounded-xl shadow-xl flex items-center justify-center font-bold text-lg active:scale-95 transition border border-slate-700">
-          📍
-        </button>
-        <button onclick="map.zoomIn()" title="Acercar mapa" class="w-11 h-11 bg-slate-900/95 backdrop-blur-md text-white rounded-xl shadow-xl flex items-center justify-center font-extrabold text-xl active:scale-95 transition border border-slate-700">
-          +
-        </button>
-        <button onclick="map.zoomOut()" title="Alejar mapa" class="w-11 h-11 bg-slate-900/95 backdrop-blur-md text-white rounded-xl shadow-xl flex items-center justify-center font-extrabold text-xl active:scale-95 transition border border-slate-700">
-          −
-        </button>
-      </div>
-
-      <!-- HUD Superior de Ruta ("¿Cómo llegar?" Activo) -->
-      <div id="navHud" class="hidden absolute top-24 left-3 right-16 z-20 max-w-sm bg-slate-950/95 text-white backdrop-blur-md rounded-2xl px-3.5 py-2.5 shadow-2xl flex items-center justify-between border border-orange-500/60 animate-bounce-short">
-        <div class="flex items-center gap-2.5 min-w-0">
-          <div class="w-8 h-8 rounded-lg bg-orange-500/20 text-orange-400 flex items-center justify-center font-bold text-lg flex-shrink-0 animate-pulse">
-            🚶
-          </div>
-          <div class="min-w-0">
-            <p class="text-[10px] text-slate-400 truncate">Rumbo a <span id="navTargetName" class="text-white font-bold">Local</span></p>
-            <p class="text-xs font-black text-amber-400" id="navDistance">A ... metros</p>
-          </div>
-        </div>
-        <button onclick="cancelNavigation()" class="text-xs bg-red-600 hover:bg-red-500 text-white px-2.5 py-1 rounded-lg font-bold ml-2 flex-shrink-0 transition">
-          ✕ Salir
-        </button>
-      </div>
-
-      <!-- MINI-CARD FLOTANTE INFERIOR (NO TAPA EL MAPA, SOLO OCUPA 105PX) -->
-      <div id="miniStandCard" class="hidden absolute bottom-4 left-3 right-3 z-30 max-w-sm mx-auto bg-slate-950/95 text-white backdrop-blur-xl border border-slate-700/90 rounded-2xl p-3 shadow-2xl transition-all duration-300 pointer-events-auto">
-        <div class="flex items-start justify-between gap-2">
-          <div class="flex items-center gap-2.5 flex-1 min-w-0">
-            <div id="miniStandIcon" class="w-11 h-11 rounded-xl bg-orange-500/20 border border-orange-500/40 text-2xl flex items-center justify-center flex-shrink-0 shadow">
-              🍺
+      <!-- CONTENEDOR DEL MAPA DEL RECINTO / CANCHA -->
+      <div class="px-2 pt-2 sm:px-4 max-w-xl mx-auto">
+        <div id="mapWrapper" class="h-[380px] sm:h-[420px] w-full rounded-2xl overflow-hidden border border-slate-700/80 shadow-2xl relative transition-all duration-300">
+          
+          <!-- Barra Superior Flotante del Mapa -->
+          <div class="absolute top-2.5 left-2.5 right-2.5 z-20 flex items-center justify-between pointer-events-none gap-2">
+            <!-- Badge GPS -->
+            <div id="mapGpsBadge" class="bg-slate-900/95 backdrop-blur-md border border-slate-700/80 text-white text-[11px] font-bold px-3 py-1 rounded-full shadow-lg pointer-events-auto flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span id="mapGpsAccuracy">GPS En Cancha</span>
+              <button onclick="activateManualAdjust()" class="text-orange-400 hover:underline text-[10px] ml-1">Calibrar</button>
             </div>
-            <div class="min-w-0 flex-1">
-              <div class="flex items-center gap-1.5 flex-wrap">
-                <span id="miniStandNumber" class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-amber-500 text-slate-950 shadow-sm">
-                  P-01
-                </span>
-                <h4 id="miniStandName" class="text-sm font-black text-white truncate">
-                  Nombre del Puesto
-                </h4>
+
+            <!-- Botones Superiores -->
+            <div class="flex items-center gap-1.5 pointer-events-auto">
+              <!-- Botón Centrar Recinto -->
+              <button onclick="resetMapView()" title="Centrar todo el recinto" class="bg-slate-900/95 backdrop-blur-md border border-amber-500/60 text-amber-300 hover:text-white px-2.5 py-1 rounded-xl shadow-lg text-[11px] font-black flex items-center gap-1 active:scale-95 transition">
+                🔄 Centrar
+              </button>
+              <!-- Botón Expandir / Reducir Pantalla Completa -->
+              <button id="toggleExpandMapBtn" onclick="toggleMapExpand()" title="Expandir pantalla completa" class="bg-slate-900/95 backdrop-blur-md border border-slate-700/80 text-white px-2.5 py-1 rounded-xl shadow-lg hover:bg-slate-800 text-[11px] font-bold flex items-center gap-1 transition">
+                ⤢ Expandir
+              </button>
+            </div>
+          </div>
+
+          <!-- Controles Laterales (Brújula, Mi Posición, Zoom) -->
+          <div class="absolute right-2.5 top-12 z-20 flex flex-col gap-1.5 pointer-events-auto">
+            <button id="mapCompassBtn" onclick="requestCompassPermission()" title="Brújula 360°" class="w-9 h-9 bg-slate-900/95 backdrop-blur-md text-orange-400 rounded-xl shadow-lg flex items-center justify-center font-bold text-base active:scale-95 transition border border-slate-700">
+              🧭
+            </button>
+            <button id="mapCenterGpsBtn" title="Centrar en mi ubicación" class="w-9 h-9 bg-slate-900/95 backdrop-blur-md text-blue-400 rounded-xl shadow-lg flex items-center justify-center font-bold text-base active:scale-95 transition border border-slate-700">
+              📍
+            </button>
+            <button onclick="map.zoomIn()" title="Acercar" class="w-9 h-9 bg-slate-900/95 backdrop-blur-md text-white rounded-xl shadow-lg flex items-center justify-center font-extrabold text-lg active:scale-95 transition border border-slate-700">
+              +
+            </button>
+            <button onclick="map.zoomOut()" title="Alejar" class="w-9 h-9 bg-slate-900/95 backdrop-blur-md text-white rounded-xl shadow-lg flex items-center justify-center font-extrabold text-lg active:scale-95 transition border border-slate-700">
+              −
+            </button>
+          </div>
+
+          <!-- HUD Superior de Ruta ("¿Cómo llegar?" Activo) -->
+          <div id="navHud" class="hidden absolute top-12 left-2.5 right-14 z-20 bg-slate-950/95 text-white backdrop-blur-md rounded-2xl px-3 py-2 shadow-2xl flex items-center justify-between border border-orange-500/70 pointer-events-auto">
+            <div class="flex items-center gap-2 min-w-0">
+              <div class="w-7 h-7 rounded-lg bg-orange-500/20 text-orange-400 flex items-center justify-center font-bold text-base flex-shrink-0 animate-pulse">
+                🚶
               </div>
-              <p id="miniStandLocation" class="text-[11px] text-slate-300 truncate mt-0.5 font-medium">
-                📍 Pasillo Este #1
-              </p>
+              <div class="min-w-0">
+                <p class="text-[10px] text-slate-400 truncate">Ruta a <span id="navTargetName" class="text-white font-bold">Local</span></p>
+                <p class="text-xs font-black text-amber-400" id="navDistance">A 25 metros</p>
+              </div>
+            </div>
+            <button onclick="cancelNavigation()" class="text-xs bg-red-600 hover:bg-red-500 text-white px-2.5 py-1 rounded-lg font-bold ml-1.5 flex-shrink-0 transition">
+              ✕ Salir
+            </button>
+          </div>
+
+          <!-- MINI-CARD FLOTANTE SOBRE EL MAPA (NO TAPA LA CANCHA) -->
+          <div id="miniStandCard" class="hidden absolute bottom-3 left-2.5 right-2.5 z-30 bg-slate-950/95 text-white backdrop-blur-xl border border-slate-700/90 rounded-2xl p-2.5 shadow-2xl transition-all duration-300 pointer-events-auto">
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex items-center gap-2 flex-1 min-w-0">
+                <div id="miniStandIcon" class="w-10 h-10 rounded-xl bg-orange-500/20 border border-orange-500/40 text-xl flex items-center justify-center flex-shrink-0 shadow">
+                  🍔
+                </div>
+                <div class="min-w-0 flex-1">
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span id="miniStandNumber" class="text-[10px] font-black uppercase px-2 py-0.2 rounded bg-amber-500 text-slate-950 shadow-sm">
+                      P-01
+                    </span>
+                    <h4 id="miniStandName" class="text-xs sm:text-sm font-black text-white truncate">
+                      Nombre del Puesto
+                    </h4>
+                  </div>
+                  <p id="miniStandLocation" class="text-[10px] text-slate-300 truncate mt-0.5 font-medium">
+                    📍 Pasillo Oeste #1
+                  </p>
+                </div>
+              </div>
+              <!-- Botón cerrar con 1 toque -->
+              <button onclick="closeMiniCard()" title="Cerrar tarjeta" class="w-6 h-6 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center text-xs font-bold flex-shrink-0 transition">
+                ✕
+              </button>
+            </div>
+
+            <!-- Botones de Acción de la Mini Card -->
+            <div class="flex items-center gap-2 mt-2 pt-1.5 border-t border-slate-800/80">
+              <button id="miniStandNavBtn" onclick="startNavigationFromMini()" class="flex-1 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-black text-xs py-1.5 px-3 rounded-xl shadow-lg flex items-center justify-center gap-1.5 active:scale-95 transition">
+                <span>🚶</span> ¿Cómo llegar? <span id="miniStandDist" class="text-[10px] font-semibold opacity-90">(25m)</span>
+              </button>
+              <button id="miniStandMenuBtn" onclick="scrollToStandCard(selectedStandForMini ? selectedStandForMini.id : null)" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs py-1.5 px-3 rounded-xl border border-slate-700 flex items-center justify-center gap-1 active:scale-95 transition flex-shrink-0">
+                <span>📋</span> Ver Menú
+              </button>
             </div>
           </div>
-          <!-- Botón cerrar con 1 toque para volver al mapa libre -->
-          <button onclick="closeMiniCard()" title="Cerrar y volver al mapa" class="w-7 h-7 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center text-sm font-bold flex-shrink-0 transition">
-            ✕
-          </button>
-        </div>
 
-        <!-- Botones de Acción Directos -->
-        <div class="flex items-center gap-2 mt-2.5 pt-2 border-t border-slate-800/80">
-          <button id="miniStandNavBtn" onclick="startNavigationFromMini()" class="flex-1 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-black text-xs py-2 px-3 rounded-xl shadow-lg flex items-center justify-center gap-1.5 active:scale-95 transition">
-            <span>🚶</span> ¿Cómo llegar? <span id="miniStandDist" class="text-[10px] font-semibold opacity-90">(25m)</span>
+          <!-- Contenedor Leaflet del Mapa -->
+          <div id="map" class="w-full h-full"></div>
+        </div>
+      </div>
+
+      <!-- BARRA DE ACCESOS RÁPIDOS 1-TOQUE (JUSTO DEBAJO DEL MAPA) -->
+      <div class="px-3 pt-3 max-w-xl mx-auto">
+        <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
+          <button onclick="mapFilterCategory('all')" id="mapPill-all" class="map-filter-chip active px-3 py-1.5 rounded-full text-xs font-black bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md whitespace-nowrap transition active:scale-95 border border-white/40">
+            ✨ Todo el Recinto
           </button>
-          <button id="miniStandMenuBtn" onclick="openFullSheetFromMini()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs py-2 px-3 rounded-xl border border-slate-700 flex items-center justify-center gap-1 active:scale-95 transition flex-shrink-0">
-            <span>📋</span> Ver Carta
+          <button onclick="mapFilterCategory('stage')" id="mapPill-stage" class="map-filter-chip px-3 py-1.5 rounded-full text-xs font-black bg-red-600 hover:bg-red-500 text-white shadow-md whitespace-nowrap transition active:scale-95 border border-red-300/40 flex items-center gap-1">
+            🎸 Escenario
+          </button>
+          <button onclick="mapFilterCategory('wc')" id="mapPill-wc" class="map-filter-chip px-3 py-1.5 rounded-full text-xs font-black bg-blue-600 hover:bg-blue-500 text-white shadow-md whitespace-nowrap transition active:scale-95 border border-blue-300/40 flex items-center gap-1">
+            🚻 Baños
+          </button>
+          <button onclick="mapFilterCategory('food')" id="mapPill-food" class="map-filter-chip px-3 py-1.5 rounded-full text-xs font-bold bg-slate-900 text-emerald-300 hover:text-white shadow whitespace-nowrap transition active:scale-95 border border-emerald-500/40 flex items-center gap-1">
+            🍔 Food Trucks (2)
+          </button>
+          <button onclick="mapFilterCategory('beer')" id="mapPill-beer" class="map-filter-chip px-3 py-1.5 rounded-full text-xs font-bold bg-slate-900 text-amber-300 hover:text-white shadow whitespace-nowrap transition active:scale-95 border border-amber-500/40 flex items-center gap-1">
+            🍺 Cervecerías (2)
+          </button>
+          <button onclick="mapFilterCategory('sweets')" id="mapPill-sweets" class="map-filter-chip px-3 py-1.5 rounded-full text-xs font-bold bg-slate-900 text-pink-300 hover:text-white shadow whitespace-nowrap transition active:scale-95 border border-pink-500/40 flex items-center gap-1">
+            🍦 Dulces (1)
           </button>
         </div>
       </div>
 
-      <!-- Contenedor del Mapa Leaflet -->
-      <div id="map" class="w-full h-full"></div>
-    </section></section>
+      <!-- SECCIÓN INTEGRADA: TARJETAS DE LOS LOCALES Y SERVICIOS (SCROLL NATURAL) -->
+      <div class="px-3 pt-3 max-w-xl mx-auto space-y-3">
+        <div class="flex items-center justify-between px-1">
+          <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-400 font-display">
+            🎪 Locales & Puntos del Festival (En Terreno)
+          </h3>
+          <span class="text-[11px] text-amber-400 font-semibold">Toca para ubicar y guiar</span>
+        </div>
+
+        <div id="integratedStandsFeed" class="space-y-3">
+          <!-- Renderizado dinámico de las tarjetas de los 5 puestos + Baños + Escenario -->
+        </div>
+      </div>
+
+    </section>
 
     <!-- PESTAÑA 3: 🍔 20 LOCALES & CARTA COMPLETA -->
     <section id="view-stands" class="h-full overflow-y-auto p-3 sm:p-4 max-w-xl mx-auto space-y-4 no-scrollbar pb-28 hidden">
@@ -740,7 +874,7 @@
   <!-- ======================================================== -->
   <script>
     // Limpiar caché vieja si la versión de datos cambió
-    const DATA_VERSION = '2026.04.dynamic_stadium_v1';
+    const DATA_VERSION = '2026.05.five_great_stands_v1';
     if (localStorage.getItem('festival_data_version') !== DATA_VERSION) {
       localStorage.setItem('festival_data_version', DATA_VERSION);
       localStorage.removeItem('festival_admin_schedule');
@@ -845,972 +979,297 @@
   {
     "id": 1,
     "number": "P-01",
-    "name": "Cervecería El Roble",
-    "category": "beer",
-    "categoryName": "Cervezas & Tragos",
-    "icon": "🍺",
-    "logoUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20140%20140%22%20width%3D%22140%22%20height%3D%22140%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22bg_ELROBLE%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%231e293b%22%20/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%230f172a%22%20/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2266%22%20fill%3D%22url%28%23bg_ELROBLE%29%22%20stroke%3D%22%23f59e0b%22%20stroke-width%3D%224.5%22%20/%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2257%22%20fill%3D%22none%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.22%29%22%20stroke-dasharray%3D%223%2C3%22%20stroke-width%3D%221.5%22%20/%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2255%22%20font-size%3D%2236%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%3E%F0%9F%8D%BA%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2296%22%20font-family%3D%22%27Outfit%27%2C%20system-ui%2C%20-apple-system%2C%20sans-serif%22%20font-size%3D%229.5%22%20font-weight%3D%22900%22%20fill%3D%22%23ffffff%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%220.8%22%3EEL%20ROBLE%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%22110%22%20font-family%3D%22%27Plus%20Jakarta%20Sans%27%2C%20system-ui%2C%20sans-serif%22%20font-size%3D%227%22%20font-weight%3D%22800%22%20fill%3D%22%23fbbf24%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%221.2%22%3ECERVECER%C3%8DA%20ARTESANAL%3C/text%3E%0A%3C/svg%3E",
-    "bannerUrl": "https://images.unsplash.com/photo-1538488881522-4326c36660df?w=800&auto=format&fit=crop&q=80",
-    "color": "#f59e0b",
-    "desc": "Schops artesanales directos de barril servidos en vaso frío: IPA, Amber Ale y micheladas con sal de Cáhuil.",
-    "slogan": "Cerveza fresca de barril directo a tu vaso",
-    "rating": "4.9 (160 pedidos)",
-    "prepTime": "3 - 5 min",
-    "latOffset": 0.00025,
-    "lngOffset": 0.00018,
-    "whatsapp": "56912345678",
+    "name": "Food Truck Bajón Criollo",
+    "category": "food",
+    "categoryName": "Comidas & Asados",
+    "icon": "🍔",
+    "bannerUrl": "https://images.unsplash.com/photo-1550547660-d9450f859349?w=800&auto=format&fit=crop&q=80",
+    "color": "#10b981",
+    "desc": "Mechadas italianas en pan ciabatta artesanal, churrascos chacareros y papas fritas supremas con salsa cheddar y tocino crocante.",
+    "slogan": "El bajón con más sabor del festival",
+    "rating": "4.9 (240 pedidos)",
+    "prepTime": "5 - 8 min",
+    "latOffset": 0.00015,
+    "lngOffset": -0.00018,
+    "locationNote": "Pasillo Oeste #1 (Frente a Cervecería El Roble)",
+    "whatsapp": "56987654321",
     "bankData": {
       "bank": "Banco Estado",
       "accountType": "Cuenta RUT",
-      "accountNumber": "15.432.890-K",
-      "holderName": "Cervecería El Roble SpA",
-      "email": "pagos@roble.cl"
+      "accountNumber": "18.765.432-1",
+      "holderName": "Carlos Valenzuela",
+      "email": "bajoncriollo@gmail.com"
     },
     "products": [
       {
-        "name": "Schop IPA Artesanal 500cc",
-        "price": "$4.000",
-        "desc": "Lúpulos patagónicos, aroma cítrico y floral, espuma densa y amargor equilibrado.",
-        "image": "https://images.unsplash.com/photo-1608270586620-248524c67de9?w=400&fit=crop",
-        "tag": "⭐ Más Pedido",
+        "name": "Mechada Italiana Gigante con Palta Natural",
+        "price": "$6.500",
         "inStock": true
       },
       {
-        "name": "Schop Amber Ale Roja 500cc",
-        "price": "$4.000",
-        "desc": "Cerveza roja con maltas tostadas caramelizadas, cuerpo medio y final sedoso a toffee.",
-        "image": "https://images.unsplash.com/photo-1538488881522-4326c36660df?w=400&fit=crop",
-        "tag": "🔥 Recomendada",
+        "name": "Churrasco Chacarero en Marraqueta Crujiente",
+        "price": "$6.000",
         "inStock": true
       },
       {
-        "name": "Michelada Tradicional El Roble",
+        "name": "Balde de Papas Fritas Supremas con Cheddar y Tocino",
         "price": "$4.500",
-        "desc": "Vaso escarchado con sal de mar de Cáhuil, jugo de limón recién exprimido y merkén ahumado.",
-        "image": "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&fit=crop",
-        "tag": "🌶️ Especial",
         "inStock": true
       },
       {
-        "name": "Vaso Coleccionable Festival Villa 2026",
-        "price": "$1.000",
-        "desc": "Vaso oficial reutilizable de policarbonato rígido. Cuida la cancha y llévate tu recuerdo.",
-        "image": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=400&fit=crop",
-        "tag": "♻️ Reutilizable",
+        "name": "Empanada de Pino al Horno de Barro",
+        "price": "$2.500",
+        "inStock": true
+      },
+      {
+        "name": "Bebida Lata 350cc Helada",
+        "price": "$1.500",
         "inStock": true
       }
-    ],
-    "locationNote": "Pasillo Este #1 (Frente a Tacos & Burritos)"
+    ]
   },
   {
     "id": 2,
     "number": "P-02",
-    "name": "Food Truck Bajón Criollo",
+    "name": "Sabor Mexicano: Tacos & Burritos",
     "category": "food",
-    "categoryName": "Comidas",
-    "icon": "🍔",
-    "logoUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20140%20140%22%20width%3D%22140%22%20height%3D%22140%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22bg_BAJ%C3%93NCRI%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%237c2d12%22%20/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23431407%22%20/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2266%22%20fill%3D%22url%28%23bg_BAJ%C3%93NCRI%29%22%20stroke%3D%22%23ea580c%22%20stroke-width%3D%224.5%22%20/%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2257%22%20fill%3D%22none%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.22%29%22%20stroke-dasharray%3D%223%2C3%22%20stroke-width%3D%221.5%22%20/%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2255%22%20font-size%3D%2236%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%3E%F0%9F%8D%94%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2296%22%20font-family%3D%22%27Outfit%27%2C%20system-ui%2C%20-apple-system%2C%20sans-serif%22%20font-size%3D%229.5%22%20font-weight%3D%22900%22%20fill%3D%22%23ffffff%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%220.8%22%3EBAJ%C3%93N%20CRIOLLO%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%22110%22%20font-family%3D%22%27Plus%20Jakarta%20Sans%27%2C%20system-ui%2C%20sans-serif%22%20font-size%3D%227%22%20font-weight%3D%22800%22%20fill%3D%22%23fde047%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%221.2%22%3EFOOD%20TRUCK%20GOURMET%3C/text%3E%0A%3C/svg%3E",
+    "categoryName": "Comidas al Paso",
+    "icon": "🌮",
     "bannerUrl": "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=800&auto=format&fit=crop&q=80",
-    "color": "#ea580c",
-    "desc": "El auténtico bajón chileno: Completos gigantes en pan amasado caliente, churrascos italianos y papas con cheddar.",
-    "slogan": "Pan amasado en el momento y palta hass 100% pura",
-    "rating": "4.9 (210 pedidos)",
-    "prepTime": "8 - 12 min",
-    "latOffset": -0.00005,
+    "color": "#10b981",
+    "desc": "Tacos al pastor con piña asada, burritos gigantes de res mechada y quesadillas doradas con guacamole casero y salsas picantes a elección.",
+    "slogan": "Sabor auténtico mexicano al paso",
+    "rating": "4.8 (195 pedidos)",
+    "prepTime": "6 - 9 min",
+    "latOffset": -0.0001,
     "lngOffset": -0.00018,
-    "whatsapp": "56987654321",
+    "locationNote": "Pasillo Oeste #2 (Frente a La Barra Terremotera)",
+    "whatsapp": "56976543210",
     "bankData": {
       "bank": "Banco Santander",
       "accountType": "Cuenta Corriente",
-      "accountNumber": "000-7654321-9",
-      "holderName": "Bajón Criollo SpA",
-      "email": "pedidos@bajoncriollo.cl"
+      "accountNumber": "00-123456-7",
+      "holderName": "María Fernanda Torres",
+      "email": "tacosabor@gmail.com"
     },
     "products": [
       {
-        "name": "Completo Italiano Gigante en Pan Amasado",
-        "price": "$2.800",
-        "desc": "Vienesa de campo, abundante palta hass recién molida, tomate en cubos y mayonesa casera batida a mano.",
-        "image": "https://images.unsplash.com/photo-1619740455993-9e612b1af08a?w=400&fit=crop",
-        "tag": "⭐ El Rey del Bajón",
-        "inStock": true
-      },
-      {
-        "name": "Churrasco Italiano en Marraqueta Crujiente",
+        "name": "Trilogía de Tacos al Pastor con Piña Asada",
         "price": "$5.500",
-        "desc": "Finas láminas de posta rosada a la plancha, palta hass extra cremosa y tomate de estación.",
-        "image": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&fit=crop",
-        "tag": "🔥 Especialidad",
         "inStock": true
       },
       {
-        "name": "Completo Alemán Tradicional",
-        "price": "$2.800",
-        "desc": "Vienesa artesanal, chucrut tibio casero, tomate fresco y mayonesa suave con toque de mostaza.",
-        "image": "https://images.unsplash.com/photo-1627054234594-541e7379766d?w=400&fit=crop",
-        "tag": "Clásico",
+        "name": "Burrito Gigante de Res Mechada y Frijoles",
+        "price": "$6.200",
         "inStock": true
       },
       {
-        "name": "Empanada de Pino al Horno a la Leña",
-        "price": "$2.500",
-        "desc": "Masa dorada a la manteca rellena con carne picada jugosa, cebolla caramelizada, aceituna y huevo.",
-        "image": "https://images.unsplash.com/photo-1608039829572-78524f79c4c7?w=400&fit=crop",
-        "tag": "Recién Horneada",
+        "name": "Quesadillas de Queso Fundido con Guacamole",
+        "price": "$4.000",
         "inStock": true
       },
       {
-        "name": "Papas Rústicas con Cheddar & Tocino",
-        "price": "$3.800",
-        "desc": "Papas cortadas a mano con piel, salsa cheddar tibia fundida y lluvia de tocino ahumado crocante.",
-        "image": "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400&fit=crop",
-        "tag": "Para Compartir",
+        "name": "Nachos Supremos con Queso y Jalapeños",
+        "price": "$4.500",
+        "inStock": true
+      },
+      {
+        "name": "Cerveza Corona 330cc bien fría con limón",
+        "price": "$3.000",
         "inStock": true
       }
-    ],
-    "locationNote": "Pasillo Oeste #4 (Frente a Barra Terremotera)"
+    ]
   },
   {
     "id": 3,
     "number": "P-03",
-    "name": "El Rincón del Sabor",
-    "category": "food",
-    "categoryName": "Comidas",
-    "icon": "🌭",
-    "logoUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20140%20140%22%20width%3D%22140%22%20height%3D%22140%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22bg_RINC%C3%93NDE%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23831843%22%20/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23500724%22%20/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2266%22%20fill%3D%22url%28%23bg_RINC%C3%93NDE%29%22%20stroke%3D%22%23f43f5e%22%20stroke-width%3D%224.5%22%20/%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2257%22%20fill%3D%22none%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.22%29%22%20stroke-dasharray%3D%223%2C3%22%20stroke-width%3D%221.5%22%20/%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2255%22%20font-size%3D%2236%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%3E%F0%9F%8C%AD%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2296%22%20font-family%3D%22%27Outfit%27%2C%20system-ui%2C%20-apple-system%2C%20sans-serif%22%20font-size%3D%229.5%22%20font-weight%3D%22900%22%20fill%3D%22%23ffffff%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%220.8%22%3ERINC%C3%93N%20DEL%20SABOR%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%22110%22%20font-family%3D%22%27Plus%20Jakarta%20Sans%27%2C%20system-ui%2C%20sans-serif%22%20font-size%3D%227%22%20font-weight%3D%22800%22%20fill%3D%22%23fed7aa%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%221.2%22%3ETRADICI%C3%93N%20CHILENA%3C/text%3E%0A%3C/svg%3E",
-    "bannerUrl": "https://images.unsplash.com/photo-1550547660-d9450f859349?w=800&auto=format&fit=crop&q=80",
-    "color": "#ea580c",
-    "desc": "Completos dinámicos especiales, sándwiches de carne mechada en cocción lenta y bebidas heladas.",
-    "slogan": "Carne mechada tierna y salsas caseras de la abuela",
-    "rating": "4.8 (115 pedidos)",
-    "prepTime": "6 - 10 min",
-    "latOffset": -0.00025,
-    "lngOffset": -0.00018,
-    "whatsapp": "56955443322",
+    "name": "Cervecería Artesanal El Roble",
+    "category": "beer",
+    "categoryName": "Cervezas Artesanales",
+    "icon": "🍺",
+    "bannerUrl": "https://images.unsplash.com/photo-1538488881522-4326c36660df?w=800&auto=format&fit=crop&q=80",
+    "color": "#f59e0b",
+    "desc": "Schops artesanales directos de barril servidos en vaso frío: IPA, Amber Ale y micheladas refrescantes con sal de Cáhuil y merkén ahumado.",
+    "slogan": "Cerveza fresca de barril directo a tu vaso",
+    "rating": "4.9 (310 pedidos)",
+    "prepTime": "2 - 4 min",
+    "latOffset": 0.00015,
+    "lngOffset": 0.00018,
+    "locationNote": "Pasillo Este #1 (Frente a Food Truck Bajón Criollo)",
+    "whatsapp": "56965432109",
     "bankData": {
       "bank": "Banco de Chile",
       "accountType": "Cuenta Vista",
-      "accountNumber": "12345678",
-      "holderName": "Marta Gómez R.",
-      "email": "marta@sabor.cl"
+      "accountNumber": "123-45678-01",
+      "holderName": "Juan Pablo Soto",
+      "email": "elroblecerveza@gmail.com"
     },
     "products": [
       {
-        "name": "Completo Dinámico Especial con Americana",
-        "price": "$2.700",
-        "desc": "Vienesa, tomate, palta hass, salsa americana casera de encurtidos, chucrut y mayo casera.",
-        "image": "https://images.unsplash.com/photo-1619740455993-9e612b1af08a?w=400&fit=crop",
-        "tag": "⭐ Favorito Criollo",
+        "name": "Schop Artesanal 500cc (IPA, Amber Ale o Golden)",
+        "price": "$4.000",
         "inStock": true
       },
       {
-        "name": "Sándwich Mechada Italiana Deshilachada",
-        "price": "$5.800",
-        "desc": "Carne de vacuno estofada por 6 horas con verduras aromáticas, palta hass y tomate fresco.",
-        "image": "https://images.unsplash.com/photo-1509722747041-616f39b57569?w=400&fit=crop",
-        "tag": "🔥 6 Hrs de Cocción",
+        "name": "Michelada con Sal de Cáhuil y Merkén",
+        "price": "$4.500",
         "inStock": true
       },
       {
-        "name": "Bebida en Lata 350cc Bien Helada",
-        "price": "$1.500",
-        "desc": "Coca-Cola, Coca Zero, Fanta o Sprite servidas al punto de escarcha.",
-        "image": "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=400&fit=crop",
-        "tag": "Bien Helada",
+        "name": "Degustación Cervecera (3 vasos de 200cc)",
+        "price": "$5.000",
+        "inStock": true
+      },
+      {
+        "name": "Vaso Coleccionable Festival 1 Litro Recargable",
+        "price": "$7.500",
         "inStock": true
       }
-    ],
-    "locationNote": "Pasillo Oeste #6 (Extremo Sur Pasillo Oeste)"
+    ]
   },
   {
     "id": 4,
     "number": "P-04",
-    "name": "Asados & Brasas del Sur",
-    "category": "food",
-    "categoryName": "Comidas",
-    "icon": "🥩",
-    "logoUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20140%20140%22%20width%3D%22140%22%20height%3D%22140%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22bg_BRASASDE%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23450a0a%22%20/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%231c0404%22%20/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2266%22%20fill%3D%22url%28%23bg_BRASASDE%29%22%20stroke%3D%22%23dc2626%22%20stroke-width%3D%224.5%22%20/%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2257%22%20fill%3D%22none%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.22%29%22%20stroke-dasharray%3D%223%2C3%22%20stroke-width%3D%221.5%22%20/%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2255%22%20font-size%3D%2236%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%3E%F0%9F%A5%A9%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2296%22%20font-family%3D%22%27Outfit%27%2C%20system-ui%2C%20-apple-system%2C%20sans-serif%22%20font-size%3D%229.5%22%20font-weight%3D%22900%22%20fill%3D%22%23ffffff%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%220.8%22%3EBRASAS%20DEL%20SUR%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%22110%22%20font-family%3D%22%27Plus%20Jakarta%20Sans%27%2C%20system-ui%2C%20sans-serif%22%20font-size%3D%227%22%20font-weight%3D%22800%22%20fill%3D%22%23fca5a5%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%221.2%22%3EASADOS%20A%20LA%20LE%C3%91A%3C/text%3E%0A%3C/svg%3E",
-    "bannerUrl": "https://images.unsplash.com/photo-1544025162-d76694265947?w=800&auto=format&fit=crop&q=80",
-    "color": "#dc2626",
-    "desc": "Carnes premium asadas al fuego de leña nativa: Brochetas gigantes de 40 cm, choripanes con pebre y cortes tiernos.",
-    "slogan": "Fuego, carbón y los mejores cortes de campo",
-    "rating": "4.9 (190 pedidos)",
-    "prepTime": "10 - 15 min",
-    "latOffset": 0.00005,
-    "lngOffset": -0.00018,
-    "whatsapp": "56933221144",
+    "name": "La Barra Terremotera & Tragos Chilenos",
+    "category": "beer",
+    "categoryName": "Tragos Típicos & Coctelería",
+    "icon": "🍹",
+    "bannerUrl": "https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=800&auto=format&fit=crop&q=80",
+    "color": "#f59e0b",
+    "desc": "Terremotos tradicionales con pipeño campesino, helado de piña y granadina artesanal, piscolas 35° y pisco sour del valle bien helado.",
+    "slogan": "El trago clásico chileno para celebrar en grande",
+    "rating": "4.9 (280 pedidos)",
+    "prepTime": "2 - 3 min",
+    "latOffset": -0.0001,
+    "lngOffset": 0.00018,
+    "locationNote": "Pasillo Este #2 (Frente a Sabor Mexicano)",
+    "whatsapp": "56954321098",
     "bankData": {
-      "bank": "Banco BCI",
-      "accountType": "Cuenta Corriente",
-      "accountNumber": "555-12345-6",
-      "holderName": "Brasas del Sur SpA",
-      "email": "asados@brasas.cl"
+      "bank": "Banco Estado",
+      "accountType": "Cuenta RUT",
+      "accountNumber": "15.432.890-K",
+      "holderName": "Rodrigo Espinoza",
+      "email": "barraterremotera@gmail.com"
     },
     "products": [
       {
-        "name": "Anticucho Mixto Lomo y Cerdo (40cm)",
-        "price": "$4.500",
-        "desc": "Brocheta XL con trozos de lomo liso, pulpa de cerdo macerada, longaniza de Chillán y pimentones a las brasas.",
-        "image": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&fit=crop",
-        "tag": "⭐ Brocheta XL",
+        "name": "Terremoto Tradicional 500cc Helado Piña y Granadina",
+        "price": "$3.500",
         "inStock": true
       },
       {
-        "name": "Choripán Artesanal con Pebre Campesino",
+        "name": "Réplica de Terremoto 1 Litro para Compartir",
+        "price": "$6.000",
+        "inStock": true
+      },
+      {
+        "name": "Terremoto Infantil Sin Alcohol (con Bilz y helado)",
         "price": "$2.500",
-        "desc": "Longaniza ahumada artesanal en marraqueta caliente con abundante pebre de tomate, cilantro y ají verde.",
-        "image": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=400&fit=crop",
-        "tag": "🔥 Clásico Parrillero",
         "inStock": true
       },
       {
-        "name": "Plato Parrillero con Ensalada a la Chilena",
-        "price": "$7.500",
-        "desc": "Corte jugoso de vacuno a la leña, longaniza, papas cocidas al vapor y ensalada fresca de tomate con cebolla.",
-        "image": "https://images.unsplash.com/photo-1544025162-d76694265947?w=400&fit=crop",
-        "tag": "Plato Fuerte",
+        "name": "Pisco Sour Artesanal del Valle 350cc",
+        "price": "$4.000",
+        "inStock": true
+      },
+      {
+        "name": "Piscola Mistral 35° en Vaso 500cc",
+        "price": "$4.500",
         "inStock": true
       }
-    ],
-    "locationNote": "Pasillo Oeste #3 (Frente a Cervecería Austral)"
+    ]
   },
   {
     "id": 5,
     "number": "P-05",
-    "name": "La Barra Terremotera",
-    "category": "beer",
-    "categoryName": "Cervezas & Tragos",
-    "icon": "🍷",
-    "logoUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20140%20140%22%20width%3D%22140%22%20height%3D%22140%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22bg_BARRATER%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23581c87%22%20/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%233b0764%22%20/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2266%22%20fill%3D%22url%28%23bg_BARRATER%29%22%20stroke%3D%22%23a855f7%22%20stroke-width%3D%224.5%22%20/%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2257%22%20fill%3D%22none%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.22%29%22%20stroke-dasharray%3D%223%2C3%22%20stroke-width%3D%221.5%22%20/%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2255%22%20font-size%3D%2236%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%3E%F0%9F%8D%B7%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2296%22%20font-family%3D%22%27Outfit%27%2C%20system-ui%2C%20-apple-system%2C%20sans-serif%22%20font-size%3D%229.5%22%20font-weight%3D%22900%22%20fill%3D%22%23ffffff%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%220.8%22%3EBARRA%20TERREMOTERA%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%22110%22%20font-family%3D%22%27Plus%20Jakarta%20Sans%27%2C%20system-ui%2C%20sans-serif%22%20font-size%3D%227%22%20font-weight%3D%22800%22%20fill%3D%22%23fef08a%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%221.2%22%3EPIPE%C3%91O%20%26%20TRAGOS%3C/text%3E%0A%3C/svg%3E",
-    "bannerUrl": "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=800&auto=format&fit=crop&q=80",
-    "color": "#f59e0b",
-    "desc": "Los terremotos oficiales del festival con pipeño de Portezuelo, helado artesanal de piña dulce y granadina.",
-    "slogan": "La tradición fiestera chilena en su punto justo",
-    "rating": "4.9 (240 pedidos)",
-    "prepTime": "2 - 4 min",
-    "latOffset": -0.00005,
-    "lngOffset": 0.00018,
-    "whatsapp": "56966778899",
-    "bankData": {
-      "bank": "Banco Estado",
-      "accountType": "Cuenta RUT",
-      "accountNumber": "18.990.112-4",
-      "holderName": "Barra Terremotera",
-      "email": "barra@terremoto.cl"
-    },
-    "products": [
-      {
-        "name": "Terremoto Tradicional 1/2 Litro",
-        "price": "$3.500",
-        "desc": "Vino pipeño campesino blanco, abundante helado de piña dulce, toque amargo de Fernet y lluvia de granadina.",
-        "image": "https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=400&fit=crop",
-        "tag": "⭐ Terremoto Oficial",
-        "inStock": true
-      },
-      {
-        "name": "Terremoto Infantil / Conductor (0% Alcohol)",
-        "price": "$2.500",
-        "desc": "Bebida blanca de limón bien fría, helado artesanal de piña cremosa y granadina dulce. 100% familiar.",
-        "image": "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=400&fit=crop",
-        "tag": "🚗 0% Alcohol",
-        "inStock": true
-      },
-      {
-        "name": "Vino Navegado Calentito con Naranja",
-        "price": "$3.000",
-        "desc": "Vino tinto del valle cocinado con rodajas de naranja dulce, canela en rama y clavo de olor.",
-        "image": "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&fit=crop",
-        "tag": "Reconfortante",
-        "inStock": true
-      }
-    ],
-    "locationNote": "Pasillo Este #4 (Frente a Bajón Criollo)"
-  },
-  {
-    "id": 6,
-    "number": "P-06",
-    "name": "Papas Fritas El Cono Loco",
-    "category": "food",
-    "categoryName": "Comidas",
-    "icon": "🍟",
-    "logoUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20140%20140%22%20width%3D%22140%22%20height%3D%22140%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22bg_ELCONOLO%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23713f12%22%20/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23422006%22%20/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2266%22%20fill%3D%22url%28%23bg_ELCONOLO%29%22%20stroke%3D%22%23eab308%22%20stroke-width%3D%224.5%22%20/%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2257%22%20fill%3D%22none%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.22%29%22%20stroke-dasharray%3D%223%2C3%22%20stroke-width%3D%221.5%22%20/%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2255%22%20font-size%3D%2236%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%3E%F0%9F%8D%9F%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2296%22%20font-family%3D%22%27Outfit%27%2C%20system-ui%2C%20-apple-system%2C%20sans-serif%22%20font-size%3D%229.5%22%20font-weight%3D%22900%22%20fill%3D%22%23ffffff%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%220.8%22%3EEL%20CONO%20LOCO%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%22110%22%20font-family%3D%22%27Plus%20Jakarta%20Sans%27%2C%20system-ui%2C%20sans-serif%22%20font-size%3D%227%22%20font-weight%3D%22800%22%20fill%3D%22%23fef08a%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%221.2%22%3EPAPAS%20R%C3%9ASTICAS%3C/text%3E%0A%3C/svg%3E",
-    "bannerUrl": "https://images.unsplash.com/photo-1576107232684-1279f3908594?w=800&auto=format&fit=crop&q=80",
-    "color": "#ea580c",
-    "desc": "Conos gigantes de papas fritas naturales con doble fritura crujiente y barra con más de 10 salsas caseras.",
-    "slogan": "Papas 100% naturales, nunca congeladas",
-    "rating": "4.8 (175 pedidos)",
-    "prepTime": "5 - 8 min",
-    "latOffset": -0.00015,
-    "lngOffset": -0.00018,
-    "whatsapp": "56944332211",
-    "bankData": {
-      "bank": "Banco Scotiabank",
-      "accountType": "Cuenta Corriente",
-      "accountNumber": "77665544",
-      "holderName": "El Cono Loco SpA",
-      "email": "papas@conoloco.cl"
-    },
-    "products": [
-      {
-        "name": "Cono Gigante de Papas Naturales (500g)",
-        "price": "$3.500",
-        "desc": "Medio kilo de papas con corte bastón grueso, doradas y crujientes con 2 salsas caseras a elección.",
-        "image": "https://images.unsplash.com/photo-1576107232684-1279f3908594?w=400&fit=crop",
-        "tag": "⭐ 1/2 Kilo",
-        "inStock": true
-      },
-      {
-        "name": "Papas con Tocino Crispy y Cheddar Fundido",
-        "price": "$4.500",
-        "desc": "Cono familiar cubierto de abundante queso cheddar líquido caliente y trocitos de tocino crocante.",
-        "image": "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400&fit=crop",
-        "tag": "🔥 El Más Pedido",
-        "inStock": true
-      },
-      {
-        "name": "Nuggets de Pechuga Caseros (8 un)",
-        "price": "$3.000",
-        "desc": "Bocaditos de pollo marinados rebozados en panko crujiente servidos con salsa barbacoa ahumada.",
-        "image": "https://images.unsplash.com/photo-1562967914-608f82629710?w=400&fit=crop",
-        "tag": "Para Picar",
-        "inStock": true
-      }
-    ],
-    "locationNote": "Pasillo Oeste #5 (Frente a Coctelería del Parque)"
-  },
-  {
-    "id": 7,
-    "number": "P-07",
-    "name": "Waffles & Crepes Dulce Antojo",
+    "name": "Waffles & Helados Dulce Antojo",
     "category": "sweets",
-    "categoryName": "Postres & Dulces",
-    "icon": "🧇",
-    "logoUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20140%20140%22%20width%3D%22140%22%20height%3D%22140%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22bg_DULCEANT%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23831843%22%20/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%234c0519%22%20/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2266%22%20fill%3D%22url%28%23bg_DULCEANT%29%22%20stroke%3D%22%23ec4899%22%20stroke-width%3D%224.5%22%20/%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2257%22%20fill%3D%22none%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.22%29%22%20stroke-dasharray%3D%223%2C3%22%20stroke-width%3D%221.5%22%20/%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2255%22%20font-size%3D%2236%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%3E%F0%9F%A7%87%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2296%22%20font-family%3D%22%27Outfit%27%2C%20system-ui%2C%20-apple-system%2C%20sans-serif%22%20font-size%3D%229.5%22%20font-weight%3D%22900%22%20fill%3D%22%23ffffff%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%220.8%22%3EDULCE%20ANTOJO%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%22110%22%20font-family%3D%22%27Plus%20Jakarta%20Sans%27%2C%20system-ui%2C%20sans-serif%22%20font-size%3D%227%22%20font-weight%3D%22800%22%20fill%3D%22%23fbcfe8%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%221.2%22%3EWAFFLES%20%26%20CREPES%3C/text%3E%0A%3C/svg%3E",
-    "bannerUrl": "https://images.unsplash.com/photo-1562376552-0d160a2f238d?w=800&auto=format&fit=crop&q=80",
-    "color": "#ec4899",
-    "desc": "Repostería en vivo: Waffles belgas con masa crocante, crepes con Nutella italiana y churros rellenos con manjar.",
-    "slogan": "El toque dulce del festival recién horneado",
-    "rating": "4.9 (180 pedidos)",
-    "prepTime": "5 - 7 min",
-    "latOffset": -0.00036,
-    "lngOffset": -0.0003,
-    "whatsapp": "56999887766",
-    "bankData": {
-      "bank": "Banco Estado",
-      "accountType": "Cuenta RUT",
-      "accountNumber": "19.334.556-7",
-      "holderName": "Dulce Antojo",
-      "email": "waffles@antojo.cl"
-    },
-    "products": [
-      {
-        "name": "Waffle Belga con Frutillas, Manjar y Crema",
-        "price": "$3.800",
-        "desc": "Waffle recién horneado con manjar artesanal tibio, frutillas del día, crema chantilly y salsa de chocolate.",
-        "image": "https://images.unsplash.com/photo-1562376552-0d160a2f238d?w=400&fit=crop",
-        "tag": "⭐ El Favorito Dulce",
-        "inStock": true
-      },
-      {
-        "name": "Crepe Francés de Nutella y Plátano",
-        "price": "$3.500",
-        "desc": "Fina masa de crepe doblada con abundante Nutella original avellanada y rodajas de plátano fresco.",
-        "image": "https://images.unsplash.com/photo-1519676867240-f03562e64548?w=400&fit=crop",
-        "tag": "Nutella Original",
-        "inStock": true
-      },
-      {
-        "name": "Churros Españoles Rellenos con Manjar (5 un)",
-        "price": "$2.500",
-        "desc": "Churros crujientes rellenos de manjar caliente y espolvoreados con azúcar flor y canela.",
-        "image": "https://images.unsplash.com/photo-1624371414361-e670edf4898d?w=400&fit=crop",
-        "tag": "Recién Fritos",
-        "inStock": true
-      }
-    ],
-    "locationNote": "Feria Sur #1 (Sector Dulces Oeste)"
-  },
-  {
-    "id": 8,
-    "number": "P-08",
-    "name": "Helados Artesanales La Nieve",
-    "category": "sweets",
-    "categoryName": "Postres & Dulces",
+    "categoryName": "Dulces, Postres & Cafetería",
     "icon": "🍦",
-    "logoUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20140%20140%22%20width%3D%22140%22%20height%3D%22140%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22bg_LANIEVE%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23083344%22%20/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23041f2d%22%20/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2266%22%20fill%3D%22url%28%23bg_LANIEVE%29%22%20stroke%3D%22%2306b6d4%22%20stroke-width%3D%224.5%22%20/%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2257%22%20fill%3D%22none%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.22%29%22%20stroke-dasharray%3D%223%2C3%22%20stroke-width%3D%221.5%22%20/%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2255%22%20font-size%3D%2236%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%3E%F0%9F%8D%A6%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2296%22%20font-family%3D%22%27Outfit%27%2C%20system-ui%2C%20-apple-system%2C%20sans-serif%22%20font-size%3D%229.5%22%20font-weight%3D%22900%22%20fill%3D%22%23ffffff%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%220.8%22%3ELA%20NIEVE%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%22110%22%20font-family%3D%22%27Plus%20Jakarta%20Sans%27%2C%20system-ui%2C%20sans-serif%22%20font-size%3D%227%22%20font-weight%3D%22800%22%20fill%3D%22%23a5f3fc%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%221.2%22%3EHELADOS%20ARTESANALES%3C/text%3E%0A%3C/svg%3E",
-    "bannerUrl": "https://images.unsplash.com/photo-1501443762994-82bd5dace89a?w=800&auto=format&fit=crop&q=80",
+    "bannerUrl": "https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?w=800&auto=format&fit=crop&q=80",
     "color": "#ec4899",
-    "desc": "Helados 100% artesanales hechos con fruta fresca sin colorantes: Lúcuma chilena, maracuyá, frambuesa y manjar chips.",
-    "slogan": "Pura fruta natural en cada barquillo",
-    "rating": "4.8 (130 pedidos)",
-    "prepTime": "2 - 3 min",
-    "latOffset": -0.00036,
-    "lngOffset": -0.0002,
-    "whatsapp": "56911335577",
-    "bankData": {
-      "bank": "Banco Itaú",
-      "accountType": "Cuenta Corriente",
-      "accountNumber": "11223344",
-      "holderName": "La Nieve Helados",
-      "email": "helados@lanieve.cl"
-    },
-    "products": [
-      {
-        "name": "Copa Helado 2 Sabores Artesanales",
-        "price": "$2.800",
-        "desc": "Elige 2 bolitas: Lúcuma chilena, Frambuesa del sur, Chocolate belga o Manjar con chips.",
-        "image": "https://images.unsplash.com/photo-1501443762994-82bd5dace89a?w=400&fit=crop",
-        "tag": "⭐ 100% Fruta",
-        "inStock": true
-      },
-      {
-        "name": "Paleta Rellena de Leche Condensada",
-        "price": "$2.000",
-        "desc": "Paleta artesanal de fruta natural con centro cremoso de leche condensada líquida.",
-        "image": "https://images.unsplash.com/photo-1488900128323-21503983a07e?w=400&fit=crop",
-        "tag": "Centro Líquido",
-        "inStock": true
-      },
-      {
-        "name": "Milkshake Clásico Cremoso con Chantilly",
-        "price": "$3.500",
-        "desc": "Batido denso preparado con 3 bolas de helado, leche fresca entera y cobertura de salsa dulce.",
-        "image": "https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=400&fit=crop",
-        "tag": "Súper Espeso",
-        "inStock": true
-      }
-    ],
-    "locationNote": "Feria Sur #2 (Sector Dulces Oeste)"
-  },
-  {
-    "id": 9,
-    "number": "P-09",
-    "name": "Cervecería Artesanal Kutral",
-    "category": "beer",
-    "categoryName": "Cervezas & Tragos",
-    "icon": "🍺",
-    "logoUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20140%20140%22%20width%3D%22140%22%20height%3D%22140%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22bg_KUTRAL%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23292524%22%20/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%230c0a09%22%20/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2266%22%20fill%3D%22url%28%23bg_KUTRAL%29%22%20stroke%3D%22%23f97316%22%20stroke-width%3D%224.5%22%20/%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2257%22%20fill%3D%22none%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.22%29%22%20stroke-dasharray%3D%223%2C3%22%20stroke-width%3D%221.5%22%20/%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2255%22%20font-size%3D%2236%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%3E%F0%9F%8D%BA%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2296%22%20font-family%3D%22%27Outfit%27%2C%20system-ui%2C%20-apple-system%2C%20sans-serif%22%20font-size%3D%229.5%22%20font-weight%3D%22900%22%20fill%3D%22%23ffffff%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%220.8%22%3EKUTRAL%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%22110%22%20font-family%3D%22%27Plus%20Jakarta%20Sans%27%2C%20system-ui%2C%20sans-serif%22%20font-size%3D%227%22%20font-weight%3D%22800%22%20fill%3D%22%23fdba74%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%221.2%22%3ECERVEZA%20AHUMADA%3C/text%3E%0A%3C/svg%3E",
-    "bannerUrl": "https://images.unsplash.com/photo-1575037614876-c38a4d44f5b8?w=800&auto=format&fit=crop&q=80",
-    "color": "#f59e0b",
-    "desc": "Cervezas del sur elaboradas con fuego y maltas ahumadas con madera nativa de roble y miel de ulmo.",
-    "slogan": "El fuego y sabor del sur en tu schop",
-    "rating": "4.9 (140 pedidos)",
-    "prepTime": "3 - 5 min",
-    "latOffset": 0.00015,
-    "lngOffset": 0.00018,
-    "whatsapp": "56922446688",
-    "bankData": {
-      "bank": "Banco BICE",
-      "accountType": "Cuenta Corriente",
-      "accountNumber": "88990011",
-      "holderName": "Kutral Cervezas",
-      "email": "kutral@cerveza.cl"
-    },
-    "products": [
-      {
-        "name": "Schop Golden Ale con Miel de Ulmo 500cc",
-        "price": "$3.800",
-        "desc": "Cerveza rubia de verano, ligera y refrescante, con un sutil aroma a miel campesina de ulmo.",
-        "image": "https://images.unsplash.com/photo-1538488881522-4326c36660df?w=400&fit=crop",
-        "tag": "Miel de Ulmo",
-        "inStock": true
-      },
-      {
-        "name": "Schop Red Ale Ahumada con Roble 500cc",
-        "price": "$4.200",
-        "desc": "Cerveza roja con maltas tostadas sobre leña nativa, cuerpo pleno y notas tostadas.",
-        "image": "https://images.unsplash.com/photo-1575037614876-c38a4d44f5b8?w=400&fit=crop",
-        "tag": "🔥 Ahumada con Roble",
-        "inStock": true
-      },
-      {
-        "name": "Pack 3 Botellas de Colección Kutral 330cc",
-        "price": "$8.500",
-        "desc": "Pack de 3 botellas de vidrio selladas para regalo o llevar a casa.",
-        "image": "https://images.unsplash.com/photo-1608270586620-248524c67de9?w=400&fit=crop",
-        "tag": "Para Llevar",
-        "inStock": true
-      }
-    ],
-    "locationNote": "Pasillo Este #2 (Frente a Pizzería Nápoles)"
-  },
-  {
-    "id": 10,
-    "number": "P-10",
-    "name": "Pizzería Nápoles al Paso",
-    "category": "food",
-    "categoryName": "Comidas",
-    "icon": "🍕",
-    "logoUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20140%20140%22%20width%3D%22140%22%20height%3D%22140%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22bg_N%C3%81POLES%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%2314532d%22%20/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23052e16%22%20/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2266%22%20fill%3D%22url%28%23bg_N%C3%81POLES%29%22%20stroke%3D%22%2322c55e%22%20stroke-width%3D%224.5%22%20/%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2257%22%20fill%3D%22none%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.22%29%22%20stroke-dasharray%3D%223%2C3%22%20stroke-width%3D%221.5%22%20/%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2255%22%20font-size%3D%2236%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%3E%F0%9F%8D%95%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2296%22%20font-family%3D%22%27Outfit%27%2C%20system-ui%2C%20-apple-system%2C%20sans-serif%22%20font-size%3D%229.5%22%20font-weight%3D%22900%22%20fill%3D%22%23ffffff%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%220.8%22%3EN%C3%81POLES%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%22110%22%20font-family%3D%22%27Plus%20Jakarta%20Sans%27%2C%20system-ui%2C%20sans-serif%22%20font-size%3D%227%22%20font-weight%3D%22800%22%20fill%3D%22%23fef08a%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%221.2%22%3EPIZZA%20A%20LA%20PIEDRA%3C/text%3E%0A%3C/svg%3E",
-    "bannerUrl": "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&auto=format&fit=crop&q=80",
-    "color": "#ea580c",
-    "desc": "Pizzas individuales estilo napolitano con masa madre fermentada 48 horas, salsa San Marzano y queso mozzarella.",
-    "slogan": "Masa madre a la piedra crujiente e inflada",
-    "rating": "4.9 (170 pedidos)",
-    "prepTime": "7 - 10 min",
-    "latOffset": 0.00015,
-    "lngOffset": -0.00018,
-    "whatsapp": "56933557799",
-    "bankData": {
-      "bank": "Banco Santander",
-      "accountType": "Cuenta Corriente",
-      "accountNumber": "99887711",
-      "holderName": "Nápoles al Paso",
-      "email": "pizza@napoles.cl"
-    },
-    "products": [
-      {
-        "name": "Pizza Margarita Individual Masa Madre",
-        "price": "$4.500",
-        "desc": "Masa madre de 48 horas, salsa de tomates San Marzano, queso mozzarella fundido y albahaca fresca.",
-        "image": "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400&fit=crop",
-        "tag": "⭐ Masa Madre",
-        "inStock": true
-      },
-      {
-        "name": "Pizza Pepperoni & Mozzarella Fundida",
-        "price": "$5.000",
-        "desc": "Doble queso mozzarella gratinado y láminas crocantes de pepperoni italiano ahumado.",
-        "image": "https://images.unsplash.com/photo-1628840042765-356cda07504e?w=400&fit=crop",
-        "tag": "Doble Queso",
-        "inStock": true
-      },
-      {
-        "name": "Focaccia al Romero y Sal de Cáhuil",
-        "price": "$2.000",
-        "desc": "Pan esponjoso horneado con aceite de oliva extra virgen, romero fresco y escamas de sal de mar.",
-        "image": "https://images.unsplash.com/photo-1589367920969-ab8e050bbb04?w=400&fit=crop",
-        "tag": "Receta Italiana",
-        "inStock": true
-      }
-    ],
-    "locationNote": "Pasillo Oeste #2 (Frente a Cervecería Kutral)"
-  },
-  {
-    "id": 11,
-    "number": "P-11",
-    "name": "Sabor Mexicano: Tacos & Burritos",
-    "category": "food",
-    "categoryName": "Comidas",
-    "icon": "🌮",
-    "logoUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20140%20140%22%20width%3D%22140%22%20height%3D%22140%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22bg_SABORMEX%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23701a75%22%20/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%234a044e%22%20/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2266%22%20fill%3D%22url%28%23bg_SABORMEX%29%22%20stroke%3D%22%23d946ef%22%20stroke-width%3D%224.5%22%20/%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2257%22%20fill%3D%22none%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.22%29%22%20stroke-dasharray%3D%223%2C3%22%20stroke-width%3D%221.5%22%20/%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2255%22%20font-size%3D%2236%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%3E%F0%9F%8C%AE%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2296%22%20font-family%3D%22%27Outfit%27%2C%20system-ui%2C%20-apple-system%2C%20sans-serif%22%20font-size%3D%229.5%22%20font-weight%3D%22900%22%20fill%3D%22%23ffffff%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%220.8%22%3ESABOR%20MEXICANO%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%22110%22%20font-family%3D%22%27Plus%20Jakarta%20Sans%27%2C%20system-ui%2C%20sans-serif%22%20font-size%3D%227%22%20font-weight%3D%22800%22%20fill%3D%22%23fde047%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%221.2%22%3ETACOS%20%26%20BURRITOS%3C/text%3E%0A%3C/svg%3E",
-    "bannerUrl": "https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=800&auto=format&fit=crop&q=80",
-    "color": "#ea580c",
-    "desc": "Tacos al pastor en tortilla de maíz nixtamalizado, quesadillas con queso fundido y totopos con guacamole fresco.",
-    "slogan": "Recetas mexicanas con cilantro, lima y guacamole casero",
-    "rating": "4.8 (145 pedidos)",
-    "prepTime": "6 - 9 min",
-    "latOffset": 0.00025,
-    "lngOffset": -0.00018,
-    "whatsapp": "56944668800",
-    "bankData": {
-      "bank": "Banco de Chile",
-      "accountType": "Cuenta Corriente",
-      "accountNumber": "33445566",
-      "holderName": "Sabor Mexicano",
-      "email": "tacos@mexicano.cl"
-    },
-    "products": [
-      {
-        "name": "Trío de Tacos al Pastor con Guacamole",
-        "price": "$4.800",
-        "desc": "3 tortillas de maíz calientes con carne marinada al achiote, piña asada, cebolla, cilantro y guacamole.",
-        "image": "https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=400&fit=crop",
-        "tag": "⭐ Trío de Tacos",
-        "inStock": true
-      },
-      {
-        "name": "Quesadilla Gigante de Pollo y Queso",
-        "price": "$4.200",
-        "desc": "Tortilla de trigo de 30 cm doblada con queso mozzarella fundido y pollo desmenuzado a la parrilla.",
-        "image": "https://images.unsplash.com/photo-1618040996337-56904b7850b9?w=400&fit=crop",
-        "tag": "Queso Fundido",
-        "inStock": true
-      },
-      {
-        "name": "Porción de Totopos con Guacamole y Salsa",
-        "price": "$2.800",
-        "desc": "Nachos de maíz crujientes para compartir con pocillo de guacamole fresco y salsa suave.",
-        "image": "https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?w=400&fit=crop",
-        "tag": "Para Picar",
-        "inStock": true
-      }
-    ],
-    "locationNote": "Pasillo Oeste #1 (Frente a Cervecería El Roble)"
-  },
-  {
-    "id": 12,
-    "number": "P-12",
-    "name": "La Coctelería del Parque",
-    "category": "beer",
-    "categoryName": "Cervezas & Tragos",
-    "icon": "🍸",
-    "logoUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20140%20140%22%20width%3D%22140%22%20height%3D%22140%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22bg_COCTELER%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23312e81%22%20/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%231e1b4b%22%20/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2266%22%20fill%3D%22url%28%23bg_COCTELER%29%22%20stroke%3D%22%236366f1%22%20stroke-width%3D%224.5%22%20/%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2257%22%20fill%3D%22none%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.22%29%22%20stroke-dasharray%3D%223%2C3%22%20stroke-width%3D%221.5%22%20/%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2255%22%20font-size%3D%2236%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%3E%F0%9F%8D%B8%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2296%22%20font-family%3D%22%27Outfit%27%2C%20system-ui%2C%20-apple-system%2C%20sans-serif%22%20font-size%3D%229.5%22%20font-weight%3D%22900%22%20fill%3D%22%23ffffff%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%220.8%22%3ECOCTELER%C3%8DA%20PARQUE%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%22110%22%20font-family%3D%22%27Plus%20Jakarta%20Sans%27%2C%20system-ui%2C%20sans-serif%22%20font-size%3D%227%22%20font-weight%3D%22800%22%20fill%3D%22%23a5b4fc%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%221.2%22%3EBARRAS%20%26%20MOCKTAILS%3C/text%3E%0A%3C/svg%3E",
-    "bannerUrl": "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=800&auto=format&fit=crop&q=80",
-    "color": "#8b5cf6",
-    "desc": "Barra de coctelería móvil con mojitos de menta fresca, Aperol Spritz, Pisco Sour del Elqui y mocktails sin alcohol.",
-    "slogan": "Coctelería de autor y frescura en tu vaso",
-    "rating": "4.9 (155 pedidos)",
-    "prepTime": "3 - 5 min",
-    "latOffset": -0.00015,
-    "lngOffset": 0.00018,
-    "whatsapp": "56955779911",
-    "bankData": {
-      "bank": "Banco Security",
-      "accountType": "Cuenta Corriente",
-      "accountNumber": "55667788",
-      "holderName": "Coctelería del Parque",
-      "email": "tragos@parque.cl"
-    },
-    "products": [
-      {
-        "name": "Mojito Cubano Menta Fresca 500cc",
-        "price": "$4.500",
-        "desc": "Ron blanco caribeño, hojas de menta fresca maceradas con lima, azúcar y soda helada.",
-        "image": "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=400&fit=crop",
-        "tag": "⭐ El Más Pedido",
-        "inStock": true
-      },
-      {
-        "name": "Aperol Spritz Clásico con Rodaja de Naranja",
-        "price": "$5.000",
-        "desc": "Aperol italiano, vino espumante brut, chorrito de agua con gas y rodaja de naranja fresca.",
-        "image": "https://images.unsplash.com/photo-1560512823-829485b8bf24?w=400&fit=crop",
-        "tag": "Refrescante",
-        "inStock": true
-      },
-      {
-        "name": "Pisco Sour Artesanal Valle del Elqui",
-        "price": "$4.000",
-        "desc": "Pisco premium transparente de 40°, limón de pica, jarabe de goma y clara batida con amargo de angostura.",
-        "image": "https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=400&fit=crop",
-        "tag": "Pisco Chileno",
-        "inStock": true
-      },
-      {
-        "name": "Mocktail Frutos Rojos (100% Sin Alcohol)",
-        "price": "$3.000",
-        "desc": "Pulpa de frambuesas y moras, agua tónica y hojas de albahaca fresca en copa con hielo.",
-        "image": "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=400&fit=crop",
-        "tag": "🌱 0% Alcohol",
-        "inStock": true
-      }
-    ],
-    "locationNote": "Pasillo Este #5 (Frente a Papas Fritas)"
-  },
-  {
-    "id": 13,
-    "number": "P-13",
-    "name": "Cafetería & Pastelería de la Abuela",
-    "category": "sweets",
-    "categoryName": "Postres & Dulces",
-    "icon": "☕",
-    "logoUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20140%20140%22%20width%3D%22140%22%20height%3D%22140%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22bg_CAF%C3%89DELA%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%233e2723%22%20/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%231b0000%22%20/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2266%22%20fill%3D%22url%28%23bg_CAF%C3%89DELA%29%22%20stroke%3D%22%23d7ccc8%22%20stroke-width%3D%224.5%22%20/%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2257%22%20fill%3D%22none%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.22%29%22%20stroke-dasharray%3D%223%2C3%22%20stroke-width%3D%221.5%22%20/%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2255%22%20font-size%3D%2236%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%3E%E2%98%95%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2296%22%20font-family%3D%22%27Outfit%27%2C%20system-ui%2C%20-apple-system%2C%20sans-serif%22%20font-size%3D%229.5%22%20font-weight%3D%22900%22%20fill%3D%22%23ffffff%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%220.8%22%3ECAF%C3%89%20DE%20LA%20ABUELA%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%22110%22%20font-family%3D%22%27Plus%20Jakarta%20Sans%27%2C%20system-ui%2C%20sans-serif%22%20font-size%3D%227%22%20font-weight%3D%22800%22%20fill%3D%22%23ffcc80%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%221.2%22%3ETOSTADUR%C3%8DA%20%26%20TORTAS%3C/text%3E%0A%3C/svg%3E",
-    "bannerUrl": "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=800&auto=format&fit=crop&q=80",
-    "color": "#ec4899",
-    "desc": "Café de especialidad en grano recién molido, tortas caseras de milhojas con manjar y medialunas de manteca.",
-    "slogan": "Café de grano tostado y dulzura familiar",
-    "rating": "4.9 (135 pedidos)",
-    "prepTime": "3 - 5 min",
-    "latOffset": -0.00036,
-    "lngOffset": -0.0001,
-    "whatsapp": "56966880022",
-    "bankData": {
-      "bank": "Banco Estado",
-      "accountType": "Cuenta RUT",
-      "accountNumber": "14.223.445-8",
-      "holderName": "Pastelería Abuela",
-      "email": "cafe@abuela.cl"
-    },
-    "products": [
-      {
-        "name": "Café Cappuccino de Grano 300cc",
-        "price": "$2.500",
-        "desc": "Espresso doble de granos tostados con leche cremosa vaporizada y toque de cacao o canela.",
-        "image": "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400&fit=crop",
-        "tag": "⭐ Café de Grano",
-        "inStock": true
-      },
-      {
-        "name": "Porción Torta Milhojas con Manjar Casero",
-        "price": "$3.500",
-        "desc": "Masa hojaldrada crujiente intercalada con manjar de campo y trocitos de nuez chilena.",
-        "image": "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400&fit=crop",
-        "tag": "Receta Tradicional",
-        "inStock": true
-      },
-      {
-        "name": "Par de Medialunas Artesanales Tibias",
-        "price": "$1.800",
-        "desc": "Dos medialunas de manteca esponjosas pinceladas con almíbar de naranja y vainilla.",
-        "image": "https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=400&fit=crop",
-        "tag": "Recién Horneadas",
-        "inStock": true
-      }
-    ],
-    "locationNote": "Feria Sur #3 (Junto al Acceso Central)"
-  },
-  {
-    "id": 14,
-    "number": "P-14",
-    "name": "Tejidos & Lana Natural del Valle",
-    "category": "crafts",
-    "categoryName": "Artesanías",
-    "icon": "🧶",
-    "logoUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20140%20140%22%20width%3D%22140%22%20height%3D%22140%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22bg_TEJIDOSD%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23064e3b%22%20/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23022c22%22%20/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2266%22%20fill%3D%22url%28%23bg_TEJIDOSD%29%22%20stroke%3D%22%2310b981%22%20stroke-width%3D%224.5%22%20/%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2257%22%20fill%3D%22none%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.22%29%22%20stroke-dasharray%3D%223%2C3%22%20stroke-width%3D%221.5%22%20/%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2255%22%20font-size%3D%2236%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%3E%F0%9F%A7%B6%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2296%22%20font-family%3D%22%27Outfit%27%2C%20system-ui%2C%20-apple-system%2C%20sans-serif%22%20font-size%3D%229.5%22%20font-weight%3D%22900%22%20fill%3D%22%23ffffff%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%220.8%22%3ETEJIDOS%20DEL%20VALLE%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%22110%22%20font-family%3D%22%27Plus%20Jakarta%20Sans%27%2C%20system-ui%2C%20sans-serif%22%20font-size%3D%227%22%20font-weight%3D%22800%22%20fill%3D%22%23a7f3d0%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%221.2%22%3E100%25%20LANA%20NATURAL%3C/text%3E%0A%3C/svg%3E",
-    "bannerUrl": "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=800&auto=format&fit=crop&q=80",
-    "color": "#059669",
-    "desc": "Prendas tejidas a mano en telar y palillo con pura lana de oveja virgen teñida con tintes vegetales del valle.",
-    "slogan": "Artesanía textil chilena 100% natural",
-    "rating": "4.9 (45 compras)",
-    "prepTime": "Inmediato",
-    "latOffset": -0.00036,
-    "lngOffset": 0.0001,
-    "whatsapp": "56977991133",
-    "bankData": {
-      "bank": "Banco Falabella",
-      "accountType": "Cuenta Corriente",
-      "accountNumber": "66778899",
-      "holderName": "Tejidos del Valle",
-      "email": "tejidos@valle.cl"
-    },
-    "products": [
-      {
-        "name": "Gorro a Telar Lana de Oveja Virgen",
-        "price": "$8.000",
-        "desc": "Gorro abrigador tejido en telar artesanal, suave y resistente al viento.",
-        "image": "https://images.unsplash.com/photo-1576871337622-98d48d1cf531?w=400&fit=crop",
-        "tag": "Pura Lana",
-        "inStock": true
-      },
-      {
-        "name": "Bufanda Infinita Pura Lana Natural",
-        "price": "$12.000",
-        "desc": "Bufanda larga circular con textura rústica teñida con hojas de nogal y cebolla.",
-        "image": "https://images.unsplash.com/photo-1520903920243-00d872a2d1c9?w=400&fit=crop",
-        "tag": "⭐ Más Vendida",
-        "inStock": true
-      }
-    ],
-    "locationNote": "Feria Sur #4 (Junto al Acceso Central Este)"
-  },
-  {
-    "id": 15,
-    "number": "P-15",
-    "name": "Orfebrería en Cobre & Cuero",
-    "category": "crafts",
-    "categoryName": "Artesanías",
-    "icon": "💍",
-    "logoUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20140%20140%22%20width%3D%22140%22%20height%3D%22140%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22bg_COBRECUE%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%237c2d12%22%20/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%233f1708%22%20/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2266%22%20fill%3D%22url%28%23bg_COBRECUE%29%22%20stroke%3D%22%23f97316%22%20stroke-width%3D%224.5%22%20/%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2257%22%20fill%3D%22none%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.22%29%22%20stroke-dasharray%3D%223%2C3%22%20stroke-width%3D%221.5%22%20/%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2255%22%20font-size%3D%2236%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%3E%F0%9F%92%8D%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2296%22%20font-family%3D%22%27Outfit%27%2C%20system-ui%2C%20-apple-system%2C%20sans-serif%22%20font-size%3D%229.5%22%20font-weight%3D%22900%22%20fill%3D%22%23ffffff%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%220.8%22%3ECOBRE%20%26%20CUERO%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%22110%22%20font-family%3D%22%27Plus%20Jakarta%20Sans%27%2C%20system-ui%2C%20sans-serif%22%20font-size%3D%227%22%20font-weight%3D%22800%22%20fill%3D%22%23fed7aa%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%221.2%22%3EORFEBRER%C3%8DA%20CHILENA%3C/text%3E%0A%3C/svg%3E",
-    "bannerUrl": "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=800&auto=format&fit=crop&q=80",
-    "color": "#059669",
-    "desc": "Joyas forjadas en cobre chileno esmaltado al fuego, aros, colgantes del árbol de la vida y pulseras de cuero trenzado.",
-    "slogan": "El metal noble de Chile transformado en arte",
-    "rating": "4.8 (60 compras)",
-    "prepTime": "Inmediato",
-    "latOffset": -0.00036,
-    "lngOffset": 0.0002,
-    "whatsapp": "56988002244",
-    "bankData": {
-      "bank": "Banco Estado",
-      "accountType": "Cuenta RUT",
-      "accountNumber": "16.778.899-2",
-      "holderName": "Cobre & Cuero",
-      "email": "joyas@cobre.cl"
-    },
-    "products": [
-      {
-        "name": "Aros de Cobre Esmaltado a Fuego",
-        "price": "$5.000",
-        "desc": "Diseños geométricos únicos con pátinas de color verde turquesa y fuego.",
-        "image": "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=400&fit=crop",
-        "tag": "⭐ Cobre Chileno",
-        "inStock": true
-      },
-      {
-        "name": "Colgante Árbol de la Vida en Cobre",
-        "price": "$7.500",
-        "desc": "Colgante forjado a mano con hilo de cuero legítimo regulable.",
-        "image": "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400&fit=crop",
-        "tag": "Hecho a Mano",
-        "inStock": true
-      }
-    ],
-    "locationNote": "Feria Sur #5 (Sector Artesanías Este)"
-  },
-  {
-    "id": 16,
-    "number": "P-16",
-    "name": "Cerámica & Alfarería Tradicional",
-    "category": "crafts",
-    "categoryName": "Artesanías",
-    "icon": "🏺",
-    "logoUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20140%20140%22%20width%3D%22140%22%20height%3D%22140%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22bg_CER%C3%81MICA%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%2378350f%22%20/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23451a03%22%20/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2266%22%20fill%3D%22url%28%23bg_CER%C3%81MICA%29%22%20stroke%3D%22%23d97706%22%20stroke-width%3D%224.5%22%20/%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2257%22%20fill%3D%22none%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.22%29%22%20stroke-dasharray%3D%223%2C3%22%20stroke-width%3D%221.5%22%20/%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2255%22%20font-size%3D%2236%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%3E%F0%9F%8F%BA%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2296%22%20font-family%3D%22%27Outfit%27%2C%20system-ui%2C%20-apple-system%2C%20sans-serif%22%20font-size%3D%229.5%22%20font-weight%3D%22900%22%20fill%3D%22%23ffffff%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%220.8%22%3ECER%C3%81MICA%20TRADICI%C3%93N%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%22110%22%20font-family%3D%22%27Plus%20Jakarta%20Sans%27%2C%20system-ui%2C%20sans-serif%22%20font-size%3D%227%22%20font-weight%3D%22800%22%20fill%3D%22%23fde68a%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%221.2%22%3EGREDA%20DE%20POMAIRE%3C/text%3E%0A%3C/svg%3E",
-    "bannerUrl": "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=800&auto=format&fit=crop&q=80",
-    "color": "#059669",
-    "desc": "Vasijas, pocillos pebreros y maceteros rústicos elaborados en greda cocida tradicional esmaltada al horno.",
-    "slogan": "Greda cocida de tradición campesina",
-    "rating": "4.9 (50 compras)",
-    "prepTime": "Inmediato",
-    "latOffset": -0.00036,
-    "lngOffset": 0.0003,
-    "whatsapp": "56999113355",
+    "desc": "Waffles belgas calientes recién horneados con frutillas y Nutella, helados artesanales en barquillo crocante y café de grano tostado.",
+    "slogan": "El toque dulce que le falta a tu tarde de festival",
+    "rating": "4.8 (170 pedidos)",
+    "prepTime": "4 - 6 min",
+    "latOffset": -0.0003,
+    "lngOffset": 0,
+    "locationNote": "Sector Sur (Plaza de Dulces junto al Acceso Central)",
+    "whatsapp": "56943210987",
     "bankData": {
       "bank": "Banco BCI",
       "accountType": "Cuenta Corriente",
-      "accountNumber": "77889900",
-      "holderName": "Cerámica Tradición",
-      "email": "greda@ceramica.cl"
+      "accountNumber": "555-1234-9",
+      "holderName": "Andrea Morales",
+      "email": "dulceantojo@gmail.com"
     },
     "products": [
       {
-        "name": "Pocillo de Greda Esmaltada para Pebre",
-        "price": "$3.000",
-        "desc": "El infaltable pocillo chileno para la mesa del asado.",
-        "image": "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=400&fit=crop",
-        "tag": "⭐ Clásico Chileno",
-        "inStock": true
-      },
-      {
-        "name": "Juego de 4 Vasos de Greda Campesinos",
-        "price": "$8.000",
-        "desc": "Vasos rústicos ideales para chicha, pipeño o vino navegado.",
-        "image": "https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=400&fit=crop",
-        "tag": "Juego Familiar",
-        "inStock": true
-      }
-    ],
-    "locationNote": "Feria Sur #6 (Sector Artesanías Este)"
-  },
-  {
-    "id": 17,
-    "number": "P-17",
-    "name": "Cosmética Natural & Aceites Esenciales",
-    "category": "crafts",
-    "categoryName": "Artesanías",
-    "icon": "🌿",
-    "logoUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20140%20140%22%20width%3D%22140%22%20height%3D%22140%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22bg_COSM%C3%89TIC%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%2314532d%22%20/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23052e16%22%20/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2266%22%20fill%3D%22url%28%23bg_COSM%C3%89TIC%29%22%20stroke%3D%22%2316a34a%22%20stroke-width%3D%224.5%22%20/%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2257%22%20fill%3D%22none%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.22%29%22%20stroke-dasharray%3D%223%2C3%22%20stroke-width%3D%221.5%22%20/%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2255%22%20font-size%3D%2236%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%3E%F0%9F%8C%BF%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2296%22%20font-family%3D%22%27Outfit%27%2C%20system-ui%2C%20-apple-system%2C%20sans-serif%22%20font-size%3D%229.5%22%20font-weight%3D%22900%22%20fill%3D%22%23ffffff%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%220.8%22%3ECOSM%C3%89TICA%20NATURAL%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%22110%22%20font-family%3D%22%27Plus%20Jakarta%20Sans%27%2C%20system-ui%2C%20sans-serif%22%20font-size%3D%227%22%20font-weight%3D%22800%22%20fill%3D%22%23bbf7d0%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%221.2%22%3EBOT%C3%81NICA%20BIO%20%26%20ECO%3C/text%3E%0A%3C/svg%3E",
-    "bannerUrl": "https://images.unsplash.com/photo-1608248597359-0a648e4b8577?w=800&auto=format&fit=crop&q=80",
-    "color": "#059669",
-    "desc": "Jabones biodegradables de avena y miel, cremas de caléndula, rosa mosqueta y aceites de aromaterapia.",
-    "slogan": "Botánica pura, orgánica y libre de químicos",
-    "rating": "4.9 (75 compras)",
-    "prepTime": "Inmediato",
-    "latOffset": -0.00026,
-    "lngOffset": 0.0003,
-    "whatsapp": "56911224466",
-    "bankData": {
-      "bank": "Banco Santander",
-      "accountType": "Cuenta Corriente",
-      "accountNumber": "44556677",
-      "holderName": "Cosmética Natural",
-      "email": "natural@eco.cl"
-    },
-    "products": [
-      {
-        "name": "Jabón Artesanal de Avena, Miel & Propóleo",
-        "price": "$3.000",
-        "desc": "Jabón exfoliante suave y humectante para piel sensible.",
-        "image": "https://images.unsplash.com/photo-1608248597359-0a648e4b8577?w=400&fit=crop",
-        "tag": "⭐ 100% Orgánico",
-        "inStock": true
-      },
-      {
-        "name": "Crema Facial de Rosa Mosqueta Chilena",
-        "price": "$7.000",
-        "desc": "Poderoso regenerador celular con aceite puro prensado en frío.",
-        "image": "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400&fit=crop",
-        "tag": "Regeneradora",
-        "inStock": true
-      }
-    ],
-    "locationNote": "Feria Sur #7 (Sector Cosmética & Cuidado)"
-  },
-  {
-    "id": 18,
-    "number": "P-18",
-    "name": "Cervecería Austral Valle",
-    "category": "beer",
-    "categoryName": "Cervezas & Tragos",
-    "icon": "🍺",
-    "logoUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20140%20140%22%20width%3D%22140%22%20height%3D%22140%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22bg_AUSTRALV%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%230f172a%22%20/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23020617%22%20/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2266%22%20fill%3D%22url%28%23bg_AUSTRALV%29%22%20stroke%3D%22%2338bdf8%22%20stroke-width%3D%224.5%22%20/%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2257%22%20fill%3D%22none%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.22%29%22%20stroke-dasharray%3D%223%2C3%22%20stroke-width%3D%221.5%22%20/%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2255%22%20font-size%3D%2236%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%3E%F0%9F%8D%BA%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2296%22%20font-family%3D%22%27Outfit%27%2C%20system-ui%2C%20-apple-system%2C%20sans-serif%22%20font-size%3D%229.5%22%20font-weight%3D%22900%22%20fill%3D%22%23ffffff%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%220.8%22%3EAUSTRAL%20VALLE%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%22110%22%20font-family%3D%22%27Plus%20Jakarta%20Sans%27%2C%20system-ui%2C%20sans-serif%22%20font-size%3D%227%22%20font-weight%3D%22800%22%20fill%3D%22%23bae6fd%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%221.2%22%3ESCHOP%20PATAG%C3%93NICO%3C/text%3E%0A%3C/svg%3E",
-    "bannerUrl": "https://images.unsplash.com/photo-1608270586620-248524c67de9?w=800&auto=format&fit=crop&q=80",
-    "color": "#f59e0b",
-    "desc": "Cervezas patagónicas en barril: Schop Calafate con notas de bayas silvestres y Schop Lager rubia cristalina.",
-    "slogan": "La frescura del fin del mundo en tu vaso",
-    "rating": "4.9 (165 pedidos)",
-    "prepTime": "3 - 5 min",
-    "latOffset": 0.00005,
-    "lngOffset": 0.00018,
-    "whatsapp": "56922335577",
-    "bankData": {
-      "bank": "Banco de Chile",
-      "accountType": "Cuenta Corriente",
-      "accountNumber": "88776655",
-      "holderName": "Austral Valle",
-      "email": "cerveza@austral.cl"
-    },
-    "products": [
-      {
-        "name": "Schop Calafate Austral 500cc",
+        "name": "Waffle Belga con Frutillas, Plátano y Nutella",
         "price": "$4.500",
-        "desc": "Cerveza negra con extracto de calafate silvestre, aroma frutal y espuma tostada.",
-        "image": "https://images.unsplash.com/photo-1538488881522-4326c36660df?w=400&fit=crop",
-        "tag": "⭐ Fruto Patagónico",
         "inStock": true
       },
       {
-        "name": "Schop Lager Rubia Cristalina 500cc",
-        "price": "$3.800",
-        "desc": "Lager clásica rubia de gran tomabilidad, balanceada, bien carbonatada y fría.",
-        "image": "https://images.unsplash.com/photo-1608270586620-248524c67de9?w=400&fit=crop",
-        "tag": "Refrescante",
+        "name": "Copa de Helado Artesanal 2 Sabores en Barquillo",
+        "price": "$3.000",
+        "inStock": true
+      },
+      {
+        "name": "Crepe Francés con Manjar Casero y Nueces",
+        "price": "$4.000",
+        "inStock": true
+      },
+      {
+        "name": "Café de Grano Americano o Espresso",
+        "price": "$2.000",
+        "inStock": true
+      },
+      {
+        "name": "Chocolate Caliente Espeso con Marshmallows",
+        "price": "$2.500",
         "inStock": true
       }
-    ],
-    "locationNote": "Pasillo Este #3 (Frente a Asados & Brasas)"
+    ]
   },
   {
-    "id": 19,
-    "number": "ESC",
-    "name": "Escenario Principal",
-    "category": "service",
-    "categoryName": "Escenario",
-    "icon": "🎸",
-    "logoUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20140%20140%22%20width%3D%22140%22%20height%3D%22140%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22bg_ESCENARI%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%237f1d1d%22%20/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23450a0a%22%20/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2266%22%20fill%3D%22url%28%23bg_ESCENARI%29%22%20stroke%3D%22%23ef4444%22%20stroke-width%3D%224.5%22%20/%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2257%22%20fill%3D%22none%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.22%29%22%20stroke-dasharray%3D%223%2C3%22%20stroke-width%3D%221.5%22%20/%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2255%22%20font-size%3D%2236%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%3E%F0%9F%8E%B8%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2296%22%20font-family%3D%22%27Outfit%27%2C%20system-ui%2C%20-apple-system%2C%20sans-serif%22%20font-size%3D%229.5%22%20font-weight%3D%22900%22%20fill%3D%22%23ffffff%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%220.8%22%3EESCENARIO%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%22110%22%20font-family%3D%22%27Plus%20Jakarta%20Sans%27%2C%20system-ui%2C%20sans-serif%22%20font-size%3D%227%22%20font-weight%3D%22800%22%20fill%3D%22%23fca5a5%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%221.2%22%3ETARIMA%20CENTRAL%3C/text%3E%0A%3C/svg%3E",
-    "bannerUrl": "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=800&auto=format&fit=crop&q=80",
-    "color": "#dc2626",
-    "desc": "Tarima central donde se presentan las bandas, humoristas y grupos del festival.",
-    "slogan": "Sonido, luces y música en vivo",
-    "rating": "Tarima Central",
-    "prepTime": "En Vivo",
-    "latOffset": 0.00044,
-    "lngOffset": 0,
-    "whatsapp": "",
-    "bankData": null,
-    "products": [],
-    "locationNote": "Cabecera Norte de la Cancha (Escenario Principal)"
-  },
-  {
-    "id": 20,
+    "id": 6,
     "number": "WC",
     "name": "Batería de Baños Químicos",
     "category": "service",
-    "categoryName": "Servicios",
+    "categoryName": "Servicios Sanitarios",
     "icon": "🚻",
-    "logoUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20140%20140%22%20width%3D%22140%22%20height%3D%22140%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22bg_SERVICIO%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%231e3a8a%22%20/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23172554%22%20/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2266%22%20fill%3D%22url%28%23bg_SERVICIO%29%22%20stroke%3D%22%233b82f6%22%20stroke-width%3D%224.5%22%20/%3E%0A%20%20%3Ccircle%20cx%3D%2270%22%20cy%3D%2270%22%20r%3D%2257%22%20fill%3D%22none%22%20stroke%3D%22rgba%28255%2C255%2C255%2C0.22%29%22%20stroke-dasharray%3D%223%2C3%22%20stroke-width%3D%221.5%22%20/%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2255%22%20font-size%3D%2236%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%3E%F0%9F%9A%BB%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%2296%22%20font-family%3D%22%27Outfit%27%2C%20system-ui%2C%20-apple-system%2C%20sans-serif%22%20font-size%3D%229.5%22%20font-weight%3D%22900%22%20fill%3D%22%23ffffff%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%220.8%22%3ESERVICIOS%3C/text%3E%0A%20%20%3Ctext%20x%3D%2270%22%20y%3D%22110%22%20font-family%3D%22%27Plus%20Jakarta%20Sans%27%2C%20system-ui%2C%20sans-serif%22%20font-size%3D%227%22%20font-weight%3D%22800%22%20fill%3D%22%2393c5fd%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%221.2%22%3EBA%C3%91OS%20%26%20PRIMEROS%20AUX%3C/text%3E%0A%3C/svg%3E",
     "bannerUrl": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=800&auto=format&fit=crop&q=80",
-    "color": "#2563eb",
-    "desc": "Servicios higiénicos higienizados, lavamanos con jabón, estación de primeros auxilios y punto verde de reciclaje.",
-    "slogan": "Punto de higiene y asistencia",
-    "rating": "Servicios",
-    "prepTime": "24 hrs",
-    "latOffset": -0.00046,
-    "lngOffset": 0.00032,
+    "color": "#0284c7",
+    "desc": "Módulo con 8 cabinas sanitarias higienizadas permanentemente, dispensadores de jabón y alcohol gel, lavamanos y cabina accesible.",
+    "slogan": "Servicios higiénicos limpios y accesibles 24 hrs",
+    "rating": "Servicio Oficial",
+    "prepTime": "Acceso Inmediato",
+    "latOffset": -0.00042,
+    "lngOffset": 0.00028,
+    "locationNote": "Costado Sureste (Junto a la Salida y Primeros Auxilios)",
     "whatsapp": "",
     "bankData": null,
-    "products": [],
-    "locationNote": "Costado Sureste (Salida y Servicios)"
+    "products": []
+  },
+  {
+    "id": 7,
+    "number": "ESC",
+    "name": "Escenario Principal de Conciertos",
+    "category": "service",
+    "categoryName": "Música & Shows en Vivo",
+    "icon": "🎸",
+    "bannerUrl": "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=800&auto=format&fit=crop&q=80",
+    "color": "#dc2626",
+    "desc": "Tarima principal del festival con sistema de sonido Line Array, pantalla gigante LED y presentaciones de artistas y DJs oficiales.",
+    "slogan": "El corazón musical del festival en la cancha",
+    "rating": "Tarima Oficial",
+    "prepTime": "En Vivo Ahora",
+    "latOffset": 0.00042,
+    "lngOffset": 0,
+    "locationNote": "Cabecera Norte de la Cancha (Escenario Central)",
+    "whatsapp": "",
+    "bankData": null,
+    "products": []
   }
 ];
 
@@ -2549,22 +2008,27 @@
     const cLat = DEFAULT_CENTER[0];
     const cLng = DEFAULT_CENTER[1];
 
-    // Delimitación oficial del recinto deportivo y feria
+    // Asegurar que cada puesto tenga sus coordenadas lat y lng calculadas numéricamente
+    stands.forEach(s => {
+      s.lat = cLat + (s.latOffset || 0);
+      s.lng = cLng + (s.lngOffset || 0);
+    });
+
+    // Delimitación del recinto deportivo para encuadre automático
     const stadiumBounds = L.latLngBounds([
-      [cLat - 0.00062, cLng - 0.00048], // Entrada y Servicios Sur
-      [cLat + 0.00062, cLng + 0.00048]  // Escenario Principal Norte
+      [cLat - 0.00058, cLng - 0.00042], // Entrada Sur
+      [cLat + 0.00055, cLng + 0.00042]  // Escenario Norte
     ]);
 
     const map = L.map('map', {
       zoomControl: false,
       maxZoom: 21,
       minZoom: 16,
-      maxBounds: stadiumBounds.pad(0.4),
-      maxBoundsViscosity: 0.8
+      maxBounds: stadiumBounds.pad(0.35),
+      maxBoundsViscosity: 0.85
     });
 
-    // 1. Capas Base Disponibles (100% Sin marcas de agua de CartoDB)
-    // Fondo de lona oscura deportiva para la Cancha de Festival
+    // 1. Capas Base de Fondo (Sin CartoDB ni marcas de agua)
     const osmLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 21,
       maxNativeZoom: 19,
@@ -2577,15 +2041,14 @@
       attribution: '&copy; Esri'
     });
 
-    // 2. RECINTO DEL ESTADIO & CANCHA ILUSTRADA DEL FESTIVAL (Capa Vectorial Interactiva)
+    // 2. RECINTO DEL ESTADIO & CANCHA ILUSTRADA (Capa Vectorial)
     const stadiumGroup = L.layerGroup().addTo(map);
 
-    // A. Recinto Exterior & Pista Atlética de Tartán (Concourse / Running Track)
+    // A. Recinto Exterior & Pista Atlética de Tartán Rojo
     const stadiumOuterBounds = [
-      [cLat - 0.00060, cLng - 0.00044],
-      [cLat + 0.00060, cLng + 0.00044]
+      [cLat - 0.00058, cLng - 0.00042],
+      [cLat + 0.00058, cLng + 0.00042]
     ];
-    // Pavimento exterior oscuro del recinto
     L.rectangle(stadiumOuterBounds, {
       color: '#1e293b',
       weight: 2,
@@ -2593,35 +2056,25 @@
       fillOpacity: 1
     }).addTo(stadiumGroup);
 
-    // Pista de Atletismo de Tartán Rojo Terracota
+    // Pista de atletismo terracota
     const trackBounds = [
-      [cLat - 0.00054, cLng - 0.00040],
-      [cLat + 0.00054, cLng + 0.00040]
+      [cLat - 0.00052, cLng - 0.00038],
+      [cLat + 0.00052, cLng + 0.00038]
     ];
     L.rectangle(trackBounds, {
       color: '#ffffff',
       weight: 1.5,
-      opacity: 0.3,
+      opacity: 0.35,
       fillColor: '#991b1b',
-      fillOpacity: 0.75
+      fillOpacity: 0.85
     }).addTo(stadiumGroup);
 
-    // Carriles blancos de la pista atlética
-    L.rectangle([[cLat - 0.00051, cLng - 0.00038], [cLat + 0.00051, cLng + 0.00038]], {
-      color: '#ffffff',
-      weight: 1,
-      dashArray: '4, 6',
-      opacity: 0.4,
-      fill: false
-    }).addTo(stadiumGroup);
+    // B. Cancha de Césped Verde Profesional con Franjas de Corte
+    const pitchNorth = cLat + 0.00032;
+    const pitchSouth = cLat - 0.00044;
+    const pitchWest  = cLng - 0.00034;
+    const pitchEast  = cLng + 0.00034;
 
-    // B. Cancha de Césped Verde Profesional (Lush Sports Turf)
-    const pitchNorth = cLat + 0.00034;
-    const pitchSouth = cLat - 0.00048;
-    const pitchWest  = cLng - 0.00036;
-    const pitchEast  = cLng + 0.00036;
-
-    // Pasto verde base
     L.rectangle([[pitchSouth, pitchWest], [pitchNorth, pitchEast]], {
       color: '#15803d',
       weight: 2,
@@ -2629,8 +2082,8 @@
       fillOpacity: 0.98
     }).addTo(stadiumGroup);
 
-    // Franjas de corte de césped alternadas (Lawn Stripes de estadio)
-    const numStripes = 8;
+    // Franjas de corte de césped
+    const numStripes = 6;
     const stripeHeight = (pitchNorth - pitchSouth) / numStripes;
     for (let i = 0; i < numStripes; i++) {
       if (i % 2 === 1) {
@@ -2644,33 +2097,32 @@
       }
     }
 
-    // C. Líneas Blancas Reglamentarias de Fútbol
-    // Perímetro de cal
+    // C. Líneas Reglamentarias de Fútbol Blancas
     L.rectangle([[pitchSouth, pitchWest], [pitchNorth, pitchEast]], {
       color: '#ffffff',
       weight: 2,
-      opacity: 0.65,
+      opacity: 0.7,
       fill: false
     }).addTo(stadiumGroup);
 
-    // Línea de mitad de cancha
+    // Mitad de cancha
     const pitchCenterLat = (pitchNorth + pitchSouth) / 2;
     L.polyline([[pitchCenterLat, pitchWest], [pitchCenterLat, pitchEast]], {
       color: '#ffffff',
       weight: 2,
-      opacity: 0.65
+      opacity: 0.7
     }).addTo(stadiumGroup);
 
-    // Círculo central reglamentario
+    // Círculo central
     L.circle([pitchCenterLat, cLng], {
       radius: 9.15,
       color: '#ffffff',
       weight: 2,
-      opacity: 0.65,
+      opacity: 0.7,
       fill: false
     }).addTo(stadiumGroup);
 
-    // Punto central de saque
+    // Punto central
     L.circle([pitchCenterLat, cLng], {
       radius: 1,
       color: '#ffffff',
@@ -2679,156 +2131,107 @@
       weight: 1
     }).addTo(stadiumGroup);
 
-    // Áreas de gol norte y sur
-    L.rectangle([[pitchNorth - 0.00014, cLng - 0.00018], [pitchNorth, cLng + 0.00018]], {
-      color: '#ffffff',
-      weight: 1.5,
-      opacity: 0.55,
-      fill: false
-    }).addTo(stadiumGroup);
-    L.rectangle([[pitchSouth, cLng - 0.00018], [pitchSouth + 0.00014, cLng + 0.00018]], {
-      color: '#ffffff',
-      weight: 1.5,
-      opacity: 0.55,
-      fill: false
-    }).addTo(stadiumGroup);
-
-    // D. Bulevar Central Peatonal de la Feria
+    // D. Bulevar Central Peatonal Iluminado
     const walkWest = cLng - 0.00007;
     const walkEast = cLng + 0.00007;
-    L.rectangle([[pitchSouth - 0.00005, walkWest], [pitchNorth, walkEast]], {
+    L.rectangle([[pitchSouth - 0.00004, walkWest], [pitchNorth, walkEast]], {
       color: '#f59e0b',
       weight: 2,
       dashArray: '3, 4',
-      opacity: 0.8,
+      opacity: 0.85,
       fillColor: '#334155',
       fillOpacity: 0.92
     }).addTo(stadiumGroup);
 
-    // Guirnaldas de luces festivas con bombillas encendidas
-    const festoonStep = 0.000065;
+    // Guirnaldas de luces festivas
+    const festoonStep = 0.00007;
     for (let fLat = pitchSouth; fLat <= pitchNorth - 0.00003; fLat += festoonStep) {
       L.circleMarker([fLat, walkWest], { radius: 2.5, color: '#fbbf24', fillColor: '#fef08a', fillOpacity: 0.95, weight: 1 }).addTo(stadiumGroup);
       L.circleMarker([fLat, walkEast], { radius: 2.5, color: '#fbbf24', fillColor: '#fef08a', fillOpacity: 0.95, weight: 1 }).addTo(stadiumGroup);
     }
 
-    // E. Escenario Principal Gigante (Cabecera Norte) con Luces Animadas
+    // E. Escenario Principal al Norte (Concert Stage)
     const stageBounds = [
-      [pitchNorth, cLng - 0.00022],
-      [cLat + 0.00054, cLng + 0.00022]
+      [pitchNorth, cLng - 0.00020],
+      [cLat + 0.00050, cLng + 0.00020]
     ];
     L.rectangle(stageBounds, {
-      color: '#e11d48',
-      weight: 3,
+      color: '#dc2626',
+      weight: 2.5,
       fillColor: '#09090b',
       fillOpacity: 1
     }).addTo(stadiumGroup);
 
-    // Torres de sonido Line Array (izquierda y derecha del escenario)
-    L.rectangle([[pitchNorth + 0.00002, cLng - 0.00025], [pitchNorth + 0.00012, cLng - 0.00021]], {
+    // Torres de sonido Line Array
+    L.rectangle([[pitchNorth + 0.00002, cLng - 0.00023], [pitchNorth + 0.00010, cLng - 0.00019]], {
       color: '#eab308',
       weight: 2,
       fillColor: '#18181b',
       fillOpacity: 1
     }).addTo(stadiumGroup);
-    L.rectangle([[pitchNorth + 0.00002, cLng + 0.00021], [pitchNorth + 0.00012, cLng + 0.00025]], {
+    L.rectangle([[pitchNorth + 0.00002, cLng + 0.00019], [pitchNorth + 0.00010, cLng + 0.00023]], {
       color: '#eab308',
       weight: 2,
       fillColor: '#18181b',
       fillOpacity: 1
     }).addTo(stadiumGroup);
 
-    // Cartel Interactivo Gigante del Escenario Principal con Focos de Concierto
+    // Cartel Centrado del Escenario Principal
     const stageBannerIcon = L.divIcon({
-      className: 'stage-banner-marker',
+      className: 'stage-central-marker',
       html: `
-        <div class="relative flex flex-col items-center cursor-pointer select-none" onclick="onStageClick()">
-          <!-- Luces láser / focos de concierto animados -->
-          <div class="absolute -top-12 -left-8 w-24 h-24 stage-spotlight-left pointer-events-none" style="background: radial-gradient(ellipse at top, rgba(239,68,68,0.45) 0%, rgba(239,68,68,0) 70%);"></div>
-          <div class="absolute -top-12 -right-8 w-24 h-24 stage-spotlight-right pointer-events-none" style="background: radial-gradient(ellipse at top, rgba(59,130,246,0.45) 0%, rgba(59,130,246,0) 70%);"></div>
-
-          <!-- Banner con pulso en vivo -->
-          <div class="px-3.5 py-1.5 rounded-full bg-gradient-to-r from-red-600 via-rose-600 to-amber-500 text-white text-[11px] font-black shadow-2xl border-2 border-white flex items-center gap-2 whitespace-nowrap transform hover:scale-105 transition-transform">
-            <span class="text-base">🎸</span>
-            <span>ESCENARIO PRINCIPAL</span>
-            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
-          </div>
-          <div class="text-[9px] font-extrabold text-amber-300 bg-slate-950/90 px-2 py-0.5 rounded-full border border-amber-500/50 -mt-1 shadow-md">
-            🔴 EN VIVO AHORA
-          </div>
+        <div class="px-3.5 py-1.5 rounded-full bg-gradient-to-r from-red-600 via-rose-600 to-amber-500 text-white text-[11px] font-black shadow-xl border-2 border-white flex items-center gap-1.5 whitespace-nowrap cursor-pointer hover:scale-105 transition" onclick="onStageClick()">
+          <span class="text-sm">🎸</span> ESCENARIO PRINCIPAL <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
         </div>
       `,
-      iconAnchor: [95, 20]
+      iconAnchor: [85, 14]
     });
-    L.marker([cLat + 0.00045, cLng], { icon: stageBannerIcon, zIndexOffset: 850 }).addTo(stadiumGroup);
+    L.marker([cLat + 0.00041, cLng], { icon: stageBannerIcon, zIndexOffset: 850 }).addTo(stadiumGroup);
 
-    // F. Acceso Principal y Control de Entrada (Sur)
+    // F. Acceso Principal al Recinto (Sur)
     const entranceBannerIcon = L.divIcon({
-      className: 'entrance-banner-marker',
+      className: 'entrance-central-marker',
       html: `
-        <div class="px-3 py-1 rounded-full bg-slate-950/95 text-amber-400 text-[10px] font-black border-2 border-amber-400 shadow-xl flex items-center gap-1.5 whitespace-nowrap cursor-pointer hover:scale-105 transition">
-          <span class="text-sm">🎟️</span> ENTRADA Y ACCESO AL RECINTO
+        <div class="px-3 py-1 rounded-full bg-slate-900/95 text-amber-400 text-[10px] font-black border-2 border-amber-400 shadow-xl flex items-center gap-1 whitespace-nowrap">
+          <span>🎟️</span> ACCESO AL RECINTO
         </div>
       `,
-      iconAnchor: [85, 12]
+      iconAnchor: [70, 12]
     });
-    L.marker([pitchSouth - 0.00007, cLng], { icon: entranceBannerIcon, zIndexOffset: 800 }).addTo(stadiumGroup);
+    L.marker([pitchSouth - 0.00005, cLng], { icon: entranceBannerIcon, zIndexOffset: 800 }).addTo(stadiumGroup);
 
-    // G. Rótulos en el Suelo para Orientar Pasillos
-    const westAisleLabel = L.divIcon({
-      className: 'aisle-floor-label',
-      html: `<div class="text-[9px] font-black text-emerald-300 tracking-wider uppercase bg-emerald-950/90 px-2.5 py-0.5 rounded-full border border-emerald-500/60 whitespace-nowrap shadow-md">🍔 Pasillo Food Trucks</div>`,
-      iconAnchor: [70, 8]
-    });
-    L.marker([cLat, cLng - 0.00018], { icon: westAisleLabel, zIndexOffset: 200, interactive: false }).addTo(stadiumGroup);
+    // Encuadre inicial del mapa
+    map.fitBounds(stadiumBounds, { padding: [15, 15] });
 
-    const eastAisleLabel = L.divIcon({
-      className: 'aisle-floor-label',
-      html: `<div class="text-[9px] font-black text-amber-300 tracking-wider uppercase bg-amber-950/90 px-2.5 py-0.5 rounded-full border border-amber-500/60 whitespace-nowrap shadow-md">🍺 Pasillo Cervecerías</div>`,
-      iconAnchor: [70, 8]
-    });
-    L.marker([cLat, cLng + 0.00018], { icon: eastAisleLabel, zIndexOffset: 200, interactive: false }).addTo(stadiumGroup);
-
-    // Ajustar encuadre inicial del mapa para mostrar TODO el festival en pantalla móvil
-    map.fitBounds(stadiumBounds, { padding: [20, 20] });
-
-    // Función para volver a la vista general completa del festival
     function resetMapView() {
       closeMiniCard();
       mapFilterCategory('all');
-      map.flyToBounds(stadiumBounds, { padding: [20, 20], duration: 0.8 });
+      map.flyToBounds(stadiumBounds, { padding: [15, 15], duration: 0.7 });
     }
 
-    // 3. Conmutador de Capas (Cancha -> Satélite -> Calles)
-    let currentMapMode = 0; // 0: Cancha, 1: Satelite, 2: Calles
-    const layerBtn = document.getElementById('toggleMapLayerBtn');
-    if (layerBtn) {
-      layerBtn.textContent = '🏟️ Cancha';
-      layerBtn.addEventListener('click', () => {
-        currentMapMode = (currentMapMode + 1) % 3;
-        if (currentMapMode === 0) {
-          map.removeLayer(osmLayer);
-          map.removeLayer(satelliteLayer);
-          if (!map.hasLayer(stadiumGroup)) map.addLayer(stadiumGroup);
-          layerBtn.textContent = '🏟️ Cancha';
-        } else if (currentMapMode === 1) {
-          map.removeLayer(osmLayer);
-          map.addLayer(satelliteLayer);
-          if (!map.hasLayer(stadiumGroup)) map.addLayer(stadiumGroup);
-          layerBtn.textContent = '🛰️ Satélite';
+    let isMapExpanded = false;
+    function toggleMapExpand() {
+      isMapExpanded = !isMapExpanded;
+      const wrap = document.getElementById('mapWrapper');
+      const btn = document.getElementById('toggleExpandMapBtn');
+      if (wrap) {
+        if (isMapExpanded) {
+          wrap.classList.remove('h-[380px]', 'sm:h-[420px]');
+          wrap.classList.add('h-[calc(100dvh-175px)]');
+          if (btn) btn.innerHTML = '⤢ Reducir';
         } else {
-          map.removeLayer(satelliteLayer);
-          map.addLayer(osmLayer);
-          if (!map.hasLayer(stadiumGroup)) map.addLayer(stadiumGroup);
-          layerBtn.textContent = '🗺️ Calles';
+          wrap.classList.remove('h-[calc(100dvh-175px)]');
+          wrap.classList.add('h-[380px]', 'sm:h-[420px]');
+          if (btn) btn.innerHTML = '⤢ Expandir';
         }
-      });
+        setTimeout(() => { map.invalidateSize(); map.fitBounds(stadiumBounds, { padding: [15, 15] }); }, 320);
+      }
     }
 
-    let userLocation = null;
+    // 3. Usuario & GPS en Cancha
+    let userLocation = [cLat - 0.00038, cLng]; // Punto inicial visible de inmediato en la entrada
     let userMarker = null;
     let userAccuracyCircle = null;
-    let isSimulating = false;
     let isAdjusting = false;
     let activeNavStand = null;
     let navRoutePolyline = null;
@@ -2873,27 +2276,17 @@
       });
     }
 
-    function calculateBearing(lat1, lon1, lat2, lon2) {
-      const toRad = deg => deg * Math.PI / 180;
-      const toDeg = rad => rad * 180 / Math.PI;
-      const y = Math.sin(toRad(lon2 - lon1)) * Math.cos(toRad(lat2));
-      const x = Math.cos(toRad(lat1)) * Math.sin(toRad(lat2)) -
-                Math.sin(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.cos(toRad(lon2 - lon1));
-      const brng = toDeg(Math.atan2(y, x));
-      return (brng + 360) % 360;
-    }
-
     function calculateDistanceMeters(lat1, lon1, lat2, lon2) {
+      if (lat1 === undefined || lon1 === undefined || lat2 === undefined || lon2 === undefined) return 25;
       const R = 6371e3;
       const phi1 = lat1 * Math.PI / 180;
       const phi2 = lat2 * Math.PI / 180;
       const dPhi = (lat2 - lat1) * Math.PI / 180;
       const dLam = (lon2 - lon1) * Math.PI / 180;
-      const a = Math.sin(dPhi/2) * Math.sin(dPhi/2) +
-                Math.cos(phi1) * Math.cos(phi2) *
-                Math.sin(dLam/2) * Math.sin(dLam/2);
+      const a = Math.sin(dPhi/2) * Math.sin(dPhi/2) + Math.cos(phi1) * Math.cos(phi2) * Math.sin(dLam/2) * Math.sin(dLam/2);
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-      return Math.round(R * c);
+      const res = Math.round(R * c);
+      return isNaN(res) ? 25 : res;
     }
 
     let orientationActive = false;
@@ -2940,28 +2333,16 @@
       if (existing) existing.remove();
       const toast = document.createElement('div');
       toast.id = 'mapOrientationToast';
-      toast.className = 'absolute bottom-24 left-1/2 -translate-x-1/2 z-40 bg-slate-900/95 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-2xl border border-slate-700 pointer-events-none transition-opacity duration-300';
+      toast.className = 'absolute bottom-20 left-1/2 -translate-x-1/2 z-40 bg-slate-900/95 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-2xl border border-slate-700 pointer-events-none transition-opacity duration-300';
       toast.textContent = msg;
-      document.getElementById('view-map').appendChild(toast);
+      const wrapper = document.getElementById('mapWrapper');
+      if (wrapper) wrapper.appendChild(toast);
       setTimeout(() => { toast.classList.add('opacity-0'); setTimeout(() => toast.remove(), 300); }, 2200);
     }
 
     function updateUserPosition(lat, lng, accuracy = 4, heading = null) {
       const accBadge = document.getElementById('mapGpsAccuracy');
       if (accBadge) accBadge.textContent = '±' + Math.round(accuracy) + 'm';
-
-      if (previousGpsPos) {
-        const dist = calculateDistanceMeters(previousGpsPos.lat, previousGpsPos.lng, lat, lng);
-        if (dist >= 1.5) {
-          const brg = calculateBearing(previousGpsPos.lat, previousGpsPos.lng, lat, lng);
-          if (!orientationActive) setHeadingAngle(Math.round(brg));
-          previousGpsPos = { lat, lng };
-        }
-      } else {
-        previousGpsPos = { lat, lng };
-      }
-
-      if (heading !== null && !orientationActive) setHeadingAngle(Math.round(heading));
 
       userLocation = [lat, lng];
 
@@ -2977,7 +2358,7 @@
           radius: displayRadius,
           color: '#3b82f6',
           fillColor: '#60a5fa',
-          fillOpacity: 0.10,
+          fillOpacity: 0.12,
           weight: 1.5
         }).addTo(map);
       } else {
@@ -2992,76 +2373,77 @@
       if (selectedStandForMini) updateMiniDistance(selectedStandForMini);
     }
 
+    // Inicializar posición de inmediato para que el usuario NUNCA desaparezca
+    updateUserPosition(userLocation[0], userLocation[1], 4);
+
     function initGps() {
       if ('geolocation' in navigator) {
         navigator.geolocation.watchPosition(
           (pos) => {
-            const lat = pos.coords.latitude;
-            const lng = pos.coords.longitude;
-            updateUserPosition(lat, lng, pos.coords.accuracy || 4, pos.coords.heading);
+            updateUserPosition(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy || 4, pos.coords.heading);
           },
           (err) => {
-            console.warn('GPS error, usando posición simulada en el acceso sur:', err.message);
-            updateUserPosition(cLat - 0.00045, cLng, 4);
+            console.warn('GPS no disponible, usando posición en la cancha:', err.message);
           },
           { enableHighAccuracy: true, maximumAge: 2000, timeout: 10000 }
         );
-      } else {
-        updateUserPosition(cLat - 0.00045, cLng, 4);
       }
     }
     initGps();
 
-    // 4. Renderizado Dinámico de Puestos 3D con Toldos de Feria
+    // 4. Renderizado de los 5 Grandes Puestos + Baños + Escenario
     let mapMarkers = [];
     function renderStandsOnMap() {
       mapMarkers.forEach(m => map.removeLayer(m));
       mapMarkers = [];
 
       stands.forEach(stand => {
-        // El escenario principal tiene su cartel interactivo gigante en la cabecera norte
-        if (stand.number === 'ESC' || stand.id === 19) return;
+        // Asegurar que lat y lng existan
+        if (stand.lat === undefined) stand.lat = cLat + (stand.latOffset || 0);
+        if (stand.lng === undefined) stand.lng = cLng + (stand.lngOffset || 0);
+
+        // El escenario tiene su cartel central interactivo
+        if (stand.number === 'ESC' || stand.id === 7) return;
 
         const cat = stand.category;
         const toldoClass = cat === 'food' ? 'toldo-food'
           : cat === 'beer' ? 'toldo-beer'
           : cat === 'sweets' ? 'toldo-sweets'
-          : cat === 'crafts' ? 'toldo-crafts'
           : 'toldo-service';
 
         const categoryColor = cat === 'beer' ? '#f59e0b'
           : cat === 'food' ? '#10b981'
           : cat === 'sweets' ? '#ec4899'
-          : cat === 'crafts' ? '#8b5cf6'
           : '#0284c7';
 
-        const photoOrIcon = stand.photoUrl
-          ? `<img src="${stand.photoUrl}" class="w-full h-full rounded-full object-cover p-0.5" alt="${stand.name}">`
-          : `<span class="text-2xl select-none filter drop-shadow">${stand.icon}</span>`;
+        const shortName = stand.number === 'WC' ? 'Baños' 
+          : stand.name.replace('Food Truck ', '').replace('Cervecería Artesanal ', '').replace('La Barra ', '').replace('Sabor Mexicano: ', '').split(' ')[0] + ' ' + (stand.name.split(' ')[1] || '');
 
         const iconHtml = `
           <div class="stand-booth-marker" data-stand-id="${stand.id}" data-category="${stand.category}">
             <!-- Toldo rayado de feria -->
             <div class="stand-toldo ${toldoClass}"></div>
-            <!-- Píldora del número nítida (P-01, P-02, WC) -->
+            <!-- Píldora del número nítida -->
             <span class="stand-number-badge">${stand.number}</span>
             <!-- Círculo interior con icono/foto -->
-            <div class="stand-booth-circle" style="background: radial-gradient(circle, ${categoryColor} 20%, #0f172a 100%);">
-              ${photoOrIcon}
+            <div class="stand-booth-circle" style="background: radial-gradient(circle, ${categoryColor} 25%, #0f172a 100%);">
+              <span class="text-2xl select-none filter drop-shadow">${stand.icon}</span>
             </div>
             <!-- Puntero al suelo -->
             <div class="stand-booth-pointer"></div>
+            <!-- Nombre visible del local -->
+            <span class="stand-label-tag">${shortName}</span>
           </div>
         `;
 
         const icon = L.divIcon({
           className: 'stand-pin-leaflet-icon',
           html: iconHtml,
-          iconSize: [48, 58],
-          iconAnchor: [24, 56]
+          iconSize: [52, 68],
+          iconAnchor: [26, 64]
         });
 
-        const m = L.marker([stand.lat, stand.lng], { icon: icon, zIndexOffset: 400 }).addTo(map);
+        const m = L.marker([stand.lat, stand.lng], { icon: icon, zIndexOffset: 450 }).addTo(map);
         m.on('click', () => {
           showMiniStandCard(stand);
         });
@@ -3071,11 +2453,110 @@
     }
     renderStandsOnMap();
 
-    // 5. INTERACCIÓN LIMPIA Y NO INVASIVA: MINI-CARD INFERIOR
+    // 5. Renderizado de las Tarjetas Integradas debajo del Mapa (Scroll Natural)
+    function renderIntegratedStandsFeed() {
+      const container = document.getElementById('integratedStandsFeed');
+      if (!container) return;
+
+      container.innerHTML = '';
+      stands.forEach(stand => {
+        const isService = stand.number === 'WC' || stand.number === 'ESC';
+        const card = document.createElement('div');
+        card.id = 'stand-feed-card-' + stand.id;
+        card.className = 'bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl hover:border-slate-700 transition flex flex-col gap-3';
+
+        const productsHtml = stand.products && stand.products.length > 0 ? `
+          <div class="space-y-1.5 pt-2 border-t border-slate-800">
+            <p class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Platos & Precios Más Pedidos:</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+              ${stand.products.slice(0, 3).map(p => `
+                <div class="flex items-center justify-between text-xs bg-slate-950/60 px-2.5 py-1.5 rounded-lg border border-slate-800">
+                  <span class="text-slate-200 font-medium truncate mr-2">${p.name}</span>
+                  <span class="font-black text-amber-400 shrink-0">${p.price}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        ` : '';
+
+        const whatsappBtn = stand.whatsapp ? `
+          <a href="https://wa.me/${stand.whatsapp}?text=Hola%2C%20quiero%20hacer%20un%20pedido%20en%20${encodeURIComponent(stand.name)}" target="_blank" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center justify-center gap-1 shadow transition">
+            <span>💬</span> WhatsApp
+          </a>
+        ` : '';
+
+        card.innerHTML = `
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-3xl shadow flex-shrink-0" style="background-color: ${stand.color}25; border: 1.5px solid ${stand.color};">
+                ${stand.icon}
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-amber-500 text-slate-950 shadow-sm">
+                    ${stand.number}
+                  </span>
+                  <span class="text-xs font-bold text-slate-400">${stand.categoryName}</span>
+                </div>
+                <h4 class="text-base font-black text-white mt-0.5">${stand.name}</h4>
+              </div>
+            </div>
+            <span class="text-[11px] font-extrabold text-amber-400 bg-amber-950/60 border border-amber-500/40 px-2.5 py-1 rounded-lg shrink-0">
+              ⏱️ ${stand.prepTime}
+            </span>
+          </div>
+
+          <p class="text-xs text-slate-300 leading-relaxed">${stand.desc}</p>
+          <p class="text-xs text-amber-300/90 font-medium">📍 ${stand.locationNote || 'En la Cancha'}</p>
+
+          ${productsHtml}
+
+          <div class="flex items-center gap-2 pt-2 border-t border-slate-800 flex-wrap">
+            <button onclick="focusStandFromCard(${stand.id})" class="flex-1 min-w-[130px] px-3 py-2 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-xs font-black shadow flex items-center justify-center gap-1.5 active:scale-95 transition">
+              <span>📍</span> Ver en Cancha & Guiarme
+            </button>
+            ${whatsappBtn}
+            ${!isService ? `
+              <button onclick="openBottomSheetById(${stand.id})" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold border border-slate-700 transition">
+                📋 Carta Completa
+              </button>
+            ` : ''}
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+    renderIntegratedStandsFeed();
+
+    // 6. Conexión Mapa <-> Tarjetas
+    function focusStandFromCard(standId) {
+      const stand = stands.find(s => s.id === standId);
+      if (!stand) return;
+
+      // Desplazar suavemente hacia el mapa
+      const mapWrap = document.getElementById('mapWrapper');
+      if (mapWrap) mapWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      // Centrar y abrir mini card
+      showMiniStandCard(stand);
+      startNavigation(stand);
+    }
+
+    function scrollToStandCard(standId) {
+      if (!standId) return;
+      const card = document.getElementById('stand-feed-card-' + standId);
+      if (card) {
+        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        card.classList.add('ring-2', 'ring-amber-400');
+        setTimeout(() => card.classList.remove('ring-2', 'ring-amber-400'), 2500);
+      } else {
+        openBottomSheetById(standId);
+      }
+    }
+
     function showMiniStandCard(stand) {
       selectedStandForMini = stand;
 
-      // Destacar visualmente el puesto seleccionado
       document.querySelectorAll('.stand-booth-marker').forEach(el => {
         el.classList.remove('stand-selected');
         if (el.getAttribute('data-stand-id') == stand.id) {
@@ -3088,34 +2569,17 @@
       const numEl = document.getElementById('miniStandNumber');
       const nameEl = document.getElementById('miniStandName');
       const locEl = document.getElementById('miniStandLocation');
-      const menuBtn = document.getElementById('miniStandMenuBtn');
 
-      if (iconEl) iconEl.innerHTML = stand.photoUrl ? `<img src="${stand.photoUrl}" class="w-full h-full rounded-xl object-cover">` : stand.icon;
-      if (numEl) {
-        numEl.textContent = stand.number;
-        numEl.style.backgroundColor = stand.color || '#f59e0b';
-      }
+      if (iconEl) iconEl.textContent = stand.icon;
+      if (numEl) numEl.textContent = stand.number;
       if (nameEl) nameEl.textContent = stand.name;
       if (locEl) locEl.textContent = '📍 ' + (stand.locationNote || stand.categoryName);
 
-      // Si es baño o servicio sin productos, ocultar botón "Ver Carta"
-      if (menuBtn) {
-        if (!stand.products || stand.products.length === 0) {
-          menuBtn.classList.add('hidden');
-        } else {
-          menuBtn.classList.remove('hidden');
-        }
-      }
-
       updateMiniDistance(stand);
 
-      if (card) {
-        card.classList.remove('hidden');
-        card.classList.add('animate-slide-up');
-      }
+      if (card) card.classList.remove('hidden');
 
-      // Re-centrar el mapa suavemente dejando espacio libre arriba de la tarjeta
-      map.panTo([stand.lat - 0.00008, stand.lng], { animate: true, duration: 0.6 });
+      map.panTo([stand.lat - 0.00007, stand.lng], { animate: true, duration: 0.5 });
     }
 
     function closeMiniCard() {
@@ -3127,13 +2591,9 @@
 
     function updateMiniDistance(stand) {
       const distEl = document.getElementById('miniStandDist');
-      if (!distEl) return;
-      if (userLocation) {
-        const m = calculateDistanceMeters(userLocation[0], userLocation[1], stand.lat, stand.lng);
-        distEl.textContent = '· A ' + m + 'm';
-      } else {
-        distEl.textContent = '';
-      }
+      if (!distEl || !stand) return;
+      const m = calculateDistanceMeters(userLocation[0], userLocation[1], stand.lat, stand.lng);
+      distEl.textContent = '(' + m + 'm)';
     }
 
     function startNavigationFromMini() {
@@ -3141,22 +2601,14 @@
       startNavigation(selectedStandForMini);
     }
 
-    function openFullSheetFromMini() {
-      if (!selectedStandForMini) return;
-      openBottomSheet(selectedStandForMini);
-    }
-
     function onStageClick() {
-      const stageStand = stands.find(s => s.id === 19 || s.number === 'ESC');
+      const stageStand = stands.find(s => s.number === 'ESC');
       if (stageStand) {
         showMiniStandCard(stageStand);
-      } else {
-        const liveTab = document.getElementById('tabLiveBtn');
-        if (liveTab) liveTab.click();
+        startNavigation(stageStand);
       }
     }
 
-    // 6. FILTRO RÁPIDO POR CATEGORÍA EN EL MAPA (1 Solo Toque)
     function mapFilterCategory(cat) {
       document.querySelectorAll('.map-filter-chip').forEach(btn => btn.classList.remove('active', 'bg-gradient-to-r', 'from-orange-500', 'to-amber-500'));
       const activeBtn = document.getElementById('mapPill-' + cat);
@@ -3165,55 +2617,48 @@
       if (cat === 'all') {
         document.querySelectorAll('.stand-booth-marker').forEach(el => el.classList.remove('stand-dimmed'));
         closeMiniCard();
-        map.flyToBounds(stadiumBounds, { padding: [20, 20], duration: 0.7 });
+        map.flyToBounds(stadiumBounds, { padding: [15, 15], duration: 0.6 });
         return;
       }
 
       if (cat === 'stage') {
-        const stageStand = stands.find(s => s.id === 19 || s.number === 'ESC');
-        map.flyTo([cLat + 0.00045, cLng], 19.5, { duration: 0.7 });
+        const stageStand = stands.find(s => s.number === 'ESC');
+        map.flyTo([cLat + 0.00041, cLng], 19, { duration: 0.6 });
         if (stageStand) showMiniStandCard(stageStand);
         return;
       }
 
       if (cat === 'wc') {
-        const wcStand = stands.find(s => s.id === 20 || s.number === 'WC');
+        const wcStand = stands.find(s => s.number === 'WC');
         if (wcStand) {
-          map.flyTo([wcStand.lat, wcStand.lng], 19.5, { duration: 0.7 });
+          map.flyTo([wcStand.lat, wcStand.lng], 19, { duration: 0.6 });
           showMiniStandCard(wcStand);
         }
         return;
       }
 
-      // Filtrar otros puestos: atenuar los que no corresponden
       document.querySelectorAll('.stand-booth-marker').forEach(el => {
         const c = el.getAttribute('data-category');
         if (c === cat) el.classList.remove('stand-dimmed');
         else el.classList.add('stand-dimmed');
       });
 
-      // Centrar en el grupo correspondiente
-      if (cat === 'food') {
-        map.flyTo([cLat, cLng - 0.00018], 19.5, { duration: 0.7 });
-      } else if (cat === 'beer') {
-        map.flyTo([cLat, cLng + 0.00018], 19.5, { duration: 0.7 });
-      } else if (cat === 'sweets' || cat === 'crafts') {
-        map.flyTo([cLat - 0.00035, cLng], 19.5, { duration: 0.7 });
-      }
+      if (cat === 'food') map.flyTo([cLat, cLng - 0.00018], 19, { duration: 0.6 });
+      else if (cat === 'beer') map.flyTo([cLat, cLng + 0.00018], 19, { duration: 0.6 });
+      else if (cat === 'sweets') map.flyTo([cLat - 0.00030, cLng], 19, { duration: 0.6 });
     }
 
-    // Botón centrar en GPS
     const centerBtn = document.getElementById('mapCenterGpsBtn');
     if (centerBtn) {
       centerBtn.addEventListener('click', () => {
-        if (userLocation) map.flyTo(userLocation, 19.5, { duration: 0.7 });
+        if (userLocation) map.flyTo(userLocation, 19.5, { duration: 0.6 });
         else initGps();
       });
     }
 
     function activateManualAdjust() {
       isAdjusting = true;
-      alert('🎯 Toca en el mapa sobre tu ubicación exacta para calibrar.');
+      alert('🎯 Toca en el césped del mapa sobre tu posición exacta para calibrar.');
     }
 
     map.on('click', (e) => {
@@ -3222,16 +2667,14 @@
         isAdjusting = false;
         showMapToast('✅ Ubicación GPS calibrada');
       } else {
-        // Tocar en el césped deselecciona la mini tarjeta
         closeMiniCard();
       }
     });
 
-    // 7. Navegación Asistida con Ruta Animada
     function startNavigation(stand) {
       activeNavStand = stand;
       if (!userLocation) {
-        userLocation = [cLat - 0.00045, cLng];
+        userLocation = [cLat - 0.00038, cLng];
       }
 
       const points = [userLocation, [stand.lat, stand.lng]];
@@ -3245,10 +2688,12 @@
         className: 'festival-walk-route'
       }).addTo(map);
 
-      document.getElementById('navTargetName').textContent = stand.name;
-      document.getElementById('navHud').classList.remove('hidden');
+      const navHud = document.getElementById('navHud');
+      const targetName = document.getElementById('navTargetName');
+      if (targetName) targetName.textContent = stand.name;
+      if (navHud) navHud.classList.remove('hidden');
 
-      map.fitBounds(L.latLngBounds(points), { padding: [60, 60] });
+      map.fitBounds(L.latLngBounds(points), { padding: [50, 50] });
 
       updateNavigationDistance();
     }
@@ -3256,20 +2701,16 @@
     function updateNavigationDistance() {
       if (!activeNavStand || !userLocation) return;
       const m = calculateDistanceMeters(userLocation[0], userLocation[1], activeNavStand.lat, activeNavStand.lng);
-      document.getElementById('navDistance').textContent = 'A ' + m + ' metros caminando';
+      const distEl = document.getElementById('navDistance');
+      if (distEl) distEl.textContent = 'A ' + m + ' metros caminando';
       if (navRoutePolyline) navRoutePolyline.setLatLngs([userLocation, [activeNavStand.lat, activeNavStand.lng]]);
     }
 
     function cancelNavigation() {
       activeNavStand = null;
       if (navRoutePolyline) { map.removeLayer(navRoutePolyline); navRoutePolyline = null; }
-      document.getElementById('navHud').classList.add('hidden');
-    }
-
-    function cancelNavigation() {
-      activeNavStand = null;
-      if (navRoutePolyline) { map.removeLayer(navRoutePolyline); navRoutePolyline = null; }
-      document.getElementById('navHud').classList.add('hidden');
+      const navHud = document.getElementById('navHud');
+      if (navHud) navHud.classList.add('hidden');
     }
 
     // ========================================================
