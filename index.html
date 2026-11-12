@@ -125,6 +125,135 @@
     @keyframes dash {
       to { stroke-dashoffset: -16; }
     }
+  
+    /* ESTILOS DE FESTIVAL DINÁMICO & PUESTOS 3D */
+    .stand-pin-leaflet-icon {
+      background: transparent !important;
+      border: none !important;
+    }
+    .stand-booth-marker {
+      width: 48px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      cursor: pointer;
+      filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.5));
+      transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.2s;
+    }
+    .stand-booth-marker:hover, .stand-booth-marker:active {
+      transform: scale(1.18) translateY(-4px);
+      z-index: 999 !important;
+    }
+    .stand-booth-marker.stand-selected {
+      transform: scale(1.25) translateY(-6px);
+      z-index: 1000 !important;
+      filter: drop-shadow(0 0 16px rgba(251, 191, 36, 0.95)) drop-shadow(0 8px 20px rgba(0, 0, 0, 0.6));
+    }
+    .stand-booth-marker.stand-dimmed {
+      opacity: 0.35;
+      filter: grayscale(60%) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    }
+
+    /* Toldo rayado estilo feria artesanal */
+    .stand-toldo {
+      width: 38px;
+      height: 10px;
+      border-radius: 6px 6px 0 0;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      position: relative;
+      z-index: 2;
+      border: 1.5px solid #ffffff;
+      border-bottom: none;
+    }
+    .stand-toldo.toldo-food {
+      background: repeating-linear-gradient(45deg, #ef4444, #ef4444 5px, #ffffff 5px, #ffffff 10px);
+    }
+    .stand-toldo.toldo-beer {
+      background: repeating-linear-gradient(45deg, #f59e0b, #f59e0b 5px, #ffffff 5px, #ffffff 10px);
+    }
+    .stand-toldo.toldo-sweets {
+      background: repeating-linear-gradient(45deg, #ec4899, #ec4899 5px, #ffffff 5px, #ffffff 10px);
+    }
+    .stand-toldo.toldo-crafts {
+      background: repeating-linear-gradient(45deg, #8b5cf6, #8b5cf6 5px, #ffffff 5px, #ffffff 10px);
+    }
+    .stand-toldo.toldo-service {
+      background: repeating-linear-gradient(45deg, #0284c7, #0284c7 5px, #ffffff 5px, #ffffff 10px);
+    }
+
+    /* Píldora del número del puesto - SIEMPRE NÍTIDA Y NUNCA CORTADA */
+    .stand-number-badge {
+      position: absolute;
+      top: -12px;
+      right: -8px;
+      background: #0f172a;
+      color: #fbbf24;
+      font-family: 'Outfit', 'Plus Jakarta Sans', system-ui, sans-serif;
+      font-size: 10px;
+      font-weight: 900;
+      padding: 1.5px 6px;
+      border-radius: 9999px;
+      border: 1.5px solid #ffffff;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.6);
+      z-index: 20;
+      white-space: nowrap;
+      pointer-events: none;
+      letter-spacing: 0.5px;
+    }
+
+    /* Cuerpo circular del puesto */
+    .stand-booth-circle {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 2.5px solid #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      margin-top: -2px;
+      box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.3), 0 4px 8px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Flecha puntero al suelo */
+    .stand-booth-pointer {
+      width: 0;
+      height: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 7px solid #ffffff;
+      margin-top: -1px;
+      filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));
+    }
+
+    /* Luces de escenario animadas */
+    @keyframes laserBeamLeft {
+      0%, 100% { transform: rotate(-25deg); opacity: 0.4; }
+      50% { transform: rotate(15deg); opacity: 0.75; }
+    }
+    @keyframes laserBeamRight {
+      0%, 100% { transform: rotate(25deg); opacity: 0.4; }
+      50% { transform: rotate(-15deg); opacity: 0.75; }
+    }
+    .stage-spotlight-left {
+      transform-origin: top center;
+      animation: laserBeamLeft 3.5s ease-in-out infinite;
+    }
+    .stage-spotlight-right {
+      transform-origin: top center;
+      animation: laserBeamRight 3.5s ease-in-out infinite;
+    }
+
+    /* Ruta punteada animada */
+    .festival-walk-route {
+      stroke-dasharray: 8, 10;
+      animation: festivalWalkDash 1.2s linear infinite;
+    }
+    @keyframes festivalWalkDash {
+      to { stroke-dashoffset: -18; }
+    }
   </style>
 </head>
 <body class="bg-slate-950 text-slate-100 flex flex-col min-h-[100dvh] relative overflow-x-hidden antialiased">
@@ -305,55 +434,130 @@
     </section>
 
     <!-- PESTAÑA 2: 🗺️ MAPA INTERACTIVO & GPS (CANCHA / VILLA) -->
-    <section id="view-map" class="h-[calc(100dvh-175px)] min-h-[500px] w-full hidden relative">
+    <section id="view-map" class="h-[calc(100dvh-175px)] min-h-[520px] w-full hidden relative overflow-hidden">
       
-      <!-- Controles flotantes en el mapa -->
-      <div class="absolute top-3 left-3 right-3 z-20 flex items-center justify-between pointer-events-none">
+      <!-- Barra Superior Flotante: GPS + Selector de Capa + Reset -->
+      <div class="absolute top-2.5 left-2.5 right-2.5 z-20 flex items-center justify-between pointer-events-none gap-2">
         
-        <!-- Badge de señal GPS -->
-        <div id="mapGpsBadge" class="bg-slate-900/90 backdrop-blur-md border border-slate-700 text-white text-[11px] font-bold px-3 py-1.5 rounded-full shadow-lg pointer-events-auto flex items-center gap-2">
+        <!-- Estado de GPS -->
+        <div id="mapGpsBadge" class="bg-slate-900/95 backdrop-blur-md border border-slate-700/80 text-white text-[11px] font-bold px-3 py-1.5 rounded-full shadow-lg pointer-events-auto flex items-center gap-2">
           <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span id="mapGpsAccuracy">GPS Activo (±4m)</span>
+          <span id="mapGpsAccuracy">GPS Activo</span>
           <button onclick="activateManualAdjust()" class="text-orange-400 hover:underline text-[10px] ml-1">Calibrar</button>
         </div>
 
-        <!-- Alternar Satélite vs Calles -->
-        <button id="toggleMapLayerBtn" class="bg-slate-900/90 backdrop-blur-md border border-slate-700/80 text-white px-3 py-2 rounded-xl shadow-lg pointer-events-auto hover:bg-slate-800 text-xs font-bold flex items-center gap-1.5 transition-all">
-          🏟️ Cancha
+        <!-- Botones Superiores Derechos -->
+        <div class="flex items-center gap-1.5 pointer-events-auto">
+          <!-- Botón Volver / Vista General del Recinto -->
+          <button onclick="resetMapView()" title="Ver recinto completo" class="bg-slate-900/95 backdrop-blur-md border border-amber-500/50 text-amber-300 hover:text-white px-2.5 py-1.5 rounded-xl shadow-lg text-xs font-black flex items-center gap-1 active:scale-95 transition">
+            🔄 Recinto Completo
+          </button>
+
+          <!-- Alternador de Capa -->
+          <button id="toggleMapLayerBtn" class="bg-slate-900/95 backdrop-blur-md border border-slate-700/80 text-white px-2.5 py-1.5 rounded-xl shadow-lg hover:bg-slate-800 text-xs font-bold flex items-center gap-1 transition">
+            🏟️ Cancha
+          </button>
+        </div>
+      </div>
+
+      <!-- Barra de Filtros Rápidos (Un solo toque para encontrar todo) -->
+      <div class="absolute top-12 left-2 right-2 z-20 flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1 pointer-events-auto">
+        <button onclick="mapFilterCategory('all')" id="mapPill-all" class="map-filter-chip active px-3 py-1 rounded-full text-xs font-black bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-lg whitespace-nowrap transition-transform active:scale-95 border border-white/40">
+          ✨ Todo el Recinto
+        </button>
+        <button onclick="mapFilterCategory('stage')" id="mapPill-stage" class="map-filter-chip px-3 py-1 rounded-full text-xs font-black bg-red-600 hover:bg-red-500 text-white shadow-md whitespace-nowrap transition-transform active:scale-95 border border-red-300/40 flex items-center gap-1">
+          🎸 Escenario
+        </button>
+        <button onclick="mapFilterCategory('wc')" id="mapPill-wc" class="map-filter-chip px-3 py-1 rounded-full text-xs font-black bg-blue-600 hover:bg-blue-500 text-white shadow-md whitespace-nowrap transition-transform active:scale-95 border border-blue-300/40 flex items-center gap-1">
+          🚻 Baños
+        </button>
+        <button onclick="mapFilterCategory('food')" id="mapPill-food" class="map-filter-chip px-3 py-1 rounded-full text-xs font-bold bg-slate-900/90 text-emerald-300 hover:text-white shadow-md whitespace-nowrap transition-transform active:scale-95 border border-emerald-500/40 flex items-center gap-1">
+          🍔 Comidas (6)
+        </button>
+        <button onclick="mapFilterCategory('beer')" id="mapPill-beer" class="map-filter-chip px-3 py-1 rounded-full text-xs font-bold bg-slate-900/90 text-amber-300 hover:text-white shadow-md whitespace-nowrap transition-transform active:scale-95 border border-amber-500/40 flex items-center gap-1">
+          🍺 Cervezas (5)
+        </button>
+        <button onclick="mapFilterCategory('sweets')" id="mapPill-sweets" class="map-filter-chip px-3 py-1 rounded-full text-xs font-bold bg-slate-900/90 text-pink-300 hover:text-white shadow-md whitespace-nowrap transition-transform active:scale-95 border border-pink-500/40 flex items-center gap-1">
+          🍦 Dulces (3)
+        </button>
+        <button onclick="mapFilterCategory('crafts')" id="mapPill-crafts" class="map-filter-chip px-3 py-1 rounded-full text-xs font-bold bg-slate-900/90 text-purple-300 hover:text-white shadow-md whitespace-nowrap transition-transform active:scale-95 border border-purple-500/40 flex items-center gap-1">
+          🧶 Artesanías (4)
         </button>
       </div>
 
-      <!-- Botones flotantes de acción del mapa -->
-      <div class="absolute right-3.5 bottom-24 z-20 flex flex-col gap-2.5">
-        <button id="mapCompassBtn" onclick="requestCompassPermission()" title="Activar Brújula y Giro 360°" class="w-12 h-12 bg-white text-orange-600 rounded-2xl shadow-2xl flex items-center justify-center font-bold text-xl active:scale-95 transition border border-slate-200">
+      <!-- Controles Laterales: Brújula + Mi Ubicación + Zoom -->
+      <div class="absolute right-3 top-24 z-20 flex flex-col gap-2">
+        <button id="mapCompassBtn" onclick="requestCompassPermission()" title="Activar Brújula 360°" class="w-11 h-11 bg-slate-900/95 backdrop-blur-md text-orange-400 rounded-xl shadow-xl flex items-center justify-center font-bold text-lg active:scale-95 transition border border-slate-700">
           🧭
         </button>
-        <button id="mapCenterGpsBtn" title="Centrar en mi ubicación" class="w-12 h-12 bg-white text-blue-600 rounded-2xl shadow-2xl flex items-center justify-center font-bold text-xl active:scale-95 transition">
-          🎯
+        <button id="mapCenterGpsBtn" title="Centrar en mi posición GPS" class="w-11 h-11 bg-slate-900/95 backdrop-blur-md text-blue-400 rounded-xl shadow-xl flex items-center justify-center font-bold text-lg active:scale-95 transition border border-slate-700">
+          📍
         </button>
-        <button id="mapSimGpsBtn" title="Modo Simulación (Caminar con clics)" class="w-12 h-12 bg-white text-purple-600 rounded-2xl shadow-2xl flex items-center justify-center font-bold text-lg active:scale-95 transition">
-          🚶‍♂️
+        <button onclick="map.zoomIn()" title="Acercar mapa" class="w-11 h-11 bg-slate-900/95 backdrop-blur-md text-white rounded-xl shadow-xl flex items-center justify-center font-extrabold text-xl active:scale-95 transition border border-slate-700">
+          +
+        </button>
+        <button onclick="map.zoomOut()" title="Alejar mapa" class="w-11 h-11 bg-slate-900/95 backdrop-blur-md text-white rounded-xl shadow-xl flex items-center justify-center font-extrabold text-xl active:scale-95 transition border border-slate-700">
+          −
         </button>
       </div>
 
-      <!-- HUD Superior de Ruta ("¿Cómo llegar?") -->
-      <div id="navHud" class="hidden absolute top-14 left-4 right-4 z-20 max-w-sm mx-auto bg-slate-900/95 text-white backdrop-blur-md rounded-2xl px-4 py-3 shadow-2xl flex items-center justify-between border border-slate-700">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-orange-500/20 text-orange-400 flex items-center justify-center font-bold text-xl animate-pulse">
-            🧭
+      <!-- HUD Superior de Ruta ("¿Cómo llegar?" Activo) -->
+      <div id="navHud" class="hidden absolute top-24 left-3 right-16 z-20 max-w-sm bg-slate-950/95 text-white backdrop-blur-md rounded-2xl px-3.5 py-2.5 shadow-2xl flex items-center justify-between border border-orange-500/60 animate-bounce-short">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <div class="w-8 h-8 rounded-lg bg-orange-500/20 text-orange-400 flex items-center justify-center font-bold text-lg flex-shrink-0 animate-pulse">
+            🚶
           </div>
-          <div>
-            <p class="text-[11px] text-slate-400 font-medium">Caminando directo a <span id="navTargetName" class="text-white font-bold">Local</span></p>
-            <p class="text-sm font-black text-orange-400" id="navDistance">A ... metros</p>
+          <div class="min-w-0">
+            <p class="text-[10px] text-slate-400 truncate">Rumbo a <span id="navTargetName" class="text-white font-bold">Local</span></p>
+            <p class="text-xs font-black text-amber-400" id="navDistance">A ... metros</p>
           </div>
         </div>
-        <button onclick="cancelNavigation()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-600 font-semibold">
-          Finalizar
+        <button onclick="cancelNavigation()" class="text-xs bg-red-600 hover:bg-red-500 text-white px-2.5 py-1 rounded-lg font-bold ml-2 flex-shrink-0 transition">
+          ✕ Salir
         </button>
       </div>
 
-      <div id="map"></div>
-    </section>
+      <!-- MINI-CARD FLOTANTE INFERIOR (NO TAPA EL MAPA, SOLO OCUPA 105PX) -->
+      <div id="miniStandCard" class="hidden absolute bottom-4 left-3 right-3 z-30 max-w-sm mx-auto bg-slate-950/95 text-white backdrop-blur-xl border border-slate-700/90 rounded-2xl p-3 shadow-2xl transition-all duration-300 pointer-events-auto">
+        <div class="flex items-start justify-between gap-2">
+          <div class="flex items-center gap-2.5 flex-1 min-w-0">
+            <div id="miniStandIcon" class="w-11 h-11 rounded-xl bg-orange-500/20 border border-orange-500/40 text-2xl flex items-center justify-center flex-shrink-0 shadow">
+              🍺
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span id="miniStandNumber" class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-amber-500 text-slate-950 shadow-sm">
+                  P-01
+                </span>
+                <h4 id="miniStandName" class="text-sm font-black text-white truncate">
+                  Nombre del Puesto
+                </h4>
+              </div>
+              <p id="miniStandLocation" class="text-[11px] text-slate-300 truncate mt-0.5 font-medium">
+                📍 Pasillo Este #1
+              </p>
+            </div>
+          </div>
+          <!-- Botón cerrar con 1 toque para volver al mapa libre -->
+          <button onclick="closeMiniCard()" title="Cerrar y volver al mapa" class="w-7 h-7 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center text-sm font-bold flex-shrink-0 transition">
+            ✕
+          </button>
+        </div>
+
+        <!-- Botones de Acción Directos -->
+        <div class="flex items-center gap-2 mt-2.5 pt-2 border-t border-slate-800/80">
+          <button id="miniStandNavBtn" onclick="startNavigationFromMini()" class="flex-1 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-black text-xs py-2 px-3 rounded-xl shadow-lg flex items-center justify-center gap-1.5 active:scale-95 transition">
+            <span>🚶</span> ¿Cómo llegar? <span id="miniStandDist" class="text-[10px] font-semibold opacity-90">(25m)</span>
+          </button>
+          <button id="miniStandMenuBtn" onclick="openFullSheetFromMini()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs py-2 px-3 rounded-xl border border-slate-700 flex items-center justify-center gap-1 active:scale-95 transition flex-shrink-0">
+            <span>📋</span> Ver Carta
+          </button>
+        </div>
+      </div>
+
+      <!-- Contenedor del Mapa Leaflet -->
+      <div id="map" class="w-full h-full"></div>
+    </section></section>
 
     <!-- PESTAÑA 3: 🍔 20 LOCALES & CARTA COMPLETA -->
     <section id="view-stands" class="h-full overflow-y-auto p-3 sm:p-4 max-w-xl mx-auto space-y-4 no-scrollbar pb-28 hidden">
@@ -536,7 +740,7 @@
   <!-- ======================================================== -->
   <script>
     // Limpiar caché vieja si la versión de datos cambió
-    const DATA_VERSION = '2026.03.stadium_cancha_v1';
+    const DATA_VERSION = '2026.04.dynamic_stadium_v1';
     if (localStorage.getItem('festival_data_version') !== DATA_VERSION) {
       localStorage.setItem('festival_data_version', DATA_VERSION);
       localStorage.removeItem('festival_admin_schedule');
@@ -2342,80 +2546,91 @@
     // 8. MAPA LEAFLET, GPS & NAVEGACIÓN
     // ========================================================
     const DEFAULT_CENTER = [-33.4500, -70.6600];
+    const cLat = DEFAULT_CENTER[0];
+    const cLng = DEFAULT_CENTER[1];
+
+    // Delimitación oficial del recinto deportivo y feria
+    const stadiumBounds = L.latLngBounds([
+      [cLat - 0.00062, cLng - 0.00048], // Entrada y Servicios Sur
+      [cLat + 0.00062, cLng + 0.00048]  // Escenario Principal Norte
+    ]);
+
     const map = L.map('map', {
       zoomControl: false,
-      maxZoom: 22,
-      minZoom: 16
-    }).setView(DEFAULT_CENTER, 19);
-
-    L.control.zoom({ position: 'bottomleft' }).addTo(map);
-
-    // 1. Capas Base: Por defecto Dark NoLabels (elimina números de casas y calles residenciales)
-    const darkNoLabelsLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
-      maxZoom: 22,
-      maxNativeZoom: 19,
-      attribution: '&copy; CartoDB &copy; OpenStreetMap'
-    }).addTo(map);
-
-    const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-      maxZoom: 22,
-      maxNativeZoom: 19,
-      attribution: '&copy; Esri'
+      maxZoom: 21,
+      minZoom: 16,
+      maxBounds: stadiumBounds.pad(0.4),
+      maxBoundsViscosity: 0.8
     });
 
-    const streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 22,
+    // 1. Capas Base Disponibles (100% Sin marcas de agua de CartoDB)
+    // Fondo de lona oscura deportiva para la Cancha de Festival
+    const osmLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 21,
       maxNativeZoom: 19,
       attribution: '&copy; OpenStreetMap'
     });
 
-    // 2. RECINTO DEL ESTADIO & CANCHA DEPORTIVA DEL FESTIVAL (Capa Vectorial)
+    const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      maxZoom: 21,
+      maxNativeZoom: 19,
+      attribution: '&copy; Esri'
+    });
+
+    // 2. RECINTO DEL ESTADIO & CANCHA ILUSTRADA DEL FESTIVAL (Capa Vectorial Interactiva)
     const stadiumGroup = L.layerGroup().addTo(map);
 
-    const cLat = DEFAULT_CENTER[0];
-    const cLng = DEFAULT_CENTER[1];
-
-    // A. Recinto Exterior y Pista Atlética de Tartán (Concourse / Running Track)
+    // A. Recinto Exterior & Pista Atlética de Tartán (Concourse / Running Track)
     const stadiumOuterBounds = [
-      [cLat - 0.00058, cLng - 0.00044],
-      [cLat + 0.00058, cLng + 0.00044]
+      [cLat - 0.00060, cLng - 0.00044],
+      [cLat + 0.00060, cLng + 0.00044]
     ];
+    // Pavimento exterior oscuro del recinto
     L.rectangle(stadiumOuterBounds, {
-      color: '#334155',
+      color: '#1e293b',
       weight: 2,
-      fillColor: '#0f172a',
-      fillOpacity: 0.95
+      fillColor: '#0b0f19',
+      fillOpacity: 1
     }).addTo(stadiumGroup);
 
-    // Borde de pista perimetral
+    // Pista de Atletismo de Tartán Rojo Terracota
     const trackBounds = [
-      [cLat - 0.00053, cLng - 0.00040],
-      [cLat + 0.00053, cLng + 0.00040]
+      [cLat - 0.00054, cLng - 0.00040],
+      [cLat + 0.00054, cLng + 0.00040]
     ];
     L.rectangle(trackBounds, {
-      color: '#b91c1c',
-      weight: 3,
-      dashArray: '6, 6',
-      fillColor: '#881337',
-      fillOpacity: 0.28
+      color: '#ffffff',
+      weight: 1.5,
+      opacity: 0.3,
+      fillColor: '#991b1b',
+      fillOpacity: 0.75
     }).addTo(stadiumGroup);
 
-    // B. Césped Verde de la Cancha de Fútbol (Pitch Turf)
+    // Carriles blancos de la pista atlética
+    L.rectangle([[cLat - 0.00051, cLng - 0.00038], [cLat + 0.00051, cLng + 0.00038]], {
+      color: '#ffffff',
+      weight: 1,
+      dashArray: '4, 6',
+      opacity: 0.4,
+      fill: false
+    }).addTo(stadiumGroup);
+
+    // B. Cancha de Césped Verde Profesional (Lush Sports Turf)
     const pitchNorth = cLat + 0.00034;
     const pitchSouth = cLat - 0.00048;
     const pitchWest  = cLng - 0.00036;
     const pitchEast  = cLng + 0.00036;
 
-    // Pasto base verde profundo
+    // Pasto verde base
     L.rectangle([[pitchSouth, pitchWest], [pitchNorth, pitchEast]], {
       color: '#15803d',
       weight: 2,
       fillColor: '#166534',
-      fillOpacity: 0.96
+      fillOpacity: 0.98
     }).addTo(stadiumGroup);
 
-    // Franjas de corte de césped alternadas (Lawn Stripes de estadio profesional)
-    const numStripes = 6;
+    // Franjas de corte de césped alternadas (Lawn Stripes de estadio)
+    const numStripes = 8;
     const stripeHeight = (pitchNorth - pitchSouth) / numStripes;
     for (let i = 0; i < numStripes; i++) {
       if (i % 2 === 1) {
@@ -2429,21 +2644,21 @@
       }
     }
 
-    // C. Líneas Reglamentarias Blancas de la Cancha
-    // Línea perimetral de cal blanca
+    // C. Líneas Blancas Reglamentarias de Fútbol
+    // Perímetro de cal
     L.rectangle([[pitchSouth, pitchWest], [pitchNorth, pitchEast]], {
       color: '#ffffff',
       weight: 2,
-      opacity: 0.55,
+      opacity: 0.65,
       fill: false
     }).addTo(stadiumGroup);
 
-    // Línea central de mitad de cancha
+    // Línea de mitad de cancha
     const pitchCenterLat = (pitchNorth + pitchSouth) / 2;
     L.polyline([[pitchCenterLat, pitchWest], [pitchCenterLat, pitchEast]], {
       color: '#ffffff',
       weight: 2,
-      opacity: 0.55
+      opacity: 0.65
     }).addTo(stadiumGroup);
 
     // Círculo central reglamentario
@@ -2451,125 +2666,138 @@
       radius: 9.15,
       color: '#ffffff',
       weight: 2,
-      opacity: 0.55,
+      opacity: 0.65,
       fill: false
     }).addTo(stadiumGroup);
 
     // Punto central de saque
     L.circle([pitchCenterLat, cLng], {
-      radius: 0.9,
+      radius: 1,
       color: '#ffffff',
       fillColor: '#ffffff',
-      fillOpacity: 0.85,
+      fillOpacity: 0.9,
       weight: 1
     }).addTo(stadiumGroup);
 
-    // Áreas de penal norte y sur
+    // Áreas de gol norte y sur
     L.rectangle([[pitchNorth - 0.00014, cLng - 0.00018], [pitchNorth, cLng + 0.00018]], {
       color: '#ffffff',
       weight: 1.5,
-      opacity: 0.45,
+      opacity: 0.55,
       fill: false
     }).addTo(stadiumGroup);
     L.rectangle([[pitchSouth, cLng - 0.00018], [pitchSouth + 0.00014, cLng + 0.00018]], {
       color: '#ffffff',
       weight: 1.5,
-      opacity: 0.45,
+      opacity: 0.55,
       fill: false
     }).addTo(stadiumGroup);
 
-    // D. Bulevar Central Peatonal de la Feria (Conecta Entrada con Escenario)
-    const walkWest = cLng - 0.000065;
-    const walkEast = cLng + 0.000065;
+    // D. Bulevar Central Peatonal de la Feria
+    const walkWest = cLng - 0.00007;
+    const walkEast = cLng + 0.00007;
     L.rectangle([[pitchSouth - 0.00005, walkWest], [pitchNorth, walkEast]], {
       color: '#f59e0b',
       weight: 2,
       dashArray: '3, 4',
-      opacity: 0.7,
+      opacity: 0.8,
       fillColor: '#334155',
-      fillOpacity: 0.90
+      fillOpacity: 0.92
     }).addTo(stadiumGroup);
 
-    // Guirnaldas de luces festivas en los bordes del bulevar central
-    const festoonStep = 0.00007;
-    for (let fLat = pitchSouth; fLat <= pitchNorth - 0.00004; fLat += festoonStep) {
+    // Guirnaldas de luces festivas con bombillas encendidas
+    const festoonStep = 0.000065;
+    for (let fLat = pitchSouth; fLat <= pitchNorth - 0.00003; fLat += festoonStep) {
       L.circleMarker([fLat, walkWest], { radius: 2.5, color: '#fbbf24', fillColor: '#fef08a', fillOpacity: 0.95, weight: 1 }).addTo(stadiumGroup);
       L.circleMarker([fLat, walkEast], { radius: 2.5, color: '#fbbf24', fillColor: '#fef08a', fillOpacity: 0.95, weight: 1 }).addTo(stadiumGroup);
     }
 
-    // E. Escenario Principal Gigante (Cabecera Norte de la Cancha)
+    // E. Escenario Principal Gigante (Cabecera Norte) con Luces Animadas
     const stageBounds = [
-      [pitchNorth, cLng - 0.00020],
-      [cLat + 0.00054, cLng + 0.00020]
+      [pitchNorth, cLng - 0.00022],
+      [cLat + 0.00054, cLng + 0.00022]
     ];
     L.rectangle(stageBounds, {
       color: '#e11d48',
-      weight: 2.5,
+      weight: 3,
       fillColor: '#09090b',
-      fillOpacity: 0.98
+      fillOpacity: 1
     }).addTo(stadiumGroup);
 
     // Torres de sonido Line Array (izquierda y derecha del escenario)
-    L.rectangle([[pitchNorth + 0.00002, cLng - 0.00023], [pitchNorth + 0.00010, cLng - 0.00019]], {
+    L.rectangle([[pitchNorth + 0.00002, cLng - 0.00025], [pitchNorth + 0.00012, cLng - 0.00021]], {
       color: '#eab308',
-      weight: 1.5,
+      weight: 2,
       fillColor: '#18181b',
       fillOpacity: 1
     }).addTo(stadiumGroup);
-    L.rectangle([[pitchNorth + 0.00002, cLng + 0.00019], [pitchNorth + 0.00010, cLng + 0.00023]], {
+    L.rectangle([[pitchNorth + 0.00002, cLng + 0.00021], [pitchNorth + 0.00012, cLng + 0.00025]], {
       color: '#eab308',
-      weight: 1.5,
+      weight: 2,
       fillColor: '#18181b',
       fillOpacity: 1
     }).addTo(stadiumGroup);
 
-    // Banner interactivo del Escenario Principal
+    // Cartel Interactivo Gigante del Escenario Principal con Focos de Concierto
     const stageBannerIcon = L.divIcon({
       className: 'stage-banner-marker',
       html: `
-        <div class="px-3 py-1.5 rounded-full bg-gradient-to-r from-red-600 via-rose-500 to-amber-500 text-white text-[11px] font-black shadow-xl border border-white/60 flex items-center gap-1.5 whitespace-nowrap cursor-pointer transform hover:scale-105 transition-transform animate-pulse">
-          <span>🎸</span> ESCENARIO PRINCIPAL
-          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+        <div class="relative flex flex-col items-center cursor-pointer select-none" onclick="onStageClick()">
+          <!-- Luces láser / focos de concierto animados -->
+          <div class="absolute -top-12 -left-8 w-24 h-24 stage-spotlight-left pointer-events-none" style="background: radial-gradient(ellipse at top, rgba(239,68,68,0.45) 0%, rgba(239,68,68,0) 70%);"></div>
+          <div class="absolute -top-12 -right-8 w-24 h-24 stage-spotlight-right pointer-events-none" style="background: radial-gradient(ellipse at top, rgba(59,130,246,0.45) 0%, rgba(59,130,246,0) 70%);"></div>
+
+          <!-- Banner con pulso en vivo -->
+          <div class="px-3.5 py-1.5 rounded-full bg-gradient-to-r from-red-600 via-rose-600 to-amber-500 text-white text-[11px] font-black shadow-2xl border-2 border-white flex items-center gap-2 whitespace-nowrap transform hover:scale-105 transition-transform">
+            <span class="text-base">🎸</span>
+            <span>ESCENARIO PRINCIPAL</span>
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+          </div>
+          <div class="text-[9px] font-extrabold text-amber-300 bg-slate-950/90 px-2 py-0.5 rounded-full border border-amber-500/50 -mt-1 shadow-md">
+            🔴 EN VIVO AHORA
+          </div>
         </div>
       `,
-      iconAnchor: [80, 16]
+      iconAnchor: [95, 20]
     });
-    const stageMarker = L.marker([cLat + 0.00045, cLng], { icon: stageBannerIcon, zIndexOffset: 800 }).addTo(stadiumGroup);
-    stageMarker.on('click', () => {
-      const stageStand = stands.find(s => s.id === 19 || s.number === 'ESC');
-      if (stageStand) openBottomSheet(stageStand);
-      else {
-        const liveTab = document.getElementById('tabLiveBtn');
-        if (liveTab) liveTab.click();
-      }
-    });
+    L.marker([cLat + 0.00045, cLng], { icon: stageBannerIcon, zIndexOffset: 850 }).addTo(stadiumGroup);
 
-    // F. Acceso Principal / Control de Entrada (Sur)
+    // F. Acceso Principal y Control de Entrada (Sur)
     const entranceBannerIcon = L.divIcon({
       className: 'entrance-banner-marker',
       html: `
-        <div class="px-2.5 py-1 rounded-full bg-slate-900/95 text-amber-400 text-[10px] font-black border border-amber-400/60 shadow flex items-center gap-1 whitespace-nowrap">
-          <span>🎟️</span> ACCESO & CONTROL
+        <div class="px-3 py-1 rounded-full bg-slate-950/95 text-amber-400 text-[10px] font-black border-2 border-amber-400 shadow-xl flex items-center gap-1.5 whitespace-nowrap cursor-pointer hover:scale-105 transition">
+          <span class="text-sm">🎟️</span> ENTRADA Y ACCESO AL RECINTO
         </div>
       `,
-      iconAnchor: [65, 12]
+      iconAnchor: [85, 12]
     });
-    L.marker([pitchSouth - 0.00006, cLng], { icon: entranceBannerIcon, zIndexOffset: 800 }).addTo(stadiumGroup);
+    L.marker([pitchSouth - 0.00007, cLng], { icon: entranceBannerIcon, zIndexOffset: 800 }).addTo(stadiumGroup);
 
-    // G. Rótulos en el suelo para orientar en los pasillos
+    // G. Rótulos en el Suelo para Orientar Pasillos
     const westAisleLabel = L.divIcon({
       className: 'aisle-floor-label',
-      html: `<div class="text-[9px] font-black text-emerald-300 tracking-wider uppercase bg-emerald-950/80 px-2.5 py-0.5 rounded-full border border-emerald-500/50 whitespace-nowrap shadow">🍔 Pasillo Food Trucks</div>`,
-      iconAnchor: [65, 8]
+      html: `<div class="text-[9px] font-black text-emerald-300 tracking-wider uppercase bg-emerald-950/90 px-2.5 py-0.5 rounded-full border border-emerald-500/60 whitespace-nowrap shadow-md">🍔 Pasillo Food Trucks</div>`,
+      iconAnchor: [70, 8]
     });
     L.marker([cLat, cLng - 0.00018], { icon: westAisleLabel, zIndexOffset: 200, interactive: false }).addTo(stadiumGroup);
 
     const eastAisleLabel = L.divIcon({
       className: 'aisle-floor-label',
-      html: `<div class="text-[9px] font-black text-amber-300 tracking-wider uppercase bg-amber-950/80 px-2.5 py-0.5 rounded-full border border-amber-500/50 whitespace-nowrap shadow">🍺 Pasillo Cervecerías</div>`,
-      iconAnchor: [65, 8]
+      html: `<div class="text-[9px] font-black text-amber-300 tracking-wider uppercase bg-amber-950/90 px-2.5 py-0.5 rounded-full border border-amber-500/60 whitespace-nowrap shadow-md">🍺 Pasillo Cervecerías</div>`,
+      iconAnchor: [70, 8]
     });
     L.marker([cLat, cLng + 0.00018], { icon: eastAisleLabel, zIndexOffset: 200, interactive: false }).addTo(stadiumGroup);
+
+    // Ajustar encuadre inicial del mapa para mostrar TODO el festival en pantalla móvil
+    map.fitBounds(stadiumBounds, { padding: [20, 20] });
+
+    // Función para volver a la vista general completa del festival
+    function resetMapView() {
+      closeMiniCard();
+      mapFilterCategory('all');
+      map.flyToBounds(stadiumBounds, { padding: [20, 20], duration: 0.8 });
+    }
 
     // 3. Conmutador de Capas (Cancha -> Satélite -> Calles)
     let currentMapMode = 0; // 0: Cancha, 1: Satelite, 2: Calles
@@ -2579,20 +2807,19 @@
       layerBtn.addEventListener('click', () => {
         currentMapMode = (currentMapMode + 1) % 3;
         if (currentMapMode === 0) {
-          map.removeLayer(streetLayer);
+          map.removeLayer(osmLayer);
           map.removeLayer(satelliteLayer);
-          map.addLayer(darkNoLabelsLayer);
           if (!map.hasLayer(stadiumGroup)) map.addLayer(stadiumGroup);
           layerBtn.textContent = '🏟️ Cancha';
         } else if (currentMapMode === 1) {
-          map.removeLayer(darkNoLabelsLayer);
-          map.removeLayer(streetLayer);
+          map.removeLayer(osmLayer);
           map.addLayer(satelliteLayer);
+          if (!map.hasLayer(stadiumGroup)) map.addLayer(stadiumGroup);
           layerBtn.textContent = '🛰️ Satélite';
         } else {
-          map.removeLayer(darkNoLabelsLayer);
           map.removeLayer(satelliteLayer);
-          map.addLayer(streetLayer);
+          map.addLayer(osmLayer);
+          if (!map.hasLayer(stadiumGroup)) map.addLayer(stadiumGroup);
           layerBtn.textContent = '🗺️ Calles';
         }
       });
@@ -2605,6 +2832,7 @@
     let isAdjusting = false;
     let activeNavStand = null;
     let navRoutePolyline = null;
+    let selectedStandForMini = null;
 
     const userGpsIcon = L.divIcon({
       className: 'user-gps-container',
@@ -2621,16 +2849,11 @@
               <feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-color="#000000" flood-opacity="0.35" />
             </filter>
           </defs>
-          <!-- Cono y flecha de dirección (Rotan desde el centro exacto 40, 40) -->
           <g class="user-heading-cone" style="transform-origin: 40px 40px; transform: rotate(0deg); transition: transform 0.12s ease-out;">
-            <!-- Haz de linterna radial Google Maps -->
             <path d="M 40 40 L 22 8.8 A 36 36 0 0 1 58 8.8 Z" fill="url(#gpsBeamGrad)" />
-            <!-- Flecha direccional blanca/azul nítida -->
             <polygon points="40,10 34,23 40,20 46,23" fill="#2563eb" stroke="#ffffff" stroke-width="1.8" stroke-linejoin="round" filter="url(#gpsGlow)" />
           </g>
-          <!-- Halo radar animado -->
           <circle cx="40" cy="40" r="10" class="user-gps-radar-ring" fill="rgba(37, 99, 235, 0.28)" />
-          <!-- Punto azul con borde blanco y relieve 3D -->
           <circle cx="40" cy="40" r="7.5" fill="#ffffff" filter="url(#gpsGlow)" />
           <circle cx="40" cy="40" r="5" fill="#2563eb" />
         </svg>
@@ -2646,11 +2869,10 @@
       currentHeadingAngle = degrees;
       const cones = document.querySelectorAll('.user-heading-cone');
       cones.forEach(cone => {
-        cone.style.transform = `rotate(${degrees}deg)`;
+        cone.style.transform = 'rotate(' + degrees + 'deg)';
       });
     }
 
-        // Cálculo matemático de rumbo (Bearing) entre 2 coordenadas
     function calculateBearing(lat1, lon1, lat2, lon2) {
       const toRad = deg => deg * Math.PI / 180;
       const toDeg = rad => rad * 180 / Math.PI;
@@ -2663,18 +2885,17 @@
 
     function calculateDistanceMeters(lat1, lon1, lat2, lon2) {
       const R = 6371e3;
-      const φ1 = lat1 * Math.PI / 180;
-      const φ2 = lat2 * Math.PI / 180;
-      const Δφ = (lat2 - lat1) * Math.PI / 180;
-      const Δλ = (lon2 - lon1) * Math.PI / 180;
-      const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
-                Math.cos(φ1) * Math.cos(φ2) *
-                Math.sin(Δλ/2) * Math.sin(Δλ/2);
+      const phi1 = lat1 * Math.PI / 180;
+      const phi2 = lat2 * Math.PI / 180;
+      const dPhi = (lat2 - lat1) * Math.PI / 180;
+      const dLam = (lon2 - lon1) * Math.PI / 180;
+      const a = Math.sin(dPhi/2) * Math.sin(dPhi/2) +
+                Math.cos(phi1) * Math.cos(phi2) *
+                Math.sin(dLam/2) * Math.sin(dLam/2);
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-      return R * c;
+      return Math.round(R * c);
     }
 
-    // Solicitud de permisos para sensores de movimiento (iOS y Chrome/Brave)
     let orientationActive = false;
     function requestCompassPermission() {
       if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
@@ -2682,18 +2903,18 @@
           .then(permissionState => {
             if (permissionState === 'granted') {
               setupOrientationListeners();
-              showMapToast("🧭 Brújula activada. Gira tu celular para orientarte.");
+              showMapToast('🧭 Brújula activada con éxito');
             } else {
-              showMapToast("⚠️ Permiso de brújula denegado en el navegador.");
+              showMapToast('⚠️ Permiso de brújula denegado');
             }
           })
           .catch(err => {
-            console.warn("Error permisos brújula:", err);
-            setupOrientationListeners();
+            console.error('Error brújula:', err);
+            showMapToast('⚠️ Error al activar sensor');
           });
       } else {
         setupOrientationListeners();
-        showMapToast("🧭 Brújula activada. Gira tu celular para orientarte.");
+        showMapToast('🧭 Orientación activada');
       }
     }
 
@@ -2703,206 +2924,346 @@
       const eventName = 'deviceorientationabsolute' in window ? 'deviceorientationabsolute' : 'deviceorientation';
       window.addEventListener(eventName, (e) => {
         let heading = null;
-        if (typeof e.webkitCompassHeading !== 'undefined') {
+        if (e.webkitCompassHeading) {
           heading = e.webkitCompassHeading;
         } else if (e.alpha !== null) {
-          heading = (360 - e.alpha) % 360;
+          heading = e.absolute ? 360 - e.alpha : (360 - e.alpha);
         }
-        if (heading !== null && !isNaN(heading)) {
+        if (heading !== null) {
           setHeadingAngle(Math.round(heading));
         }
       }, true);
     }
-
-    // Auto-activar al hacer clic o tocar el mapa
-    document.addEventListener('touchstart', () => { if (!orientationActive) setupOrientationListeners(); }, { once: true, passive: true });
-    document.addEventListener('click', () => { if (!orientationActive) setupOrientationListeners(); }, { once: true, passive: true });
 
     function showMapToast(msg) {
       const existing = document.getElementById('mapOrientationToast');
       if (existing) existing.remove();
       const toast = document.createElement('div');
       toast.id = 'mapOrientationToast';
-      toast.className = 'fixed top-20 left-1/2 -translate-x-1/2 bg-slate-900/95 text-white border border-orange-500/50 px-4 py-2 rounded-2xl text-xs font-bold shadow-2xl z-50 flex items-center gap-2 backdrop-blur-md animate-bounce';
-      toast.innerHTML = msg;
-      document.body.appendChild(toast);
-      setTimeout(() => { if (toast.parentNode) toast.remove(); }, 3500);
+      toast.className = 'absolute bottom-24 left-1/2 -translate-x-1/2 z-40 bg-slate-900/95 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-2xl border border-slate-700 pointer-events-none transition-opacity duration-300';
+      toast.textContent = msg;
+      document.getElementById('view-map').appendChild(toast);
+      setTimeout(() => { toast.classList.add('opacity-0'); setTimeout(() => toast.remove(), 300); }, 2200);
     }
 
     function updateUserPosition(lat, lng, accuracy = 4, heading = null) {
-      userLocation = [lat, lng];
       const accBadge = document.getElementById('mapGpsAccuracy');
-      if (accBadge) accBadge.textContent = `GPS Activo (±${Math.round(accuracy)}m)`;
+      if (accBadge) accBadge.textContent = '±' + Math.round(accuracy) + 'm';
 
-      // DOBLE MOTOR DE RUMBO:
-      // 1. Si el GPS entrega rumbo nativo (caminando en Chrome/Android)
-      if (heading !== null && heading !== undefined && !isNaN(heading) && heading >= 0) {
-        setHeadingAngle(Math.round(heading));
-      } else if (previousGpsPos) {
-        // 2. Si no hay brújula pero el usuario camina > 1.5 metros, calcular rumbo matemático
+      if (previousGpsPos) {
         const dist = calculateDistanceMeters(previousGpsPos.lat, previousGpsPos.lng, lat, lng);
         if (dist >= 1.5) {
           const brg = calculateBearing(previousGpsPos.lat, previousGpsPos.lng, lat, lng);
-          setHeadingAngle(Math.round(brg));
+          if (!orientationActive) setHeadingAngle(Math.round(brg));
           previousGpsPos = { lat, lng };
         }
       } else {
         previousGpsPos = { lat, lng };
       }
 
+      if (heading !== null && !orientationActive) setHeadingAngle(Math.round(heading));
+
+      userLocation = [lat, lng];
+
+      const displayRadius = Math.min(accuracy || 4, 12);
       if (!userMarker) {
         userMarker = L.marker(userLocation, { icon: userGpsIcon, zIndexOffset: 1000, draggable: true }).addTo(map);
         userMarker.on('dragend', (e) => {
           userLocation = [e.target.getLatLng().lat, e.target.getLatLng().lng];
           if (activeNavStand) updateNavigationDistance();
+          if (selectedStandForMini) updateMiniDistance(selectedStandForMini);
         });
-        const displayRadius = Math.min(accuracy || 4, 12);
-        userAccuracyCircle = L.circle(userLocation, { radius: displayRadius, color: '#3b82f6', fillColor: '#60a5fa', fillOpacity: 0.10, weight: 1.5 }).addTo(map);
+        userAccuracyCircle = L.circle(userLocation, {
+          radius: displayRadius,
+          color: '#3b82f6',
+          fillColor: '#60a5fa',
+          fillOpacity: 0.10,
+          weight: 1.5
+        }).addTo(map);
       } else {
         userMarker.setLatLng(userLocation);
-        const displayRadius = Math.min(accuracy || 4, 12);
         userAccuracyCircle.setLatLng(userLocation);
         userAccuracyCircle.setRadius(displayRadius);
       }
 
-      // Asegurar que el cono tenga el ángulo actual aplicado
       setHeadingAngle(currentHeadingAngle);
 
       if (activeNavStand) updateNavigationDistance();
+      if (selectedStandForMini) updateMiniDistance(selectedStandForMini);
     }
 
     function initGps() {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (pos) => {
-            updateUserPosition(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy, pos.coords.heading);
-            map.setView([pos.coords.latitude, pos.coords.longitude], 19);
-            recenterStands(pos.coords.latitude, pos.coords.longitude);
-          },
-          () => updateUserPosition(DEFAULT_CENTER[0], DEFAULT_CENTER[1], 6),
-          { enableHighAccuracy: true }
-        );
+      if ('geolocation' in navigator) {
         navigator.geolocation.watchPosition(
-          (pos) => { if (!isSimulating && !isAdjusting) updateUserPosition(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy); },
-          null,
-          { enableHighAccuracy: true, maximumAge: 3000, timeout: 5000 }
+          (pos) => {
+            const lat = pos.coords.latitude;
+            const lng = pos.coords.longitude;
+            updateUserPosition(lat, lng, pos.coords.accuracy || 4, pos.coords.heading);
+          },
+          (err) => {
+            console.warn('GPS error, usando posición simulada en el acceso sur:', err.message);
+            updateUserPosition(cLat - 0.00045, cLng, 4);
+          },
+          { enableHighAccuracy: true, maximumAge: 2000, timeout: 10000 }
         );
+      } else {
+        updateUserPosition(cLat - 0.00045, cLng, 4);
       }
     }
     initGps();
 
-    function recenterStands(cLat, cLng) {
-      stands.forEach(s => {
-        s.lat = cLat + s.latOffset;
-        s.lng = cLng + s.lngOffset;
-      });
-      renderStandsOnMap();
-    }
-    stands.forEach(s => {
-      s.lat = DEFAULT_CENTER[0] + s.latOffset;
-      s.lng = DEFAULT_CENTER[1] + s.lngOffset;
-    });
-
+    // 4. Renderizado Dinámico de Puestos 3D con Toldos de Feria
     let mapMarkers = [];
     function renderStandsOnMap() {
       mapMarkers.forEach(m => map.removeLayer(m));
       mapMarkers = [];
 
       stands.forEach(stand => {
-        // El escenario principal ya tiene su cartel interactivo gigante en la cabecera norte
+        // El escenario principal tiene su cartel interactivo gigante en la cabecera norte
         if (stand.number === 'ESC' || stand.id === 19) return;
 
-        const categoryColor = stand.category === 'beer' ? '#f59e0b'
-          : stand.category === 'food' ? '#10b981'
-          : stand.category === 'sweets' ? '#ec4899'
-          : stand.category === 'crafts' ? '#8b5cf6'
-          : '#3b82f6';
+        const cat = stand.category;
+        const toldoClass = cat === 'food' ? 'toldo-food'
+          : cat === 'beer' ? 'toldo-beer'
+          : cat === 'sweets' ? 'toldo-sweets'
+          : cat === 'crafts' ? 'toldo-crafts'
+          : 'toldo-service';
+
+        const categoryColor = cat === 'beer' ? '#f59e0b'
+          : cat === 'food' ? '#10b981'
+          : cat === 'sweets' ? '#ec4899'
+          : cat === 'crafts' ? '#8b5cf6'
+          : '#0284c7';
 
         const photoOrIcon = stand.photoUrl
           ? `<img src="${stand.photoUrl}" class="w-full h-full rounded-full object-cover p-0.5" alt="${stand.name}">`
-          : `<span class="text-xl select-none filter drop-shadow">${stand.icon}</span>`;
+          : `<span class="text-2xl select-none filter drop-shadow">${stand.icon}</span>`;
 
         const iconHtml = `
-          <div class="stand-marker-wrap relative group" data-id="${stand.id}" title="${stand.name}">
-            <div class="stand-pin-circle" style="background: radial-gradient(circle, ${categoryColor} 10%, #0f172a 100%);">
+          <div class="stand-booth-marker" data-stand-id="${stand.id}" data-category="${stand.category}">
+            <!-- Toldo rayado de feria -->
+            <div class="stand-toldo ${toldoClass}"></div>
+            <!-- Píldora del número nítida (P-01, P-02, WC) -->
+            <span class="stand-number-badge">${stand.number}</span>
+            <!-- Círculo interior con icono/foto -->
+            <div class="stand-booth-circle" style="background: radial-gradient(circle, ${categoryColor} 20%, #0f172a 100%);">
               ${photoOrIcon}
-              <span class="stand-number-pill">${stand.number}</span>
             </div>
-            <div class="stand-pin-pointer"></div>
+            <!-- Puntero al suelo -->
+            <div class="stand-booth-pointer"></div>
           </div>
         `;
 
         const icon = L.divIcon({
           className: 'stand-pin-leaflet-icon',
           html: iconHtml,
-          iconSize: [44, 52],
-          iconAnchor: [22, 50]
+          iconSize: [48, 58],
+          iconAnchor: [24, 56]
         });
 
-        const m = L.marker([stand.lat, stand.lng], { icon: icon, zIndexOffset: 300 }).addTo(map);
-        m.on('click', () => openBottomSheet(stand));
+        const m = L.marker([stand.lat, stand.lng], { icon: icon, zIndexOffset: 400 }).addTo(map);
+        m.on('click', () => {
+          showMiniStandCard(stand);
+        });
+        m.standData = stand;
         mapMarkers.push(m);
       });
     }
     renderStandsOnMap();
 
-    document.getElementById('mapCenterGpsBtn').addEventListener('click', () => {
-      if (userLocation) map.flyTo(userLocation, 19);
-      else initGps();
-    });
+    // 5. INTERACCIÓN LIMPIA Y NO INVASIVA: MINI-CARD INFERIOR
+    function showMiniStandCard(stand) {
+      selectedStandForMini = stand;
 
-    const simBtn = document.getElementById('mapSimGpsBtn');
-    simBtn.addEventListener('click', () => {
-      isSimulating = !isSimulating;
-      simBtn.classList.toggle('ring-4', isSimulating);
-      simBtn.classList.toggle('ring-purple-400', isSimulating);
-      alert(isSimulating ? '🚶 Haz clic en el mapa para moverte virtualmente' : 'GPS real activado');
-    });
+      // Destacar visualmente el puesto seleccionado
+      document.querySelectorAll('.stand-booth-marker').forEach(el => {
+        el.classList.remove('stand-selected');
+        if (el.getAttribute('data-stand-id') == stand.id) {
+          el.classList.add('stand-selected');
+        }
+      });
+
+      const card = document.getElementById('miniStandCard');
+      const iconEl = document.getElementById('miniStandIcon');
+      const numEl = document.getElementById('miniStandNumber');
+      const nameEl = document.getElementById('miniStandName');
+      const locEl = document.getElementById('miniStandLocation');
+      const menuBtn = document.getElementById('miniStandMenuBtn');
+
+      if (iconEl) iconEl.innerHTML = stand.photoUrl ? `<img src="${stand.photoUrl}" class="w-full h-full rounded-xl object-cover">` : stand.icon;
+      if (numEl) {
+        numEl.textContent = stand.number;
+        numEl.style.backgroundColor = stand.color || '#f59e0b';
+      }
+      if (nameEl) nameEl.textContent = stand.name;
+      if (locEl) locEl.textContent = '📍 ' + (stand.locationNote || stand.categoryName);
+
+      // Si es baño o servicio sin productos, ocultar botón "Ver Carta"
+      if (menuBtn) {
+        if (!stand.products || stand.products.length === 0) {
+          menuBtn.classList.add('hidden');
+        } else {
+          menuBtn.classList.remove('hidden');
+        }
+      }
+
+      updateMiniDistance(stand);
+
+      if (card) {
+        card.classList.remove('hidden');
+        card.classList.add('animate-slide-up');
+      }
+
+      // Re-centrar el mapa suavemente dejando espacio libre arriba de la tarjeta
+      map.panTo([stand.lat - 0.00008, stand.lng], { animate: true, duration: 0.6 });
+    }
+
+    function closeMiniCard() {
+      selectedStandForMini = null;
+      const card = document.getElementById('miniStandCard');
+      if (card) card.classList.add('hidden');
+      document.querySelectorAll('.stand-booth-marker').forEach(el => el.classList.remove('stand-selected'));
+    }
+
+    function updateMiniDistance(stand) {
+      const distEl = document.getElementById('miniStandDist');
+      if (!distEl) return;
+      if (userLocation) {
+        const m = calculateDistanceMeters(userLocation[0], userLocation[1], stand.lat, stand.lng);
+        distEl.textContent = '· A ' + m + 'm';
+      } else {
+        distEl.textContent = '';
+      }
+    }
+
+    function startNavigationFromMini() {
+      if (!selectedStandForMini) return;
+      startNavigation(selectedStandForMini);
+    }
+
+    function openFullSheetFromMini() {
+      if (!selectedStandForMini) return;
+      openBottomSheet(selectedStandForMini);
+    }
+
+    function onStageClick() {
+      const stageStand = stands.find(s => s.id === 19 || s.number === 'ESC');
+      if (stageStand) {
+        showMiniStandCard(stageStand);
+      } else {
+        const liveTab = document.getElementById('tabLiveBtn');
+        if (liveTab) liveTab.click();
+      }
+    }
+
+    // 6. FILTRO RÁPIDO POR CATEGORÍA EN EL MAPA (1 Solo Toque)
+    function mapFilterCategory(cat) {
+      document.querySelectorAll('.map-filter-chip').forEach(btn => btn.classList.remove('active', 'bg-gradient-to-r', 'from-orange-500', 'to-amber-500'));
+      const activeBtn = document.getElementById('mapPill-' + cat);
+      if (activeBtn) activeBtn.classList.add('active', 'bg-gradient-to-r', 'from-orange-500', 'to-amber-500');
+
+      if (cat === 'all') {
+        document.querySelectorAll('.stand-booth-marker').forEach(el => el.classList.remove('stand-dimmed'));
+        closeMiniCard();
+        map.flyToBounds(stadiumBounds, { padding: [20, 20], duration: 0.7 });
+        return;
+      }
+
+      if (cat === 'stage') {
+        const stageStand = stands.find(s => s.id === 19 || s.number === 'ESC');
+        map.flyTo([cLat + 0.00045, cLng], 19.5, { duration: 0.7 });
+        if (stageStand) showMiniStandCard(stageStand);
+        return;
+      }
+
+      if (cat === 'wc') {
+        const wcStand = stands.find(s => s.id === 20 || s.number === 'WC');
+        if (wcStand) {
+          map.flyTo([wcStand.lat, wcStand.lng], 19.5, { duration: 0.7 });
+          showMiniStandCard(wcStand);
+        }
+        return;
+      }
+
+      // Filtrar otros puestos: atenuar los que no corresponden
+      document.querySelectorAll('.stand-booth-marker').forEach(el => {
+        const c = el.getAttribute('data-category');
+        if (c === cat) el.classList.remove('stand-dimmed');
+        else el.classList.add('stand-dimmed');
+      });
+
+      // Centrar en el grupo correspondiente
+      if (cat === 'food') {
+        map.flyTo([cLat, cLng - 0.00018], 19.5, { duration: 0.7 });
+      } else if (cat === 'beer') {
+        map.flyTo([cLat, cLng + 0.00018], 19.5, { duration: 0.7 });
+      } else if (cat === 'sweets' || cat === 'crafts') {
+        map.flyTo([cLat - 0.00035, cLng], 19.5, { duration: 0.7 });
+      }
+    }
+
+    // Botón centrar en GPS
+    const centerBtn = document.getElementById('mapCenterGpsBtn');
+    if (centerBtn) {
+      centerBtn.addEventListener('click', () => {
+        if (userLocation) map.flyTo(userLocation, 19.5, { duration: 0.7 });
+        else initGps();
+      });
+    }
 
     function activateManualAdjust() {
       isAdjusting = true;
-      alert('🎯 Haz clic en el mapa sobre tu puesto exacto para calibrar tu posición.');
+      alert('🎯 Toca en el mapa sobre tu ubicación exacta para calibrar.');
     }
 
     map.on('click', (e) => {
       if (isAdjusting) {
-        updateUserPosition(e.latlng.lat, e.latlng.lng, 1);
+        updateUserPosition(e.latlng.lat, e.latlng.lng, 2);
         isAdjusting = false;
-        alert('Posición calibrada con 0m de error 🎯');
-      } else if (isSimulating) {
-        updateUserPosition(e.latlng.lat, e.latlng.lng, 4);
+        showMapToast('✅ Ubicación GPS calibrada');
+      } else {
+        // Tocar en el césped deselecciona la mini tarjeta
+        closeMiniCard();
       }
     });
 
-    function calculateDistance(lat1, lon1, lat2, lon2) {
-      const R = 6371e3;
-      const dLat = (lat2 - lat1) * Math.PI / 180;
-      const dLon = (lon2 - lon1) * Math.PI / 180;
-      const a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);
-      return Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
-    }
-
+    // 7. Navegación Asistida con Ruta Animada
     function startNavigation(stand) {
       activeNavStand = stand;
-      closeBottomSheet();
-      if (!userLocation) updateUserPosition(DEFAULT_CENTER[0], DEFAULT_CENTER[1], 6);
+      if (!userLocation) {
+        userLocation = [cLat - 0.00045, cLng];
+      }
 
-      document.getElementById('navHud').classList.remove('hidden');
-      document.getElementById('navTargetName').textContent = stand.name;
+      const points = [userLocation, [stand.lat, stand.lng]];
 
       if (navRoutePolyline) map.removeLayer(navRoutePolyline);
-      const points = [userLocation, [stand.lat, stand.lng]];
-      navRoutePolyline = L.polyline(points, { color: '#f97316', weight: 5, opacity: 0.9, className: 'leaflet-routing-line' }).addTo(map);
-      map.fitBounds(L.latLngBounds(points), { padding: [80, 80] });
+
+      navRoutePolyline = L.polyline(points, {
+        color: '#f97316',
+        weight: 4,
+        opacity: 0.95,
+        className: 'festival-walk-route'
+      }).addTo(map);
+
+      document.getElementById('navTargetName').textContent = stand.name;
+      document.getElementById('navHud').classList.remove('hidden');
+
+      map.fitBounds(L.latLngBounds(points), { padding: [60, 60] });
 
       updateNavigationDistance();
     }
 
     function updateNavigationDistance() {
       if (!activeNavStand || !userLocation) return;
-      const m = calculateDistance(userLocation[0], userLocation[1], activeNavStand.lat, activeNavStand.lng);
-      document.getElementById('navDistance').textContent = `A ${m} metros de distancia`;
+      const m = calculateDistanceMeters(userLocation[0], userLocation[1], activeNavStand.lat, activeNavStand.lng);
+      document.getElementById('navDistance').textContent = 'A ' + m + ' metros caminando';
       if (navRoutePolyline) navRoutePolyline.setLatLngs([userLocation, [activeNavStand.lat, activeNavStand.lng]]);
+    }
+
+    function cancelNavigation() {
+      activeNavStand = null;
+      if (navRoutePolyline) { map.removeLayer(navRoutePolyline); navRoutePolyline = null; }
+      document.getElementById('navHud').classList.add('hidden');
     }
 
     function cancelNavigation() {
