@@ -322,6 +322,9 @@
 
       <!-- Botones flotantes de acción del mapa -->
       <div class="absolute right-3.5 bottom-24 z-20 flex flex-col gap-2.5">
+        <button id="mapCompassBtn" onclick="requestCompassPermission()" title="Activar Brújula y Giro 360°" class="w-12 h-12 bg-white text-orange-600 rounded-2xl shadow-2xl flex items-center justify-center font-bold text-xl active:scale-95 transition border border-slate-200">
+          🧭
+        </button>
         <button id="mapCenterGpsBtn" title="Centrar en mi ubicación" class="w-12 h-12 bg-white text-blue-600 rounded-2xl shadow-2xl flex items-center justify-center font-bold text-xl active:scale-95 transition">
           🎯
         </button>
@@ -2259,24 +2262,116 @@
       iconAnchor: [10, 10]
     });
 
+    let currentHeadingAngle = 0;
+    let previousGpsPos = null;
+
     function setHeadingAngle(degrees) {
-      const cone = document.getElementById('userHeadingCone');
-      if (cone) cone.style.transform = `translate(-50%, -75px) rotate(${degrees}deg)`;
+      currentHeadingAngle = degrees;
+      const cones = document.querySelectorAll('.user-heading-cone');
+      cones.forEach(cone => {
+        cone.style.transform = `translate(-50%, -75px) rotate(${degrees}deg)`;
+      });
     }
 
-    if (window.DeviceOrientationEvent) {
-      window.addEventListener('deviceorientationabsolute' in window ? 'deviceorientationabsolute' : 'deviceorientation', (e) => {
+    // Cálculo matemático de rumbo (Bearing) entre 2 coordenadas
+    function calculateBearing(lat1, lon1, lat2, lon2) {
+      const toRad = deg => deg * Math.PI / 180;
+      const toDeg = rad => rad * 180 / Math.PI;
+      const y = Math.sin(toRad(lon2 - lon1)) * Math.cos(toRad(lat2));
+      const x = Math.cos(toRad(lat1)) * Math.sin(toRad(lat2)) -
+                Math.sin(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.cos(toRad(lon2 - lon1));
+      const brng = toDeg(Math.atan2(y, x));
+      return (brng + 360) % 360;
+    }
+
+    function calculateDistanceMeters(lat1, lon1, lat2, lon2) {
+      const R = 6371e3;
+      const φ1 = lat1 * Math.PI / 180;
+      const φ2 = lat2 * Math.PI / 180;
+      const Δφ = (lat2 - lat1) * Math.PI / 180;
+      const Δλ = (lon2 - lon1) * Math.PI / 180;
+      const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+                Math.cos(φ1) * Math.cos(φ2) *
+                Math.sin(Δλ/2) * Math.sin(Δλ/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      return R * c;
+    }
+
+    // Solicitud de permisos para sensores de movimiento (iOS y Chrome/Brave)
+    let orientationActive = false;
+    function requestCompassPermission() {
+      if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+        DeviceOrientationEvent.requestPermission()
+          .then(permissionState => {
+            if (permissionState === 'granted') {
+              setupOrientationListeners();
+              showMapToast("🧭 Brújula activada. Gira tu celular para orientarte.");
+            } else {
+              showMapToast("⚠️ Permiso de brújula denegado en el navegador.");
+            }
+          })
+          .catch(err => {
+            console.warn("Error permisos brújula:", err);
+            setupOrientationListeners();
+          });
+      } else {
+        setupOrientationListeners();
+        showMapToast("🧭 Brújula activada. Gira tu celular para orientarte.");
+      }
+    }
+
+    function setupOrientationListeners() {
+      if (orientationActive) return;
+      orientationActive = true;
+      const eventName = 'deviceorientationabsolute' in window ? 'deviceorientationabsolute' : 'deviceorientation';
+      window.addEventListener(eventName, (e) => {
         let heading = null;
-        if (typeof e.webkitCompassHeading !== 'undefined') heading = e.webkitCompassHeading;
-        else if (e.alpha !== null) heading = (360 - e.alpha) % 360;
-        if (heading !== null) setHeadingAngle(Math.round(heading));
+        if (typeof e.webkitCompassHeading !== 'undefined') {
+          heading = e.webkitCompassHeading;
+        } else if (e.alpha !== null) {
+          heading = (360 - e.alpha) % 360;
+        }
+        if (heading !== null && !isNaN(heading)) {
+          setHeadingAngle(Math.round(heading));
+        }
       }, true);
     }
 
-    function updateUserPosition(lat, lng, accuracy = 4) {
+    // Auto-activar al hacer clic o tocar el mapa
+    document.addEventListener('touchstart', () => { if (!orientationActive) setupOrientationListeners(); }, { once: true, passive: true });
+    document.addEventListener('click', () => { if (!orientationActive) setupOrientationListeners(); }, { once: true, passive: true });
+
+    function showMapToast(msg) {
+      const existing = document.getElementById('mapOrientationToast');
+      if (existing) existing.remove();
+      const toast = document.createElement('div');
+      toast.id = 'mapOrientationToast';
+      toast.className = 'fixed top-20 left-1/2 -translate-x-1/2 bg-slate-900/95 text-white border border-orange-500/50 px-4 py-2 rounded-2xl text-xs font-bold shadow-2xl z-50 flex items-center gap-2 backdrop-blur-md animate-bounce';
+      toast.innerHTML = msg;
+      document.body.appendChild(toast);
+      setTimeout(() => { if (toast.parentNode) toast.remove(); }, 3500);
+    }
+
+    function updateUserPosition(lat, lng, accuracy = 4, heading = null) {
       userLocation = [lat, lng];
       const accBadge = document.getElementById('mapGpsAccuracy');
       if (accBadge) accBadge.textContent = `GPS Activo (±${Math.round(accuracy)}m)`;
+
+      // DOBLE MOTOR DE RUMBO:
+      // 1. Si el GPS entrega rumbo nativo (caminando en Chrome/Android)
+      if (heading !== null && heading !== undefined && !isNaN(heading) && heading >= 0) {
+        setHeadingAngle(Math.round(heading));
+      } else if (previousGpsPos) {
+        // 2. Si no hay brújula pero el usuario camina > 1.5 metros, calcular rumbo matemático
+        const dist = calculateDistanceMeters(previousGpsPos.lat, previousGpsPos.lng, lat, lng);
+        if (dist >= 1.5) {
+          const brg = calculateBearing(previousGpsPos.lat, previousGpsPos.lng, lat, lng);
+          setHeadingAngle(Math.round(brg));
+          previousGpsPos = { lat, lng };
+        }
+      } else {
+        previousGpsPos = { lat, lng };
+      }
 
       if (!userMarker) {
         userMarker = L.marker(userLocation, { icon: userGpsIcon, zIndexOffset: 1000, draggable: true }).addTo(map);
@@ -2291,6 +2386,9 @@
         userAccuracyCircle.setRadius(accuracy);
       }
 
+      // Asegurar que el cono tenga el ángulo actual aplicado
+      setHeadingAngle(currentHeadingAngle);
+
       if (activeNavStand) updateNavigationDistance();
     }
 
@@ -2298,7 +2396,7 @@
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           (pos) => {
-            updateUserPosition(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy);
+            updateUserPosition(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy, pos.coords.heading);
             map.setView([pos.coords.latitude, pos.coords.longitude], 19);
             recenterStands(pos.coords.latitude, pos.coords.longitude);
           },
