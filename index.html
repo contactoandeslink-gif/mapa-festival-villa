@@ -407,6 +407,7 @@
             <span id="sheetNumber" class="text-xs text-slate-400 font-bold">#P-01</span>
           </div>
           <h2 id="sheetName" class="text-xl font-black text-white font-display">Nombre del Local</h2>
+            <div id="sheetLocationNote" class="hidden text-[11px] text-emerald-400 font-bold bg-emerald-950/60 border border-emerald-500/30 px-2 py-0.5 rounded-lg flex items-center gap-1 mt-1"></div>
         </div>
       </div>
       <button onclick="closeBottomSheet()" class="text-slate-400 hover:text-white text-xl p-1">✕</button>
@@ -2625,6 +2626,16 @@
       document.getElementById('sheetName').textContent = stand.name;
       document.getElementById('sheetDesc').textContent = stand.desc;
 
+      const locEl = document.getElementById('sheetLocationNote');
+      if (locEl) {
+        if (stand.locationNote) {
+          locEl.textContent = '📍 ' + stand.locationNote;
+          locEl.classList.remove('hidden');
+        } else {
+          locEl.classList.add('hidden');
+        }
+      }
+
       const pList = document.getElementById('sheetProductsList');
       pList.innerHTML = '';
       if (stand.products && stand.products.length > 0) {
@@ -2752,6 +2763,22 @@
         showLiveToast(`📍 ¡Estás aquí! Frente a ${stand.name}`);
       }
     }
+    // Auto-detección al escanear QR físico de puesto (ej: index.html?stand=P-01)
+    window.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const standParam = urlParams.get('stand') || urlParams.get('puesto') || urlParams.get('p');
+      if (standParam) {
+        const found = stands.find(s => s.number === standParam || String(s.id) === standParam);
+        if (found) {
+          setTimeout(() => {
+            updateUserPosition(found.lat, found.lng, 2);
+            switchTab('map');
+            openBottomSheet(found);
+            showLiveToast("📍 ¡Estás aquí! Frente a " + found.name + " (" + found.number + ")");
+          }, 450);
+        }
+      }
+    });
   </script>
 </body>
 </html>

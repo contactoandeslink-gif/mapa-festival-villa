@@ -338,7 +338,13 @@
             <label class="font-bold text-slate-300">URL del Logo o Foto del Food Truck:</label>
             <span class="text-[10px] text-slate-400">Se muestra en el mapa y la carta</span>
           </div>
-          <input id="stLogoUrl" type="text" placeholder="https://images.unsplash.com/..." oninput="updateStandLogoPreview(this.value)" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white text-[11px] outline-none focus:ring-2 focus:ring-orange-500">
+          <div class="flex gap-2">
+            <input id="stLogoUrl" type="text" placeholder="https://images.unsplash.com/... o sube una foto" oninput="updateStandLogoPreview(this.value)" class="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white text-[11px] outline-none focus:ring-2 focus:ring-orange-500">
+            <button type="button" onclick="document.getElementById('stFileInput').click()" class="px-3 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition flex items-center gap-1 shrink-0">
+              <span>📷</span> Subir Foto
+            </button>
+            <input type="file" id="stFileInput" accept="image/*" class="hidden" onchange="handleStandPhotoUpload(event)">
+          </div>
 
           <!-- Presets rápidos para asignar fotos bonitas con 1 clic -->
           <div class="flex items-center gap-1.5 flex-wrap mt-2">
@@ -1864,59 +1870,78 @@
     function renderAdminStandsList(filter = '') {
       const container = document.getElementById('adminStandsListContainer');
       container.innerHTML = '';
-
       const commercial = stands.filter(s => s.category !== 'service');
-      document.getElementById('standsCountBadge').textContent = commercial.length;
+
+      const badge = document.getElementById('standsCountBadge');
+      if (badge) badge.textContent = commercial.length;
 
       commercial.forEach(stand => {
-        if (filter && !stand.name.toLowerCase().includes(filter.toLowerCase()) && !stand.desc.toLowerCase().includes(filter.toLowerCase())) return;
+        if (filter && !stand.name.toLowerCase().includes(filter.toLowerCase()) && !stand.desc.toLowerCase().includes(filter.toLowerCase()) && !stand.number.toLowerCase().includes(filter.toLowerCase())) return;
 
         const card = document.createElement('div');
-        card.className = 'bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-lg space-y-4';
+        card.className = 'bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-xl space-y-4 transition hover:border-slate-700';
 
         let prodRows = '';
         if (stand.products && stand.products.length > 0) {
           stand.products.forEach((prod, pIdx) => {
+            const isStock = prod.inStock !== false;
             prodRows += `
-              <div class="flex items-center justify-between bg-slate-950 p-2.5 rounded-xl border border-slate-800 gap-3 text-xs">
-                <div class="flex items-center gap-2 flex-1 min-w-0">
-                  <input 
-                    type="checkbox" 
-                    ${prod.inStock ? 'checked' : ''} 
-                    onchange="toggleProductStockAdmin(${stand.id}, ${pIdx}, this.checked)"
-                    title="Desmarca para 'Sin Stock / Agotado'"
-                    class="w-4 h-4 text-orange-600 rounded cursor-pointer"
-                  />
-                  <input 
-                    type="text" 
-                    value="${prod.name}" 
-                    onchange="updateProductNameAdmin(${stand.id}, ${pIdx}, this.value)"
-                    class="bg-transparent font-bold text-slate-200 outline-none w-full ${!prod.inStock ? 'line-through text-red-400' : ''}"
-                  />
-                  ${!prod.inStock ? '<span class="text-[9px] bg-red-950 border border-red-800 text-red-400 px-1.5 rounded font-black shrink-0">AGOTADO</span>' : ''}
-                </div>
+              <div class="flex items-center justify-between bg-slate-950 p-2.5 rounded-2xl border border-slate-800 gap-2.5 text-xs">
+                <!-- Botón de Stock Interactivo (Verde En Stock / Rojo Agotado) -->
+                <button 
+                  type="button"
+                  onclick="toggleProductStockAdmin(${stand.id}, ${pIdx}, ${!isStock})" 
+                  title="Toca para alternar En Stock / Agotado"
+                  class="px-2.5 py-1.5 rounded-xl font-black text-[10px] uppercase transition flex items-center gap-1 shrink-0 active:scale-95 ${
+                    isStock 
+                      ? 'bg-emerald-950/80 hover:bg-emerald-900 text-emerald-300 border border-emerald-500/50' 
+                      : 'bg-red-950/90 hover:bg-red-900 text-red-300 border border-red-500/60 shadow-lg shadow-red-950/50'
+                  }"
+                >
+                  <span>${isStock ? '🟢' : '🔴'}</span>
+                  <span>${isStock ? 'En Stock' : 'Agotado'}</span>
+                </button>
 
+                <!-- Nombre del Producto editable al vuelo -->
+                <input 
+                  type="text" 
+                  value="${prod.name}" 
+                  onchange="updateProductNameAdmin(${stand.id}, ${pIdx}, this.value)"
+                  placeholder="Nombre del producto"
+                  title="Modifica el nombre y presiona Enter o haz clic fuera"
+                  class="bg-transparent font-bold text-slate-200 outline-none flex-1 min-w-0 text-xs focus:bg-slate-900 focus:px-2 rounded-lg py-1 transition ${!isStock ? 'line-through text-slate-500' : ''}"
+                />
+
+                <!-- Precio editable al vuelo con formato -->
                 <div class="flex items-center gap-1 shrink-0">
-                  <span class="text-[10px] text-slate-500 font-bold">Precio:</span>
+                  <span class="text-[10px] text-slate-500 font-bold">$</span>
                   <input 
                     type="text" 
-                    value="${prod.price}" 
+                    value="${prod.price.replace('$', '').trim()}" 
                     onchange="updateProductPriceAdmin(${stand.id}, ${pIdx}, this.value)"
-                    class="w-20 bg-slate-900 border border-slate-700 rounded px-2 py-1 text-orange-400 font-extrabold text-xs text-right outline-none"
+                    title="Modifica el precio"
+                    class="w-20 bg-slate-900 border border-orange-500/40 rounded-xl px-2.5 py-1.5 text-orange-400 font-black text-xs text-right outline-none focus:ring-2 focus:ring-orange-500 shadow-inner"
                   />
-                  <button onclick="deleteProductFromStand(${stand.id}, ${pIdx})" class="text-slate-500 hover:text-red-400 text-xs p-1" title="Eliminar plato">✕</button>
+                  <button onclick="deleteProductFromStand(${stand.id}, ${pIdx})" class="p-1 text-slate-500 hover:text-red-400 text-xs rounded transition" title="Eliminar plato">✕</button>
                 </div>
               </div>
             `;
           });
         } else {
-          prodRows = '<p class="text-xs text-slate-500 italic p-2 bg-slate-950 rounded-xl">No hay productos cargados.</p>';
+          prodRows = '<p class="text-xs text-slate-500 italic p-3 bg-slate-950 rounded-2xl border border-dashed border-slate-800 text-center">No hay productos en carta. Agrega el primero con el botón "+ Producto".</p>';
         }
 
         // Thumbnail de logo real
         const logoRender = stand.logoUrl 
-          ? `<img src="${stand.logoUrl}" class="w-full h-full object-cover rounded-2xl" alt="${stand.name}">`
+          ? `<img src="${stand.logoUrl}" class="w-full h-full object-cover rounded-2xl" alt="${stand.name}" onerror="this.onerror=null;this.parentElement.innerHTML='<span class=\'text-2xl\'>${stand.icon}</span>';">`
           : `<span class="text-2xl">${stand.icon}</span>`;
+
+        // Badge de ubicación de referencia si existe
+        const locationBadge = stand.locationNote 
+          ? `<div class="text-[11px] text-emerald-400 font-semibold bg-emerald-950/40 px-2.5 py-1 rounded-xl border border-emerald-500/20 flex items-center gap-1.5 mt-1">
+              <span>📍</span> <span>${stand.locationNote}</span>
+            </div>` 
+          : '';
 
         card.innerHTML = `
           <div class="flex items-start justify-between gap-4 flex-wrap">
@@ -1926,29 +1951,39 @@
               </div>
               <div>
                 <div class="flex items-center gap-2">
-                  <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-orange-600 text-white">${stand.categoryName}</span>
-                  <span class="text-xs text-slate-500 font-mono font-bold">${stand.number}</span>
-                  ${stand.logoUrl ? '<span class="text-[9px] bg-emerald-950 text-emerald-400 border border-emerald-500/30 px-1.5 rounded font-bold">Foto Real</span>' : ''}
+                  <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded-md text-white" style="background-color: ${stand.color || '#ea580c'}">${stand.categoryName}</span>
+                  <span class="text-xs text-slate-400 font-mono font-bold bg-slate-800 px-1.5 py-0.5 rounded border border-slate-700">${stand.number}</span>
+                  ${stand.logoUrl ? '<span class="text-[9px] bg-emerald-950 text-emerald-400 border border-emerald-500/30 px-1.5 py-0.5 rounded font-bold">Foto Real</span>' : ''}
                 </div>
-                <h3 class="text-base font-black text-white font-display mt-0.5">${stand.name}</h3>
-                <p class="text-xs text-slate-400">${stand.desc}</p>
+                <h3 class="text-base font-black text-white font-display mt-1">${stand.name}</h3>
+                <p class="text-xs text-slate-400 max-w-lg leading-relaxed mt-0.5">${stand.desc || 'Sin descripción'}</p>
+                ${locationBadge}
               </div>
             </div>
 
-            <div class="flex items-center gap-2">
-              <button onclick="openProductModalForStand(${stand.id})" class="px-3 py-1.5 rounded-xl bg-orange-600/20 hover:bg-orange-600 text-orange-300 hover:text-white border border-orange-500/30 text-xs font-bold transition flex items-center gap-1">
+            <!-- Botones de Acción de Puesto -->
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <button onclick="captureGpsDirectlyForStand(${stand.id})" title="Fijar coordenadas GPS parado frente a este puesto" class="px-2.5 py-1.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600 text-emerald-300 hover:text-white border border-emerald-500/40 text-xs font-bold transition flex items-center gap-1 active:scale-95">
+                <span>📍</span> GPS
+              </button>
+              <button onclick="previewStandQrFlyer(${stand.id})" title="Ver e imprimir cartel QR de este local" class="px-2.5 py-1.5 rounded-xl bg-purple-600/20 hover:bg-purple-600 text-purple-300 hover:text-white border border-purple-500/40 text-xs font-bold transition flex items-center gap-1 active:scale-95">
+                <span>🖨️</span> QR
+              </button>
+              <button onclick="openProductModalForStand(${stand.id})" class="px-3 py-1.5 rounded-xl bg-orange-600/20 hover:bg-orange-600 text-orange-300 hover:text-white border border-orange-500/30 text-xs font-bold transition flex items-center gap-1 active:scale-95">
                 <span>➕</span> Producto
               </button>
-              <button onclick="editStandModal(${stand.id})" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-blue-400 text-xs" title="Editar puesto y logo">✏️</button>
-              <button onclick="deleteStand(${stand.id})" class="p-2 rounded-xl bg-slate-800 hover:bg-red-900/60 text-red-400 text-xs" title="Eliminar">🗑️</button>
+              <button onclick="editStandModal(${stand.id})" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-blue-400 text-xs border border-slate-700" title="Editar puesto, foto y datos bancarios">✏️</button>
+              <button onclick="deleteStand(${stand.id})" class="p-2 rounded-xl bg-slate-800 hover:bg-red-900/60 text-red-400 text-xs border border-slate-700" title="Eliminar puesto">🗑️</button>
             </div>
           </div>
 
-          <!-- Carta de Productos -->
-          <div class="space-y-2 pt-2 border-t border-slate-800">
+          <!-- Carta de Productos y Precios en vivo -->
+          <div class="space-y-2 pt-2 border-t border-slate-800/80">
             <div class="flex items-center justify-between text-xs">
-              <span class="font-black uppercase tracking-wider text-slate-400 text-[10px]">Productos & Precios (Modifica precio o nombre en vivo):</span>
-              <span class="text-slate-500 text-[10px]">${stand.products ? stand.products.length : 0} platos/tragos</span>
+              <span class="font-black uppercase tracking-wider text-slate-400 text-[10px] flex items-center gap-1">
+                <span>🍽️</span> Carta & Precios (Modifica precio, nombre o toca En Stock / Agotado):
+              </span>
+              <span class="text-slate-500 text-[10px] font-bold">${stand.products ? stand.products.length : 0} platos/tragos</span>
             </div>
             <div class="space-y-1.5">
               ${prodRows}
@@ -1972,7 +2007,7 @@
     function updateProductNameAdmin(standId, pIdx, newName) {
       const stand = stands.find(s => s.id === standId);
       if (stand && stand.products[pIdx]) {
-        stand.products[pIdx].name = newName;
+        stand.products[pIdx].name = newName.trim();
         saveAndBroadcast();
       }
     }
@@ -1980,7 +2015,9 @@
     function updateProductPriceAdmin(standId, pIdx, newPrice) {
       const stand = stands.find(s => s.id === standId);
       if (stand && stand.products[pIdx]) {
-        stand.products[pIdx].price = newPrice;
+        let clean = newPrice.trim();
+        if (!clean.startsWith('$')) clean = '$' + clean;
+        stand.products[pIdx].price = clean;
         saveAndBroadcast();
       }
     }
@@ -2007,13 +2044,19 @@
     function saveNewProduct() {
       const standId = Number(document.getElementById('prodStandId').value);
       const name = document.getElementById('newProdName').value.trim();
-      const price = document.getElementById('newProdPrice').value.trim() || '$0';
+      let price = document.getElementById('newProdPrice').value.trim() || '$0';
+      if (!price.startsWith('$')) price = '$' + price;
 
-      if (!name) return alert('Ingresa el nombre del producto.');
+      if (!name) return alert('Por favor ingresa el nombre del producto.');
       const stand = stands.find(s => s.id === standId);
       if (stand) {
         if (!stand.products) stand.products = [];
-        stand.products.push({ name, price, inStock: true });
+        stand.products.push({
+          name,
+          price,
+          desc: 'Preparado al momento.',
+          inStock: true
+        });
         saveAndBroadcast();
         renderAdminStandsList();
         closeProductModal();
@@ -2038,9 +2081,99 @@
     function updateStandLogoPreview(url) {
       const box = document.getElementById('stLogoPreviewBox');
       if (url) {
-        box.innerHTML = `<img src="${url}" class="w-full h-full object-cover">`;
+        box.innerHTML = `<img src="${url}" class="w-full h-full object-cover rounded-2xl" onerror="this.onerror=null;this.parentElement.innerHTML='🏪';">`;
       } else {
         box.innerHTML = document.getElementById('stIcon').value || '🏪';
+      }
+    }
+
+    // Subir foto desde cámara o galería de fotos del celular
+    function handleStandPhotoUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const img = new Image();
+        img.onload = function() {
+          // Comprimir a máximo 350px para almacenamiento liviano en localStorage
+          const canvas = document.createElement('canvas');
+          const maxDim = 350;
+          let w = img.width;
+          let h = img.height;
+          if (w > h) {
+            if (w > maxDim) { h = Math.round(h * (maxDim / w)); w = maxDim; }
+          } else {
+            if (h > maxDim) { w = Math.round(w * (maxDim / h)); h = maxDim; }
+          }
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+
+          document.getElementById('stLogoUrl').value = dataUrl;
+          updateStandLogoPreview(dataUrl);
+        };
+        img.src = evt.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Capturar coordenadas GPS parado frente al puesto
+    function captureCurrentGpsForStand() {
+      if (!navigator.geolocation) return alert('GPS no disponible en este dispositivo.');
+      
+      const btn = event.target;
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<span>⏳</span> Obteniendo GPS...';
+
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          btn.innerHTML = originalText;
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          const cLat = DEFAULT_CENTER[0];
+          const cLng = DEFAULT_CENTER[1];
+          const latOff = lat - cLat;
+          const lngOff = lng - cLng;
+
+          const latInput = document.getElementById('stLatOffset');
+          const lngInput = document.getElementById('stLngOffset');
+          if (latInput) latInput.value = latOff.toFixed(7);
+          if (lngInput) lngInput.value = lngOff.toFixed(7);
+
+          alert(`📍 ¡Coordenadas capturadas con éxito!\n\nPrecisión: ±${Math.round(pos.coords.accuracy)}m\nDesplazamiento asignado al puesto.`);
+        },
+        (err) => {
+          btn.innerHTML = originalText;
+          alert('No se pudo obtener la posición GPS. Asegúrate de permitir el acceso a la ubicación en el navegador.');
+        },
+        { enableHighAccuracy: true, timeout: 8000 }
+      );
+    }
+
+    function captureGpsDirectlyForStand(standId) {
+      const stand = stands.find(s => s.id === standId);
+      if (!stand) return;
+
+      if (!navigator.geolocation) return alert('GPS no disponible.');
+      if (confirm(`¿Deseas fijar la posición de "${stand.name}" en tus coordenadas GPS actuales?`)) {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            const cLat = DEFAULT_CENTER[0];
+            const cLng = DEFAULT_CENTER[1];
+            stand.latOffset = pos.coords.latitude - cLat;
+            stand.lngOffset = pos.coords.longitude - cLng;
+            stand.lat = pos.coords.latitude;
+            stand.lng = pos.coords.longitude;
+            saveAndBroadcast();
+            renderAdminStandsList();
+            alert(`✅ Puesto "${stand.name}" calibrado exactamente en tu posición GPS actual (±${Math.round(pos.coords.accuracy)}m).`);
+          },
+          (err) => alert('No se pudo obtener la posición GPS.'),
+          { enableHighAccuracy: true }
+        );
       }
     }
 
@@ -2053,6 +2186,9 @@
       document.getElementById('stIcon').value = '🍔';
       document.getElementById('stLogoUrl').value = '';
       document.getElementById('stDesc').value = '';
+      document.getElementById('stLocationNote').value = '';
+      document.getElementById('stLatOffset').value = ((Math.random() - 0.5) * 0.0003).toFixed(7);
+      document.getElementById('stLngOffset').value = ((Math.random() - 0.5) * 0.0003).toFixed(7);
       document.getElementById('stWp').value = '';
       document.getElementById('stBank').value = '';
       document.getElementById('stAccount').value = '';
@@ -2065,14 +2201,17 @@
     function editStandModal(id) {
       const s = stands.find(x => x.id === id);
       if (!s) return;
-      document.getElementById('standModalTitle').textContent = `Editar: ${s.name}`;
+      document.getElementById('standModalTitle').textContent = `Editar: ${s.name} (${s.number})`;
       document.getElementById('editStandId').value = s.id;
       document.getElementById('stName').value = s.name;
       document.getElementById('stNumber').value = s.number;
       document.getElementById('stCat').value = s.category;
       document.getElementById('stIcon').value = s.icon;
       document.getElementById('stLogoUrl').value = s.logoUrl || '';
-      document.getElementById('stDesc').value = s.desc;
+      document.getElementById('stDesc').value = s.desc || '';
+      document.getElementById('stLocationNote').value = s.locationNote || '';
+      document.getElementById('stLatOffset').value = (s.latOffset || 0).toFixed(7);
+      document.getElementById('stLngOffset').value = (s.lngOffset || 0).toFixed(7);
       document.getElementById('stWp').value = s.whatsapp || '';
       
       const b = s.bankData || {};
@@ -2097,6 +2236,9 @@
       const icon = document.getElementById('stIcon').value.trim() || '🏪';
       const logoUrl = document.getElementById('stLogoUrl').value.trim();
       const desc = document.getElementById('stDesc').value.trim();
+      const locationNote = document.getElementById('stLocationNote').value.trim();
+      const latOffset = parseFloat(document.getElementById('stLatOffset').value) || 0;
+      const lngOffset = parseFloat(document.getElementById('stLngOffset').value) || 0;
       const wp = document.getElementById('stWp').value.trim();
 
       const bank = document.getElementById('stBank').value.trim();
@@ -2109,7 +2251,7 @@
       const catNames = { food: 'Comidas', beer: 'Cervezas & Tragos', sweets: 'Postres & Dulces', crafts: 'Artesanías', service: 'Servicios' };
       const catColors = { food: '#ea580c', beer: '#f59e0b', sweets: '#ec4899', crafts: '#059669', service: '#2563eb' };
 
-      if (!name) return alert('Ingresa el nombre del local.');
+      if (!name) return alert('Por favor ingresa el nombre del local.');
 
       if (id) {
         const s = stands.find(x => x.id === Number(id));
@@ -2122,6 +2264,11 @@
           s.icon = icon;
           s.logoUrl = logoUrl;
           s.desc = desc;
+          s.locationNote = locationNote;
+          s.latOffset = latOffset;
+          s.lngOffset = lngOffset;
+          s.lat = DEFAULT_CENTER[0] + latOffset;
+          s.lng = DEFAULT_CENTER[1] + lngOffset;
           s.whatsapp = wp;
           s.bankData = bankData;
         }
@@ -2137,11 +2284,16 @@
           icon: icon,
           logoUrl: logoUrl,
           desc: desc,
-          latOffset: (Math.random() - 0.5) * 0.0004,
-          lngOffset: (Math.random() - 0.5) * 0.0004,
+          locationNote: locationNote,
+          latOffset: latOffset,
+          lngOffset: lngOffset,
+          lat: DEFAULT_CENTER[0] + latOffset,
+          lng: DEFAULT_CENTER[1] + lngOffset,
           whatsapp: wp,
           bankData: bankData,
-          products: []
+          products: [
+            { name: 'Producto Especial ' + name, price: '$3.500', inStock: true, desc: 'Especialidad de la casa' }
+          ]
         });
       }
 
@@ -2157,6 +2309,97 @@
         renderAdminStandsList();
       }
     }
+
+    // ========================================================
+    // CARTELES QR PARA IMPRIMIR Y ESCANEO EN TERRENO
+    // ========================================================
+    function openPrintQrModal() {
+      const container = document.getElementById('printQrFlyersGrid');
+      container.innerHTML = '';
+      const commercial = stands.filter(s => s.category !== 'service');
+
+      commercial.forEach(stand => {
+        const baseUrl = 'https://contactoandeslink-gif.github.io/mapa-festival-villa/';
+        const standUrl = `${baseUrl}?stand=${encodeURIComponent(stand.number || stand.id)}`;
+        const qrImgSrc = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(standUrl)}`;
+
+        const flyer = document.createElement('div');
+        flyer.className = 'bg-white text-slate-900 rounded-3xl p-6 shadow-2xl border-4 border-slate-900 flex flex-col items-center text-center gap-4 page-break-inside-avoid print:border-2 print:shadow-none print:m-4';
+        flyer.innerHTML = `
+          <div class="flex items-center gap-2 border-b-2 border-slate-200 pb-2 w-full justify-center">
+            <span class="text-2xl">🎪</span>
+            <span class="font-black font-display text-sm uppercase tracking-tight text-slate-800">FESTIVAL VILLA 2026 • APP OFICIAL</span>
+          </div>
+
+          <div class="w-full">
+            <span class="inline-block px-3 py-1 rounded-full text-xs font-black uppercase text-white shadow" style="background-color: ${stand.color || '#ea580c'}">
+              PUESTO ${stand.number} • ${stand.categoryName}
+            </span>
+            <h2 class="text-2xl font-black font-display text-slate-950 mt-1 leading-tight">${stand.name}</h2>
+            ${stand.locationNote ? `<p class="text-xs text-slate-600 font-bold mt-0.5">📍 ${stand.locationNote}</p>` : ''}
+          </div>
+
+          <!-- Código QR nítido -->
+          <div class="p-3 bg-slate-50 border-2 border-slate-300 rounded-2xl shadow-inner">
+            <img src="${qrImgSrc}" class="w-48 h-48 sm:w-56 sm:h-56 object-contain" alt="QR Puesto ${stand.number}">
+          </div>
+
+          <div class="space-y-1">
+            <p class="text-xs font-black uppercase text-slate-800">📲 ESCANEA CON LA CÁMARA DE TU CELULAR</p>
+            <p class="text-[11px] text-slate-600 leading-snug max-w-xs">
+              Verás tu ubicación en el mapa, horarios en vivo del escenario y nuestra carta completa con pago digital.
+            </p>
+          </div>
+        `;
+        container.appendChild(flyer);
+      });
+
+      document.getElementById('printQrModal').classList.remove('hidden');
+    }
+
+    function closePrintQrModal() {
+      document.getElementById('printQrModal').classList.add('hidden');
+    }
+
+    function previewStandQrFlyer(standId) {
+      openPrintQrModal();
+      // Desplazarse al modal
+    }
+
+    function openAdminQrScannerModal() {
+      const select = document.getElementById('quickStandSelect');
+      select.innerHTML = '';
+      stands.filter(s => s.category !== 'service').forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.id;
+        opt.textContent = `[${s.number}] ${s.name} (${s.categoryName})`;
+        select.appendChild(opt);
+      });
+      document.getElementById('adminQrScannerModal').classList.remove('hidden');
+    }
+
+    function closeAdminQrScannerModal() {
+      document.getElementById('adminQrScannerModal').classList.add('hidden');
+    }
+
+    function goToSelectedStandEdit() {
+      const selId = Number(document.getElementById('quickStandSelect').value);
+      closeAdminQrScannerModal();
+      if (selId) editStandModal(selId);
+    }
+
+    // Auto-detección por parámetro URL (ej: admin.html?editStand=P-01 o ?scan=P-02)
+    window.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const scanParam = urlParams.get('scan') || urlParams.get('editStand') || urlParams.get('stand');
+      if (scanParam) {
+        const found = stands.find(s => s.number === scanParam || String(s.id) === scanParam);
+        if (found) {
+          switchAdminTab('stands');
+          setTimeout(() => editStandModal(found.id), 300);
+        }
+      }
+    });
 
     // ========================================================
     // 3. SERVICIOS (BAÑOS, ESCENARIO, SEGURIDAD)
@@ -2244,5 +2487,67 @@
     renderAdminStandsList();
     renderAdminServices();
   </script>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: IMPRIMIR CARTELES QR DE LA FERIA                  -->
+  <!-- ======================================================== -->
+  <div id="printQrModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex flex-col p-4 sm:p-6 overflow-y-auto no-scrollbar">
+    <div class="max-w-4xl mx-auto w-full bg-slate-900 border border-slate-700 rounded-3xl p-6 shadow-2xl flex flex-col gap-6 text-white my-auto">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+        <div>
+          <h2 class="text-xl font-black font-display text-white flex items-center gap-2">
+            <span>🖨️</span> Carteles QR Oficiales de los Puestos
+          </h2>
+          <p class="text-xs text-slate-400">Imprime estos carteles para colocarlos en los mesones y toldos. Los asistentes escanearán para ver su ubicación, carta y pagar.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="window.print()" class="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:brightness-110 text-white font-black text-xs rounded-xl shadow-lg flex items-center gap-1.5 transition">
+            <span>🖨️</span> Imprimir Todo
+          </button>
+          <button onclick="closePrintQrModal()" class="text-slate-400 hover:text-white text-xl p-1">✕</button>
+        </div>
+      </div>
+
+      <!-- Grid de Carteles de Puestos -->
+      <div id="printQrFlyersGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-6 print:grid-cols-1 print:gap-12">
+        <!-- Render dinámico de cada cartel -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: ESCANEAR QR PARA EDITAR PUESTO EN TERRENO          -->
+  <!-- ======================================================== -->
+  <div id="adminQrScannerModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-sm w-full p-6 shadow-2xl flex flex-col gap-4 text-white text-center">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-sm font-black font-display text-white flex items-center gap-1.5">
+          <span>📷</span> Escanear QR de Puesto
+        </h3>
+        <button onclick="closeAdminQrScannerModal()" class="text-slate-400 hover:text-white text-lg">✕</button>
+      </div>
+
+      <div class="p-6 bg-slate-950 rounded-2xl border border-dashed border-blue-500/50 flex flex-col items-center gap-3">
+        <div class="w-16 h-16 rounded-2xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-3xl animate-pulse">
+          📷
+        </div>
+        <div>
+          <p class="text-xs font-bold text-white">Selecciona o escanea el puesto</p>
+          <p class="text-[11px] text-slate-400 mt-1">Se abrirá de inmediato su panel para cambiar precios, stock o tomar foto.</p>
+        </div>
+      </div>
+
+      <div class="space-y-2 text-left">
+        <label class="text-[11px] font-bold text-slate-300 block">Elegir puesto de la lista rápidamente:</label>
+        <select id="quickStandSelect" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none">
+          <!-- Opciones dinámicas -->
+        </select>
+        <button onclick="goToSelectedStandEdit()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-black rounded-xl shadow-lg transition">
+          Abrir Editor de este Puesto
+        </button>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
