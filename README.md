@@ -22,10 +22,35 @@ Abre https://contactoandeslink-gif.github.io/mapa-festival-villa/ — funciona c
 | `sw.js` | Service Worker: caché offline del app shell, teselas del mapa y media |
 | `manifest.webmanifest` + `icon.svg` | PWA instalable |
 
+## 🗺️ Editor Visual del Recinto (cada feria es distinta)
+
+En `admin.html`, pestaña **🗺️ Diseño del Recinto**:
+
+| Herramienta | Qué hace |
+|-------------|----------|
+| 👆 Mover Puestos | Arrastra cualquier puesto con mouse o dedo; se guarda y publica solo |
+| ➕ Agregar Puesto | Clic en el mapa → se abre la ficha con la ubicación ya puesta |
+| 🛤️ Dibujar Pasillo | Clics para marcar puntos → ✅ Finalizar → nombre. Aparece en la app del asistente y las rutas “¿Cómo llegar?” lo siguen |
+| 🧩 Dibujar Sector | Dos clics en esquinas opuestas → nombre y color. Zona sombreada con banner en el mapa del asistente + entrada en la leyenda |
+| 🗑️ Eliminar | Clic sobre puesto, pasillo o sector → confirmar → fuera |
+
+El diseño (`festival_layout`: sectores + pasillos) se guarda en localStorage, se propaga por BroadcastChannel y se sube a Supabase como fila `layout` (los teléfonos lo reciben en el siguiente poll de 25 s). El asistente ve: sectores sombreados con banners, pasillos punteados con rótulo, leyenda 🗺️ colapsable, aviso “📍 ¡Usted está aquí!” al primer GPS y rutas peatronales que siguen los pasillos.
+
+## 🎨 Facelift visual + GPS inteligente (2026-11-13)
+
+- **Tema claro diurno por defecto** (fondo #F1F5F9, legible bajo el sol) con botón ☀️/🌙 que alterna al modo nocturno y persiste la preferencia.
+- **Puestos como rectángulos proporcionales** tipo plano de feria profesional (pines circulares solo para Baños/Escenario/Entrada).
+- **Navegación única** (barra inferior); header compacto.
+- **Nombres de pasillo** aparecen al acercar el zoom (como calles en Google Maps); banners y rótulos con `pointer-events: none` (nunca roban el toque).
+- **Búsqueda con vitrina de precios:** al buscar un producto, su precio aparece flotando sobre el pin del puesto y los no coincidentes se atenúan (nunca desaparecen).
+- **Estado del puesto en vivo** (🟢 OK / ⏳ Fila / 🔴 Agotado): el admin lo cambia con un toque y el rectángulo se apaga/etiqueta en todos los teléfonos en el próximo sync.
+- **GPS anti-saltos** (suavizado exponencial + rechazo de teletransportes), **snap a pasillos** (<8m se pega al centro del pasillo, como el auto de Google Maps), rumbo por curso GPS al caminar, y **distancia real caminando** (suma de tramos de la ruta, no línea recta).
+- **Editor:** snap-to-grid al soltar un puesto cerca de un pasillo (cuadrícula ~3.3m) con **auto-numeración** (“Pasillo Central #4”).
+
 ## ⚙️ Configuración importante
 
 - **Fecha del evento:** en `index.html`, constante `EVENT_DATE` (formato `'YYYY-MM-DD'`). Con `null` la app asume que el festival es hoy (modo demo). Con fecha definida, fuera de ese día muestra "📅 Próxima edición" en vez de fingir un show en vivo.
-- **Coordenadas de la cancha:** constante `DEFAULT_CENTER` en `index.html`.
+- **Coordenadas de la cancha:** constante `DEFAULT_CENTER` en `index.html` y `admin.html`.
 - **Versión de datos:** `DATA_VERSION` (en `index.html` y `admin.html`, deben coincidir). Súbela cuando cambies los datos por defecto para limpiar cachés viejas de los visitantes.
 
 ## 🧭 Funcionalidades
