@@ -2157,6 +2157,9 @@ create policy "Escritura pública del festival" on festival_config for all using
         <button type="button" onclick="copySupabaseSql()" class="w-full py-1.5 px-2 bg-slate-900 hover:bg-slate-800 text-slate-300 text-[10px] font-bold rounded-lg border border-slate-700 flex items-center justify-center gap-1 transition">
           <span>📋</span> Copiar Script SQL para Supabase
         </button>
+        <p class="text-amber-400/90 text-[10px] leading-snug border-t border-slate-800 pt-2">
+          ⚠️ <b>Atención:</b> la política de "escritura pública" permite que CUALQUIER persona en internet que conozca la URL del proyecto modifique los datos del festival (precios, stock e incluso las cuentas bancarias de los puestos). Para el día del evento, protege la escritura con una Edge Function (guía en el README del repo) o revisa los datos frecuentemente.
+        </p>
       </div>
 
     </div>
