@@ -2,15 +2,23 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Mapa interactivo oficial del Gran Festival de la Villa: puestos de comida, escenario en vivo, baños y navegación GPS en la cancha.">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="theme-color" content="#0f172a">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <title>Gran Festival de la Villa - App Oficial del Asistente</title>
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   
-  <!-- Leaflet CSS & JS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Leaflet CSS & JS (con SRI: verificado sha384) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin="anonymous"></script>
 
   <!-- Google Fonts: Plus Jakarta Sans & Outfit -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -66,177 +74,11 @@
       100% { transform: scale(2.4); opacity: 0; }
     }
 
-    .stand-pin-leaflet-icon {
-      background: transparent !important;
-      border: none !important;
-    }
-    .stand-marker-wrap {
-      width: 44px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      position: relative;
-      cursor: pointer;
-      filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.45));
-      transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-    .stand-marker-wrap:hover,
-    .stand-marker-wrap:active {
-      transform: scale(1.15) translateY(-4px);
-      z-index: 999 !important;
-    }
-    .stand-pin-circle {
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      border: 2.5px solid #ffffff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      overflow: hidden;
-      box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.25), 0 3px 6px rgba(0, 0, 0, 0.35);
-    }
-    .stand-number-pill {
-      position: absolute;
-      top: -4px;
-      right: -5px;
-      background: #0f172a;
-      color: #ffffff;
-      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-      font-size: 9px;
-      font-weight: 900;
-      padding: 1px 5px;
-      border-radius: 9999px;
-      border: 1.5px solid #ffffff;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.4);
-      line-height: 1.1;
-      pointer-events: none;
-    }
-    .stand-pin-pointer {
-      width: 0;
-      height: 0;
-      border-left: 6px solid transparent;
-      border-right: 6px solid transparent;
-      border-top: 7px solid #ffffff;
-      margin-top: -1px;
-    }
-    .stage-banner-marker, .entrance-banner-marker, .aisle-floor-label {
-      background: transparent !important;
-      border: none !important;
-      pointer-events: auto;
-    }
-
-    .leaflet-routing-line {
-      stroke-dasharray: 8, 8;
-      animation: dash 1s linear infinite;
-    }
-    @keyframes dash {
-      to { stroke-dashoffset: -16; }
-    }
-  
     /* ESTILOS DE FESTIVAL DINÁMICO & PUESTOS 3D */
     .stand-pin-leaflet-icon {
       background: transparent !important;
       border: none !important;
     }
-    .stand-booth-marker {
-      width: 48px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      position: relative;
-      cursor: pointer;
-      filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.5));
-      transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.2s;
-    }
-    .stand-booth-marker:hover, .stand-booth-marker:active {
-      transform: scale(1.18) translateY(-4px);
-      z-index: 999 !important;
-    }
-    .stand-booth-marker.stand-selected {
-      transform: scale(1.25) translateY(-6px);
-      z-index: 1000 !important;
-      filter: drop-shadow(0 0 16px rgba(251, 191, 36, 0.95)) drop-shadow(0 8px 20px rgba(0, 0, 0, 0.6));
-    }
-    .stand-booth-marker.stand-dimmed {
-      opacity: 0.35;
-      filter: grayscale(60%) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-    }
-
-    /* Toldo rayado estilo feria artesanal */
-    .stand-toldo {
-      width: 38px;
-      height: 10px;
-      border-radius: 6px 6px 0 0;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-      position: relative;
-      z-index: 2;
-      border: 1.5px solid #ffffff;
-      border-bottom: none;
-    }
-    .stand-toldo.toldo-food {
-      background: repeating-linear-gradient(45deg, #ef4444, #ef4444 5px, #ffffff 5px, #ffffff 10px);
-    }
-    .stand-toldo.toldo-beer {
-      background: repeating-linear-gradient(45deg, #f59e0b, #f59e0b 5px, #ffffff 5px, #ffffff 10px);
-    }
-    .stand-toldo.toldo-sweets {
-      background: repeating-linear-gradient(45deg, #ec4899, #ec4899 5px, #ffffff 5px, #ffffff 10px);
-    }
-    .stand-toldo.toldo-crafts {
-      background: repeating-linear-gradient(45deg, #8b5cf6, #8b5cf6 5px, #ffffff 5px, #ffffff 10px);
-    }
-    .stand-toldo.toldo-service {
-      background: repeating-linear-gradient(45deg, #0284c7, #0284c7 5px, #ffffff 5px, #ffffff 10px);
-    }
-
-    /* Píldora del número del puesto - SIEMPRE NÍTIDA Y NUNCA CORTADA */
-    .stand-number-badge {
-      position: absolute;
-      top: -12px;
-      right: -8px;
-      background: #0f172a;
-      color: #fbbf24;
-      font-family: 'Outfit', 'Plus Jakarta Sans', system-ui, sans-serif;
-      font-size: 10px;
-      font-weight: 900;
-      padding: 1.5px 6px;
-      border-radius: 9999px;
-      border: 1.5px solid #ffffff;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.6);
-      z-index: 20;
-      white-space: nowrap;
-      pointer-events: none;
-      letter-spacing: 0.5px;
-    }
-
-    /* Cuerpo circular del puesto */
-    .stand-booth-circle {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      border: 2.5px solid #ffffff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      overflow: hidden;
-      margin-top: -2px;
-      box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.3), 0 4px 8px rgba(0, 0, 0, 0.4);
-    }
-
-    /* Flecha puntero al suelo */
-    .stand-booth-pointer {
-      width: 0;
-      height: 0;
-      border-left: 6px solid transparent;
-      border-right: 6px solid transparent;
-      border-top: 7px solid #ffffff;
-      margin-top: -1px;
-      filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));
-    }
-
     /* Luces de escenario animadas */
     @keyframes laserBeamLeft {
       0%, 100% { transform: rotate(-25deg); opacity: 0.4; }
@@ -370,14 +212,6 @@
       white-space: nowrap;
       margin-top: 2px;
       pointer-events: none;
-    }
-
-    .festival-walk-route {
-      stroke-dasharray: 8, 10;
-      animation: festivalWalkDash 1.2s linear infinite;
-    }
-    @keyframes festivalWalkDash {
-      to { stroke-dashoffset: -18; }
     }
   
     /* ANIMACIÓN DEL MODAL ENCIMA DEL MAPA */
@@ -829,13 +663,33 @@
   <!-- SCRIPT: BASE DE DATOS MASIVA (20 LOCALES & 10 ARTISTAS)  -->
   <!-- ======================================================== -->
   <script>
-    // Limpiar caché vieja si la versión de datos cambió
-    const DATA_VERSION = '2026.08.modal_stacking_perfect_v2';
-    if (localStorage.getItem('festival_data_version') !== DATA_VERSION) {
-      localStorage.setItem('festival_data_version', DATA_VERSION);
-      localStorage.removeItem('festival_admin_schedule');
-      localStorage.removeItem('festival_admin_stands');
-      localStorage.removeItem('festival_manual_live_id');
+    // Limpiar caché vieja si la versión de datos cambió (con try/catch: Safari privado puede bloquear localStorage)
+    const DATA_VERSION = '2026.11.fixes_v3';
+    function safeLSGet(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
+    function safeLSSet(key, val) { try { localStorage.setItem(key, val); } catch (e) {} }
+    function safeLSRemove(key) { try { localStorage.removeItem(key); } catch (e) {} }
+
+    // Escapado HTML anti-XSS para todo dato editable que se inyecta con innerHTML
+    function esc(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    // Fecha del evento: 'YYYY-MM-DD' del día real del festival. null = asumir que es hoy (modo demo)
+    const EVENT_DATE = null;
+    function isEventDay(chileDate) {
+      if (!EVENT_DATE) return true;
+      const p = n => String(n).padStart(2, '0');
+      return `${chileDate.getFullYear()}-${p(chileDate.getMonth() + 1)}-${p(chileDate.getDate())}` === EVENT_DATE;
+    }
+
+    if (safeLSGet('festival_data_version') !== DATA_VERSION) {
+      safeLSSet('festival_data_version', DATA_VERSION);
+      safeLSRemove('festival_admin_schedule');
+      safeLSRemove('festival_admin_stands');
+      safeLSRemove('festival_manual_live_id');
     }
 
     const DEFAULT_SCHEDULE = [
@@ -1230,13 +1084,20 @@
 ];
 
             // Cargar del localStorage o inicializar con los nuevos defaults profesionales
-    let stageSchedule = JSON.parse(localStorage.getItem('festival_admin_schedule') || 'null') || DEFAULT_SCHEDULE;
-    let stands = JSON.parse(localStorage.getItem('festival_admin_stands') || 'null') || DEFAULT_STANDS;
+    let stageSchedule;
+    let stands;
+    try { stageSchedule = JSON.parse(safeLSGet('festival_admin_schedule') || 'null'); } catch (e) { stageSchedule = null; }
+    try { stands = JSON.parse(safeLSGet('festival_admin_stands') || 'null'); } catch (e) { stands = null; }
+    if (!stageSchedule || !Array.isArray(stageSchedule)) stageSchedule = DEFAULT_SCHEDULE;
+    if (!stands || !Array.isArray(stands)) stands = DEFAULT_STANDS;
 
     // ========================================================
     // 3. SINCRONIZACIÓN EN VIVO CON EL ADMINISTRADOR
     // ========================================================
-    const eventChannel = new BroadcastChannel('festival_live_sync');
+    // Guard: BroadcastChannel no existe en Safari iOS < 15.4 (sin esto, el script entero moría)
+    const eventChannel = ('BroadcastChannel' in window)
+      ? new BroadcastChannel('festival_live_sync')
+      : { postMessage() {}, set onmessage(fn) {}, get onmessage() { return null; } };
     eventChannel.onmessage = (event) => {
       if (event.data.type === 'SYNC_ALL') {
         stageSchedule = event.data.schedule;
@@ -1262,6 +1123,78 @@
     };
 
     // Escuchar cambios de localStorage entre pestañas
+    
+    // --------------------------------------------------------
+    // SINCRONIZACIÓN EN LA NUBE (SUPABASE / BACKEND COMPARTIDO)
+    // --------------------------------------------------------
+    // Permite que todos los celulares reciban en tiempo real cambios del admin
+    function checkUrlSupabaseParams() {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const sbUrl = params.get('sb_url');
+        const sbKey = params.get('sb_key');
+        if (sbUrl && sbKey) {
+          safeLSSet('festival_supabase_url', sbUrl);
+          safeLSSet('festival_supabase_key', sbKey);
+        }
+      } catch (e) {}
+    }
+    checkUrlSupabaseParams();
+
+    async function fetchCloudSync() {
+      const url = safeLSGet('festival_supabase_url');
+      const key = safeLSGet('festival_supabase_key');
+      if (!url || !key) return;
+
+      try {
+        const cleanUrl = url.replace(/\/+$/, '');
+        const res = await fetch(`${cleanUrl}/rest/v1/festival_config?select=*`, {
+          headers: {
+            'apikey': key,
+            'Authorization': `Bearer ${key}`
+          }
+        });
+
+        if (res.ok) {
+          const rows = await res.json();
+          if (Array.isArray(rows) && rows.length > 0) {
+            let changed = false;
+            rows.forEach(r => {
+              if (r.key === 'stands' && Array.isArray(r.value)) {
+                stands = r.value;
+                safeLSSet('festival_admin_stands', JSON.stringify(stands));
+                changed = true;
+              } else if (r.key === 'schedule' && Array.isArray(r.value)) {
+                stageSchedule = r.value;
+                safeLSSet('festival_admin_schedule', JSON.stringify(stageSchedule));
+                changed = true;
+              } else if (r.key === 'manual_live_id') {
+                if (r.value) safeLSSet('festival_manual_live_id', String(r.value));
+                else safeLSRemove('festival_manual_live_id');
+                changed = true;
+              }
+            });
+            if (changed) {
+              renderLiveHero();
+              renderScheduleList();
+              renderStandsFeed();
+              renderStandsOnMap();
+              showLiveToast('⚡ Información actualizada en vivo desde el festival');
+            }
+          }
+        }
+      } catch (err) {
+        // En caso de corte de señal o modo avión, la app continúa offline sin errores
+      }
+    }
+
+    // Inicializar sincronización en segundo plano
+    fetchCloudSync();
+    setInterval(fetchCloudSync, 25000);
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) fetchCloudSync();
+    });
+
     window.addEventListener('storage', (e) => {
       if (e.key === 'festival_admin_schedule' && e.newValue) {
         try { stageSchedule = JSON.parse(e.newValue); renderLiveHero(); renderScheduleList(); } catch (err) {}
@@ -1272,11 +1205,11 @@
     });
 
     // Cargar si el admin guardó cambios previos en este navegador
-    const savedSchedule = localStorage.getItem('festival_admin_schedule');
+    const savedSchedule = safeLSGet('festival_admin_schedule');
     if (savedSchedule) {
       try { stageSchedule = JSON.parse(savedSchedule); } catch (e) {}
     }
-    const savedStands = localStorage.getItem('festival_admin_stands');
+    const savedStands = safeLSGet('festival_admin_stands');
     if (savedStands) {
       try { stands = JSON.parse(savedStands); } catch (e) {}
     }
@@ -1382,13 +1315,21 @@
     function autoResolveScheduleStatus() {
       const chileDate = getChileDateObj();
       const currentTotalMin = chileDate.getHours() * 60 + chileDate.getMinutes();
-      const manualLiveId = localStorage.getItem('festival_manual_live_id');
+      const manualLiveId = safeLSGet('festival_manual_live_id');
 
       const firstAct = stageSchedule[0];
       const firstStartMin = firstAct ? parseTimeToMinutes(firstAct.time.split('-')[0]) : 900; // 15:00 default
       const lastAct = stageSchedule[stageSchedule.length - 1];
       let lastEndMin = lastAct ? parseTimeToMinutes(lastAct.time.split('-')[1]) : 60; // 01:00 default
       if (lastEndMin < 300) lastEndMin += 24 * 60; // 01:00 AM trasnoche = 25 * 60
+
+      // 0. NO ES EL DÍA DEL EVENTO (si EVENT_DATE está configurado)
+      if (!isEventDay(chileDate)) {
+        festivalLifecycleState = 'NO_EVENT_DAY';
+        stageSchedule.forEach(act => act.status = 'upcoming');
+        activeFocusAct = firstAct;
+        return;
+      }
 
       // Si el Administrador forzó un show específico con "Subir Ahora"
       if (manualLiveId) {
@@ -1492,7 +1433,10 @@
       // Actualizar insignia del encabezado
       const headerBadge = document.getElementById('headerLiveStatusBadge');
       if (headerBadge) {
-        if (festivalLifecycleState === 'PRE_EVENT') {
+        if (festivalLifecycleState === 'NO_EVENT_DAY') {
+          headerBadge.className = 'inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-black uppercase bg-blue-600/20 text-blue-300 border border-blue-500/40 transition';
+          headerBadge.innerHTML = '📅 PRÓXIMO FESTIVAL';
+        } else if (festivalLifecycleState === 'PRE_EVENT') {
           headerBadge.className = 'inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-black uppercase bg-amber-500/20 text-amber-300 border border-amber-500/40 transition';
           headerBadge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> HOY 15:00';
         } else if (festivalLifecycleState === 'POST_EVENT') {
@@ -1516,6 +1460,17 @@
       const progBar = document.getElementById('liveProgressBar');
 
       const currentTotalMin = chileDate.getHours() * 60 + chileDate.getMinutes();
+
+      if (festivalLifecycleState === 'NO_EVENT_DAY') {
+        const eventDateTxt = EVENT_DATE ? EVENT_DATE.split('-').reverse().join('-') : '';
+        if (statLabelElapsed) statLabelElapsed.textContent = 'Próxima Edición';
+        if (statElapsed) statElapsed.textContent = eventDateTxt || 'Por anunciar';
+        if (statLabelRemaining) statLabelRemaining.textContent = 'Estado';
+        if (statRemaining) statRemaining.textContent = '🎪 Preparando todo';
+        if (summaryText) summaryText.textContent = `🎪 El festival ${eventDateTxt ? 'se realizará el ' + eventDateTxt : 'está por anunciar'}. Revisa la parrilla y los locales.`;
+        if (progBar) progBar.style.width = '0%';
+        return;
+      }
 
       if (festivalLifecycleState === 'PRE_EVENT') {
         const firstStart = activeFocusAct ? parseTimeToMinutes(activeFocusAct.time.split('-')[0]) : 900;
@@ -1593,7 +1548,10 @@
       const isIntermission = liveAct.type === 'intermission';
       const liveStatusBadge = document.getElementById('heroLiveStatusBadge');
       if (liveStatusBadge) {
-        if (festivalLifecycleState === 'PRE_EVENT') {
+        if (festivalLifecycleState === 'NO_EVENT_DAY') {
+          liveStatusBadge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-blue-600/30 text-blue-300 border border-blue-500/40 shadow';
+          liveStatusBadge.innerHTML = '📅 PRÓXIMA EDICIÓN DEL FESTIVAL';
+        } else if (festivalLifecycleState === 'PRE_EVENT') {
           liveStatusBadge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 shadow-lg shadow-amber-500/30';
           liveStatusBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-slate-950"></span> ⏳ APERTURA HOY 15:00 HRS';
         } else if (festivalLifecycleState === 'POST_EVENT') {
@@ -1624,25 +1582,40 @@
 
       // Siguiente artista
       const currentIdx = stageSchedule.findIndex(s => s.id === liveAct.id);
-      const nextAct = stageSchedule[currentIdx + 1] || stageSchedule[1];
+      const nextAct = stageSchedule[currentIdx + 1] || null;
       const nextCard = document.getElementById('nextArtistCard');
-      if (nextAct) {
-        const nextStartHour = (nextAct.time || '').split('-')[0].trim();
-        nextCard.innerHTML = `
-          <div class="flex items-center gap-3">
-            <div class="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-2xl shrink-0">
-              ⚡
+      if (nextCard) {
+        if (nextAct) {
+          const nextStartHour = (nextAct.time || '').split('-')[0].trim();
+          nextCard.innerHTML = `
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-2xl shrink-0">
+                ⚡
+              </div>
+              <div>
+                <span class="text-[10px] font-black uppercase tracking-wider text-amber-400">A Continuación (${esc(nextStartHour)} hrs)</span>
+                <h3 class="text-sm sm:text-base font-black text-white font-display">${esc(nextAct.artist)}</h3>
+                <p class="text-xs text-slate-400 truncate max-w-[200px] sm:max-w-xs">${esc(nextAct.genre)}</p>
+              </div>
             </div>
-            <div>
-              <span class="text-[10px] font-black uppercase tracking-wider text-amber-400">A Continuación (${nextStartHour} hrs)</span>
-              <h3 class="text-sm sm:text-base font-black text-white font-display">${nextAct.artist}</h3>
-              <p class="text-xs text-slate-400 truncate max-w-[200px] sm:max-w-xs">${nextAct.genre}</p>
+            <span class="text-xs font-bold text-amber-300 bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700 shrink-0 font-mono">
+              ${esc(nextStartHour)} hrs
+            </span>
+          `;
+        } else {
+          nextCard.innerHTML = `
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-2xl shrink-0">
+                🏁
+              </div>
+              <div>
+                <span class="text-[10px] font-black uppercase tracking-wider text-slate-400">Cierre de la Jornada</span>
+                <h3 class="text-sm sm:text-base font-black text-white font-display">Gracias por venir al Festival de la Villa</h3>
+                <p class="text-xs text-slate-400">Vuelve a revisar la parrilla de la próxima edición</p>
+              </div>
             </div>
-          </div>
-          <span class="text-xs font-bold text-amber-300 bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700 shrink-0 font-mono">
-            ${nextStartHour} hrs
-          </span>
-        `;
+          `;
+        }
       }
     }
 
@@ -1671,11 +1644,11 @@
               </div>
               <div>
                 <div class="flex items-center gap-2">
-                  <h4 class="text-xs font-bold text-amber-300">${act.artist}</h4>
+                  <h4 class="text-xs font-bold text-amber-300">${esc(act.artist)}</h4>
                   <span class="text-[9px] bg-amber-500 text-black font-black uppercase px-2 py-0.5 rounded-full">PAUSA</span>
                   ${isLive ? '<span class="text-[9px] bg-red-600 text-white font-black uppercase px-2 py-0.5 rounded-full animate-pulse">EN ESTE MOMENTO</span>' : ''}
                 </div>
-                <p class="text-[11px] text-slate-400 mt-0.5">${act.genre}</p>
+                <p class="text-[11px] text-slate-400 mt-0.5">${esc(act.genre)}</p>
               </div>
             </div>
             <div class="text-right shrink-0">
@@ -1700,12 +1673,12 @@
               </div>
               <div>
                 <div class="flex items-center gap-2">
-                  <h4 class="text-xs font-black text-white">${act.artist}</h4>
+                  <h4 class="text-xs font-black text-white">${esc(act.artist)}</h4>
                   ${isLive ? '<span class="text-[9px] bg-red-600 text-white font-black uppercase px-2 py-0.5 rounded-full animate-pulse">EN VIVO</span>' : ''}
                   ${act.type === 'tribute' ? '<span class="text-[9px] bg-purple-900/80 text-purple-300 border border-purple-500/30 px-1.5 py-0.5 rounded font-bold">Tributo</span>' : ''}
                   ${act.type === 'humor' ? '<span class="text-[9px] bg-yellow-900/80 text-yellow-300 border border-yellow-500/30 px-1.5 py-0.5 rounded font-bold">Humor</span>' : ''}
                 </div>
-                <p class="text-[11px] text-slate-400 mt-0.5">${act.genre}</p>
+                <p class="text-[11px] text-slate-400 mt-0.5">${esc(act.genre)}</p>
               </div>
             </div>
             <div class="text-right shrink-0">
@@ -1731,6 +1704,10 @@
 
     function shareArtist() {
       const liveAct = stageSchedule.find(s => s.status === 'live');
+      if (!liveAct) {
+        alert('🎸 En este momento no hay un show en vivo en la tarima. Revisa la parrilla de horarios para saber cuándo toca tu artista favorito.');
+        return;
+      }
       if (navigator.share) {
         navigator.share({
           title: `¡${liveAct.artist} está tocando en vivo!`,
@@ -1770,15 +1747,15 @@
             prodsHtml += `
               <div class="bg-slate-950/80 rounded-2xl p-2.5 border border-slate-800 flex items-center gap-3">
                 <div class="w-16 h-16 rounded-xl bg-slate-800 shrink-0 overflow-hidden border border-slate-700">
-                  <img src="${p.image}" class="w-full h-full object-cover" alt="${p.name}" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=200';">
+                  <img src="${esc(p.image)}" class="w-full h-full object-cover" alt="${esc(p.name)}" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=200';">
                 </div>
                 <div class="min-w-0 flex-1">
                   <div class="flex items-center gap-1 mb-0.5">
-                    ${p.tag ? `<span class="text-[8px] bg-amber-500/20 text-amber-300 border border-amber-500/40 px-1 py-0.2 rounded font-black truncate">${p.tag}</span>` : ''}
+                    ${p.tag ? `<span class="text-[8px] bg-amber-500/20 text-amber-300 border border-amber-500/40 px-1 py-0.2 rounded font-black truncate">${esc(p.tag)}</span>` : ''}
                   </div>
-                  <h5 class="text-xs font-black text-white truncate">${p.name}</h5>
-                  <p class="text-[10px] text-slate-400 line-clamp-1">${p.desc || ''}</p>
-                  <span class="text-xs font-extrabold text-orange-400 block mt-1">${p.price}</span>
+                  <h5 class="text-xs font-black text-white truncate">${esc(p.name)}</h5>
+                  <p class="text-[10px] text-slate-400 line-clamp-1">${esc(p.desc || '')}</p>
+                  <span class="text-xs font-extrabold text-orange-400 block mt-1">${esc(p.price)}</span>
                 </div>
               </div>
             `;
@@ -1796,12 +1773,12 @@
         card.innerHTML = `
           <!-- Portada del Food Truck con rating y badge -->
           <div class="relative h-28 w-full overflow-hidden bg-slate-950">
-            <img src="${bannerImage}" class="w-full h-full object-cover brightness-[0.70] hover:scale-105 transition duration-500" alt="${stand.name}">
+            <img src="${esc(bannerImage)}" class="w-full h-full object-cover brightness-[0.70] hover:scale-105 transition duration-500" alt="${esc(stand.name)}">
             <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent"></div>
             
             <div class="absolute top-2.5 right-2.5 bg-black/70 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-black text-amber-300 border border-amber-500/40 flex items-center gap-1 shadow">
-              <span>⭐ ${stand.rating || '4.9'}</span>
-              <span class="text-slate-400 font-normal">• ${stand.prepTime || '10 min'}</span>
+              <span>⭐ ${esc(stand.rating || '4.9')}</span>
+              <span class="text-slate-400 font-normal">• ${esc(stand.prepTime || '10 min')}</span>
             </div>
           </div>
 
@@ -1810,20 +1787,20 @@
             <div>
               <div class="flex items-end justify-between -mt-8 mb-2">
                 <div class="w-16 h-16 rounded-2xl bg-slate-900 border-2 border-amber-500/40 shadow-2xl overflow-hidden p-0.5 shrink-0">
-                  <img src="${stand.logoUrl}" class="w-full h-full object-contain rounded-xl" alt="${stand.name}">
+                  <img src="${esc(stand.logoUrl)}" class="w-full h-full object-contain rounded-xl" alt="${esc(stand.name)}">
                 </div>
                 <div class="flex items-center gap-1.5">
                   <span class="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-lg bg-orange-600 text-white shadow">
-                    ${stand.categoryName}
+                    ${esc(stand.categoryName)}
                   </span>
                   <span class="text-xs text-slate-400 font-mono font-bold bg-slate-800 px-2 py-1 rounded-lg border border-slate-700">
-                    ${stand.number}
+                    ${esc(stand.number)}
                   </span>
                 </div>
               </div>
 
-              <h3 class="text-base font-black text-white font-display">${stand.name}</h3>
-              <p class="text-xs text-slate-300 leading-relaxed mt-0.5">${stand.desc}</p>
+              <h3 class="text-base font-black text-white font-display">${esc(stand.name)}</h3>
+              <p class="text-xs text-slate-300 leading-relaxed mt-0.5">${esc(stand.desc)}</p>
             </div>
 
             ${prodsHtml}
@@ -1901,15 +1878,15 @@
                 <div class="flex items-center gap-2.5">
                   <div class="w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 overflow-hidden shrink-0 flex items-center justify-center">
                     ${stand.logoUrl 
-                      ? `<img src="${stand.logoUrl}" class="w-full h-full object-cover" onerror="this.onerror=null;this.parentElement.innerHTML='${stand.icon}';">` 
+                      ? `<img src="${esc(stand.logoUrl)}" class="w-full h-full object-cover" onerror="this.onerror=null;this.parentElement.innerHTML='${stand.icon}';">` 
                       : `<span class="text-base">${stand.icon}</span>`}
                   </div>
                   <div>
                     <div class="flex items-center gap-1.5">
-                      <span class="font-bold text-xs text-white">${stand.name}</span>
-                      <span class="text-[9px] bg-slate-800 text-slate-400 px-1 py-0.5 rounded font-mono font-bold">${stand.number}</span>
+                      <span class="font-bold text-xs text-white">${esc(stand.name)}</span>
+                      <span class="text-[9px] bg-slate-800 text-slate-400 px-1 py-0.5 rounded font-mono font-bold">${esc(stand.number)}</span>
                     </div>
-                    <span class="text-[10px] text-orange-400 font-semibold">${stand.categoryName}</span>
+                    <span class="text-[10px] text-orange-400 font-semibold">${esc(stand.categoryName)}</span>
                   </div>
                 </div>
                 <span class="text-[10px] text-orange-400 font-extrabold uppercase">Ver Local ➔</span>
@@ -1921,8 +1898,8 @@
             matchProducts.forEach(prod => {
               html += `
                 <div class="flex items-center justify-between text-xs bg-slate-950/80 p-1.5 rounded-lg border border-slate-800">
-                  <span class="text-slate-300 font-medium">${prod.name}</span>
-                  <span class="font-extrabold text-orange-400">${prod.price}</span>
+                  <span class="text-slate-300 font-medium">${esc(prod.name)}</span>
+                  <span class="font-extrabold text-orange-400">${esc(prod.price)}</span>
                 </div>
               `;
             });
@@ -2292,6 +2269,7 @@
     // Posición inicial inmediata
     updateUserPosition(userLocation[0], userLocation[1], 4);
 
+    let gpsErrorNotified = false;
     function initGps() {
       if ('geolocation' in navigator) {
         navigator.geolocation.watchPosition(
@@ -2300,6 +2278,10 @@
           },
           (err) => {
             console.warn('GPS no disponible, usando posición en la cancha:', err.message);
+            if (!gpsErrorNotified && err.code === err.PERMISSION_DENIED) {
+              gpsErrorNotified = true;
+              showLiveToast('📍 Activa la ubicación del navegador para ver tu posición real en la cancha');
+            }
           },
           { enableHighAccuracy: true, maximumAge: 2000, timeout: 10000 }
         );
@@ -2338,7 +2320,7 @@
             <!-- Toldo rayado de feria -->
             <div class="stand-toldo ${toldoClass}"></div>
             <!-- Píldora del número nítida -->
-            <span class="stand-number-badge">${stand.number}</span>
+            <span class="stand-number-badge">${esc(stand.number)}</span>
             <!-- Círculo interior con icono/foto -->
             <div class="stand-booth-circle" style="background: radial-gradient(circle, ${categoryColor} 25%, #0f172a 100%);">
               <span class="text-2xl select-none filter drop-shadow">${stand.icon}</span>
@@ -2346,7 +2328,7 @@
             <!-- Puntero al suelo -->
             <div class="stand-booth-pointer"></div>
             <!-- Nombre visible del local -->
-            <span class="stand-label-tag">${shortName}</span>
+            <span class="stand-label-tag">${esc(shortName)}</span>
           </div>
         `;
 
@@ -2394,7 +2376,12 @@
       const productsSection = document.getElementById('modalProductsSection');
       const productsList = document.getElementById('modalProductsList');
 
-      if (banner) banner.src = stand.bannerUrl || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800';
+      // Restaurar visibilidad del banner (un onerror anterior lo dejaba display:none permanente)
+      if (banner) {
+        banner.style.display = '';
+        banner.classList.add('opacity-0');
+        banner.src = stand.bannerUrl || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800';
+      }
       if (iconBox) iconBox.textContent = stand.icon;
       if (numBadge) {
         numBadge.textContent = stand.number;
@@ -2475,12 +2462,12 @@
           productsList.innerHTML = stand.products.map(p => `
             <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-950/80 border border-slate-800">
               <div class="min-w-0 pr-2">
-                <p class="text-xs font-bold text-white truncate">${p.name}</p>
+                <p class="text-xs font-bold text-white truncate">${esc(p.name)}</p>
                 <span class="text-[10px] font-extrabold ${p.inStock ? 'text-emerald-400' : 'text-red-400'}">
                   ${p.inStock ? '● En Stock' : '● Agotado'}
                 </span>
               </div>
-              <span class="text-xs font-black text-amber-400 shrink-0">${p.price}</span>
+              <span class="text-xs font-black text-amber-400 shrink-0">${esc(p.price)}</span>
             </div>
           `).join('');
         } else {
@@ -2502,7 +2489,8 @@
       const distEl = document.getElementById('modalStandDistance');
       if (!distEl || !stand) return;
       const m = calculateDistanceMeters(userLocation[0], userLocation[1], stand.lat, stand.lng);
-      distEl.textContent = '(A ' + m + 'm)';
+      // Si el GPS real está muy lejos del recinto, no mostrar distancias absurdas en metros
+      distEl.textContent = m > 999 ? '(Fuera del recinto)' : '(A ' + m + 'm)';
     }
 
     function startNavigationFromModal() {
@@ -2619,7 +2607,7 @@
       if (!activeNavStand || !userLocation) return;
       const m = calculateDistanceMeters(userLocation[0], userLocation[1], activeNavStand.lat, activeNavStand.lng);
       const distEl = document.getElementById('navDistance');
-      if (distEl) distEl.textContent = 'A ' + m + ' metros caminando';
+      if (distEl) distEl.textContent = m > 999 ? 'Fuera del recinto (activa tu GPS en la cancha)' : 'A ' + m + ' metros caminando';
       if (navRoutePolyline) navRoutePolyline.setLatLngs([userLocation, [activeNavStand.lat, activeNavStand.lng]]);
     }
 
@@ -2640,7 +2628,7 @@
       selectedStand = stand;
       const sheetLogo = document.getElementById('sheetLogo');
       if (stand.logoUrl) {
-        sheetLogo.innerHTML = `<img src="${stand.logoUrl}" class="w-full h-full object-contain rounded-2xl" alt="${stand.name}">`;
+        sheetLogo.innerHTML = `<img src="${esc(stand.logoUrl)}" class="w-full h-full object-contain rounded-2xl" alt="${esc(stand.name)}">`;
       } else {
         sheetLogo.innerHTML = `<span class="text-3xl">${stand.icon}</span>`;
       }
@@ -2667,16 +2655,16 @@
           item.className = 'flex items-center gap-3 p-3 bg-slate-950/70 rounded-2xl border border-slate-800/90';
           item.innerHTML = `
             <div class="w-16 h-16 rounded-xl bg-slate-800 overflow-hidden shrink-0 border border-slate-700">
-              <img src="${p.image || 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=200'}" class="w-full h-full object-cover" alt="${p.name}" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=200';">
+              <img src="${esc(p.image || 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=200')}" class="w-full h-full object-cover" alt="${esc(p.name)}" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=200';">
             </div>
             <div class="min-w-0 flex-1">
               <div class="flex items-center gap-1.5 mb-0.5">
-                ${p.tag ? `<span class="text-[8px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-1.5 py-0.2 rounded font-black">${p.tag}</span>` : ''}
+                ${p.tag ? `<span class="text-[8px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-1.5 py-0.2 rounded font-black">${esc(p.tag)}</span>` : ''}
                 ${!p.inStock ? '<span class="text-[8px] bg-red-950 text-red-400 border border-red-800 px-1.5 rounded font-black">Agotado</span>' : ''}
               </div>
-              <h5 class="text-xs font-black text-white leading-tight ${!p.inStock ? 'line-through text-slate-400' : ''}">${p.name}</h5>
-              <p class="text-[10px] text-slate-400 leading-snug mt-0.5">${p.desc || ''}</p>
-              <span class="text-xs font-black text-orange-400 block mt-1">${p.price}</span>
+              <h5 class="text-xs font-black text-white leading-tight ${!p.inStock ? 'line-through text-slate-400' : ''}">${esc(p.name)}</h5>
+              <p class="text-[10px] text-slate-400 leading-snug mt-0.5">${esc(p.desc || '')}</p>
+              <span class="text-xs font-black text-orange-400 block mt-1">${esc(p.price)}</span>
             </div>
           `;
           pList.appendChild(item);
@@ -2718,34 +2706,35 @@
       document.getElementById('bankModalStandTitle').textContent = `Puesto: ${selectedStand.name} (${selectedStand.number})`;
       
       const fields = document.getElementById('bankDataFields');
+      // Atributos onclick con comilla simple + JSON.stringify: nombres con apóstrofos (O'Brien) ya no rompen el botón
       fields.innerHTML = `
         <div class="flex items-center justify-between p-2.5 bg-slate-900 rounded-xl border border-slate-700">
           <div>
             <span class="text-[10px] text-slate-400 font-bold uppercase block">Banco:</span>
-            <span class="font-bold text-white">${b.bank}</span>
+            <span class="font-bold text-white">${esc(b.bank)}</span>
           </div>
-          <button onclick="copyBankText('${b.bank}')" class="text-blue-400 bg-blue-950/80 border border-blue-500/30 font-bold px-2.5 py-1 rounded-lg text-xs">Copiar</button>
+          <button onclick='copyBankText(${JSON.stringify(b.bank || '')})' class="text-blue-400 bg-blue-950/80 border border-blue-500/30 font-bold px-2.5 py-1 rounded-lg text-xs">Copiar</button>
         </div>
         <div class="flex items-center justify-between p-2.5 bg-slate-900 rounded-xl border border-slate-700">
           <div>
             <span class="text-[10px] text-slate-400 font-bold uppercase block">Cuenta:</span>
-            <span class="font-bold text-white">${b.accountType} - ${b.accountNumber}</span>
+            <span class="font-bold text-white">${esc(b.accountType)} - ${esc(b.accountNumber)}</span>
           </div>
-          <button onclick="copyBankText('${b.accountNumber}')" class="text-blue-400 bg-blue-950/80 border border-blue-500/30 font-bold px-2.5 py-1 rounded-lg text-xs">Copiar N°</button>
+          <button onclick='copyBankText(${JSON.stringify(b.accountNumber || '')})' class="text-blue-400 bg-blue-950/80 border border-blue-500/30 font-bold px-2.5 py-1 rounded-lg text-xs">Copiar N°</button>
         </div>
         <div class="flex items-center justify-between p-2.5 bg-slate-900 rounded-xl border border-slate-700">
           <div>
             <span class="text-[10px] text-slate-400 font-bold uppercase block">Titular:</span>
-            <span class="font-bold text-white">${b.holderName}</span>
+            <span class="font-bold text-white">${esc(b.holderName)}</span>
           </div>
-          <button onclick="copyBankText('${b.holderName}')" class="text-blue-400 bg-blue-950/80 border border-blue-500/30 font-bold px-2.5 py-1 rounded-lg text-xs">Copiar</button>
+          <button onclick='copyBankText(${JSON.stringify(b.holderName || '')})' class="text-blue-400 bg-blue-950/80 border border-blue-500/30 font-bold px-2.5 py-1 rounded-lg text-xs">Copiar</button>
         </div>
         <div class="flex items-center justify-between p-2.5 bg-slate-900 rounded-xl border border-slate-700">
           <div>
             <span class="text-[10px] text-slate-400 font-bold uppercase block">Correo:</span>
-            <span class="font-bold text-white">${b.email}</span>
+            <span class="font-bold text-white">${esc(b.email)}</span>
           </div>
-          <button onclick="copyBankText('${b.email}')" class="text-blue-400 bg-blue-950/80 border border-blue-500/30 font-bold px-2.5 py-1 rounded-lg text-xs">Copiar</button>
+          <button onclick='copyBankText(${JSON.stringify(b.email || '')})' class="text-blue-400 bg-blue-950/80 border border-blue-500/30 font-bold px-2.5 py-1 rounded-lg text-xs">Copiar</button>
         </div>
       `;
       bankModal.classList.remove('hidden');
@@ -2753,8 +2742,12 @@
 
     function closeBankModal() { bankModal.classList.add('hidden'); }
     function copyBankText(text) {
-      navigator.clipboard.writeText(text);
-      alert(`Copiado: ${text}`);
+      const done = () => showLiveToast('✅ Copiado: ' + text);
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done).catch(() => { window.prompt('Copia manualmente:', text); });
+      } else {
+        window.prompt('Copia manualmente:', text);
+      }
     }
 
     // ========================================================
@@ -2783,7 +2776,7 @@
         updateUserPosition(stand.lat, stand.lng, 1);
         switchTab('stands');
         openBottomSheet(stand);
-        showLiveToast(`📍 ¡Estás aquí! Frente a ${stand.name}`);
+        showLiveToast(`📍 ¡Estás aquí! Frente a ${esc(stand.name)}`);
       }
     }
     // Auto-detección al escanear QR físico de puesto (ej: index.html?stand=P-01)
@@ -2802,6 +2795,15 @@
         }
       }
     });
+  </script>
+
+  <!-- Registro del Service Worker (PWA offline: app funciona aunque la señal de la cancha falle) -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(err => console.warn('SW no registrado:', err));
+      });
+    }
   </script>
 
   <!-- ======================================================== -->

@@ -1,44 +1,43 @@
 # 🎪 Mapa Interactivo para Eventos & Ferias en Canchas
 
-Aplicación web móvil (PWA/Web App) diseñada para ferias, kermesses vecinales, eventos costumbristas o festivales en canchas y recintos abiertos.
+Aplicación web móvil (PWA) diseñada para ferias, kermesses vecinales, eventos costumbristas o festivales en canchas y recintos abiertos.
 
-## 🚀 ¿Cómo probarlo ahora mismo?
+**🌐 En vivo en GitHub Pages:** https://contactoandeslink-gif.github.io/mapa-festival-villa/
 
-### Opción 1: Abrir directamente en el navegador (PC)
-1. Haz doble clic en el archivo [`index.html`](file:///C:/Users/sorte/.gemini/antigravity/scratch/mapa-villa-evento/index.html).
-2. Se abrirá en Google Chrome, Edge o tu navegador favorito.
+## 🚀 ¿Cómo probarlo?
 
-### Opción 2: Probarlo en tu Celular (en la misma red Wi-Fi de tu casa)
-Para ver cómo funciona la geolocalización real caminando por la cancha o tu villa:
-1. Abre una terminal de comandos en esta carpeta y ejecuta un servidor local rápido:
-   ```bash
-   npx serve .
-   # o con Python si lo tienes instalado:
-   python -m http.server 8080
-   ```
-2. Desde el navegador de tu celular, ingresa a la IP local de tu computador (por ejemplo: `http://192.168.1.15:8080`).
+### En tu celular (producción)
+Abre https://contactoandeslink-gif.github.io/mapa-festival-villa/ — funciona como PWA instalable y con caché offline (gracias a `sw.js`).
 
----
+### En tu PC (desarrollo)
+1. Clona el repo y ejecuta `iniciar_servidor.bat` (o `python -m http.server 8000`).
+2. Abre http://localhost:8000 — desde tu celular en la misma Wi-Fi: `http://192.168.1.X:8000`.
 
-## 🧭 Funcionalidades preparadas para tu prueba
+## 📁 Archivos
 
-1. **📍 Punto Azul GPS con Pulso:** 
-   - Detecta las coordenadas del celular del visitante con precisión de metros.
-   - Si estás probando desde el PC en tu casa, presiona el botón **🚶‍♂️ (Modo Simulación)** y haz clic en cualquier lugar del mapa para simular que caminas por la cancha.
+| Archivo | Rol |
+|---------|-----|
+| `index.html` | App del asistente: mapa Leaflet, GPS, fichas de locales, escenario en vivo |
+| `admin.html` | Panel del organizador: precios, stock, horarios, carteles QR (⚠️ sin contraseña, solo afecta el navegador local) |
+| `sw.js` | Service Worker: caché offline del app shell, teselas del mapa y media |
+| `manifest.webmanifest` + `icon.svg` | PWA instalable |
 
-2. **🛰️ Vista Satelital vs Calles:**
-   - Botón superior para alternar entre vista de calles o satélite en alta resolución (ideal para ver el pasto, arcos de la cancha y árboles).
+## ⚙️ Configuración importante
 
-3. **🍔 Puestos con Badges y Colores:**
-   - Insignias circulares con íconos temáticos:
-     - 🍔 Naranja: Food Trucks y comida.
-     - 🍺 Amarillo: Cerveza y barra.
-     - 🧶 Verde: Artesanías y productos de vecinos.
-     - 🚻 Azul / Morado: Baños químicos, escenario y boletería.
+- **Fecha del evento:** en `index.html`, constante `EVENT_DATE` (formato `'YYYY-MM-DD'`). Con `null` la app asume que el festival es hoy (modo demo). Con fecha definida, fuera de ese día muestra "📅 Próxima edición" en vez de fingir un show en vivo.
+- **Coordenadas de la cancha:** constante `DEFAULT_CENTER` en `index.html`.
+- **Versión de datos:** `DATA_VERSION` (en `index.html` y `admin.html`, deben coincidir). Súbela cuando cambies los datos por defecto para limpiar cachés viejas de los visitantes.
 
-4. **🧭 "¿Cómo llegar?" con Distancia en Vivo:**
-   - Toca cualquier puesto y presiona "¿Cómo llegar?".
-   - Se trazará una línea guía punteada naranja y un HUD superior indicando la distancia en tiempo real (ej. *"A 28 metros de distancia"*).
+## 🧭 Funcionalidades
 
-5. **📍+ Modo Diseñador / Organizador:**
-   - ¿Quieres mapear la cancha de tu villa en 2 minutos? Presiona el botón flotante **`📍+`** y luego haz clic sobre la cancha o plaza. Podrás poner el nombre del vecino o negocio, categoría y descripción, y quedará guardado de inmediato.
+1. **📍 Punto Azul GPS con Pulso:** geolocalización en vivo; si el GPS falla o estás fuera del recinto, avisa en vez de mostrar distancias absurdas.
+2. **🛰️ Mapa vectorial del recinto:** cancha, escenario, pasillos y puestos dibujados con Leaflet (funcionan incluso sin teselas si hay mala señal).
+3. **🍔 Puestos con fichas completas:** foto, carta con precios, WhatsApp, datos de transferencia, tiempo de preparación y "¿Cómo llegar?" con distancia en vivo.
+4. **🎸 Escenario en vivo:** motor de horarios con hora de Chile, pausas técnicas, retrasos y estados (próximo / en vivo / finalizado).
+5. **📷 QR por puesto:** carteles imprimibles desde el admin (`?stand=P-01` ubica al visitante frente al puesto).
+6. **📴 Offline:** el service worker guarda el app y las teselas visitadas; la app abre sin conexión.
+
+## ⚠️ Notas de seguridad
+
+- El panel `admin.html` **no tiene autenticación**: sus cambios solo se guardan en el navegador donde se editan (localStorage + BroadcastChannel entre pestañas). Para publicar cambios a TODOS los asistentes hace falta un backend compartido (ej. Supabase/Firebase).
+- No publiques datos bancarios o personales reales en el código: el repo es público.

@@ -55,6 +55,9 @@
 
       <!-- Acciones de Cabecera -->
       <div class="flex items-center gap-2 flex-wrap">
+        <button onclick="openCloudSyncModal()" id="btnCloudSyncStatus" class="px-3.5 py-2 bg-sky-600/30 hover:bg-sky-600 border border-sky-500/50 text-sky-300 hover:text-white text-xs font-black rounded-xl transition flex items-center gap-1.5 shadow">
+          <span>☁️</span> <span id="lblCloudSyncStatus">Nube: Configurar</span>
+        </button>
         <button onclick="broadcastAnnouncement()" class="px-3.5 py-2 bg-red-600 hover:bg-red-500 text-white text-xs font-black rounded-xl shadow-lg shadow-red-600/30 transition flex items-center gap-1.5 active:scale-95">
           <span>📢</span> Notificación Masiva
         </button>
@@ -431,7 +434,10 @@
   <!-- JAVASCRIPT DEL ADMINISTRADOR                             -->
   <!-- ======================================================== -->
   <script>
-    const eventChannel = new BroadcastChannel('festival_live_sync');
+    // Guard: BroadcastChannel no existe en Safari iOS < 15.4
+    const eventChannel = ('BroadcastChannel' in window)
+      ? new BroadcastChannel('festival_live_sync')
+      : { postMessage() {}, set onmessage(fn) {}, get onmessage() { return null; } };
 
     // ----------------------------------------------------
     // BASE DE DATOS INICIAL CON FOTOS REALES Y HORARIOS
@@ -828,7 +834,7 @@
 ];
 
             // Limpiar caché vieja si la versión de datos cambió
-    const DATA_VERSION = '2026.08.modal_stacking_perfect_v2';
+    const DATA_VERSION = '2026.11.fixes_v3';
     if (localStorage.getItem('festival_data_version') !== DATA_VERSION) {
       localStorage.setItem('festival_data_version', DATA_VERSION);
       localStorage.removeItem('festival_admin_schedule');
@@ -1791,6 +1797,9 @@
         schedule: stageSchedule,
         stands: stands
       });
+
+      // Sincronizar automáticamente a la nube en segundo plano si está configurado
+      syncToSupabaseSilent();
     }
 
     function broadcastAnnouncement() {
@@ -1818,8 +1827,10 @@
       if (confirm('¿Restablecer toda la configuración original?')) {
         localStorage.removeItem('festival_admin_schedule');
         localStorage.removeItem('festival_admin_stands');
+        localStorage.removeItem('festival_manual_live_id');
         stageSchedule = JSON.parse(JSON.stringify(DEFAULT_SCHEDULE));
-        stands = [...DEFAULT_STANDS, ...DEFAULT_SERVICES];
+        // DEFAULT_STANDS ya incluye los servicios (WC, ESC): DEFAULT_SERVICES no existe
+        stands = JSON.parse(JSON.stringify(DEFAULT_STANDS));
         saveAndBroadcast();
         renderAdminArtists();
         renderAdminStandsList();
@@ -1831,7 +1842,187 @@
     renderAdminArtists();
     renderAdminStandsList();
     renderAdminServices();
-  </script>
+  
+
+    // --------------------------------------------------------
+    // SINCRONIZACIÓN EN LA NUBE (SUPABASE INTEGRATION)
+    // --------------------------------------------------------
+    function getSbCredentials() {
+      try {
+        return {
+          url: (localStorage.getItem('festival_supabase_url') || '').trim(),
+          key: (localStorage.getItem('festival_supabase_key') || '').trim()
+        };
+      } catch (e) {
+        return { url: '', key: '' };
+      }
+    }
+
+    function updateCloudSyncBadge() {
+      const { url, key } = getSbCredentials();
+      const lbl = document.getElementById('lblCloudSyncStatus');
+      const btn = document.getElementById('btnCloudSyncStatus');
+      const dot = document.getElementById('cloudSyncStatusDot');
+      const text = document.getElementById('cloudSyncStatusText');
+
+      if (url && key) {
+        if (lbl) lbl.textContent = 'Nube: Conectada';
+        if (btn) {
+          btn.classList.remove('bg-sky-600/30', 'text-sky-300');
+          btn.classList.add('bg-emerald-600/30', 'text-emerald-300', 'border-emerald-500/50');
+        }
+        if (dot) {
+          dot.className = 'w-3 h-3 rounded-full bg-emerald-400 animate-pulse';
+        }
+        if (text) {
+          text.textContent = '🟢 Conectado a Supabase (Sincronización Masiva Activa)';
+          text.className = 'text-xs font-extrabold text-emerald-400';
+        }
+      } else {
+        if (lbl) lbl.textContent = 'Nube: Configurar';
+        if (btn) {
+          btn.className = 'px-3.5 py-2 bg-sky-600/30 hover:bg-sky-600 border border-sky-500/50 text-sky-300 hover:text-white text-xs font-black rounded-xl transition flex items-center gap-1.5 shadow';
+        }
+        if (dot) {
+          dot.className = 'w-3 h-3 rounded-full bg-slate-500';
+        }
+        if (text) {
+          text.textContent = '⚪ Modo Local (Solo este navegador)';
+          text.className = 'text-xs font-extrabold text-slate-300';
+        }
+      }
+    }
+
+    function openCloudSyncModal() {
+      const { url, key } = getSbCredentials();
+      const urlIn = document.getElementById('sbUrlInput');
+      const keyIn = document.getElementById('sbKeyInput');
+      if (urlIn) urlIn.value = url;
+      if (keyIn) keyIn.value = key;
+      updateCloudSyncBadge();
+      const modal = document.getElementById('cloudSyncModal');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeCloudSyncModal() {
+      const modal = document.getElementById('cloudSyncModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function saveCloudCredentials() {
+      const url = (document.getElementById('sbUrlInput').value || '').trim();
+      const key = (document.getElementById('sbKeyInput').value || '').trim();
+
+      if (!url || !key) {
+        if (confirm('¿Deseas desconectar la nube y volver al modo solo local?')) {
+          localStorage.removeItem('festival_supabase_url');
+          localStorage.removeItem('festival_supabase_key');
+          updateCloudSyncBadge();
+          alert('Modo local activado.');
+        }
+        return;
+      }
+
+      localStorage.setItem('festival_supabase_url', url);
+      localStorage.setItem('festival_supabase_key', key);
+      updateCloudSyncBadge();
+      testAndSyncCloud(false);
+    }
+
+    async function testAndSyncCloud(showAlert = true) {
+      const { url, key } = getSbCredentials();
+      if (!url || !key) {
+        if (showAlert) alert('Ingresa primero la URL y la Anon Key de Supabase.');
+        return;
+      }
+
+      const cleanUrl = url.replace(/\/+$/, '');
+      try {
+        const payload = [
+          { key: 'stands', value: stands, updated_at: new Date().toISOString() },
+          { key: 'schedule', value: stageSchedule, updated_at: new Date().toISOString() },
+          { key: 'manual_live_id', value: localStorage.getItem('festival_manual_live_id') || null, updated_at: new Date().toISOString() }
+        ];
+
+        const res = await fetch(`${cleanUrl}/rest/v1/festival_config`, {
+          method: 'POST',
+          headers: {
+            'apikey': key,
+            'Authorization': `Bearer ${key}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'resolution=merge-duplicates'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+          updateCloudSyncBadge();
+          if (showAlert) alert('✅ ¡Conexión con Supabase exitosa! Los datos se han sincronizado con la nube.');
+        } else {
+          const errText = await res.text();
+          console.error('Supabase error:', res.status, errText);
+          alert('⚠️ Error conectando con Supabase (' + res.status + '). Revisa la tabla festival_config y las credenciales.');
+        }
+      } catch (err) {
+        console.error('Network error Supabase:', err);
+        alert('❌ Error de red al conectar con Supabase: ' + err.message);
+      }
+    }
+
+    async function syncToSupabaseNow() {
+      await testAndSyncCloud(true);
+    }
+
+    async function syncToSupabaseSilent() {
+      const { url, key } = getSbCredentials();
+      if (!url || !key) return;
+      const cleanUrl = url.replace(/\/+$/, '');
+      try {
+        const payload = [
+          { key: 'stands', value: stands, updated_at: new Date().toISOString() },
+          { key: 'schedule', value: stageSchedule, updated_at: new Date().toISOString() },
+          { key: 'manual_live_id', value: localStorage.getItem('festival_manual_live_id') || null, updated_at: new Date().toISOString() }
+        ];
+
+        await fetch(`${cleanUrl}/rest/v1/festival_config`, {
+          method: 'POST',
+          headers: {
+            'apikey': key,
+            'Authorization': `Bearer ${key}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'resolution=merge-duplicates'
+          },
+          body: JSON.stringify(payload)
+        });
+      } catch (e) {
+        console.warn('Silent cloud sync failed:', e);
+      }
+    }
+
+    function copySupabaseSql() {
+      const sql = `-- Script para crear la tabla de sincronización en Supabase SQL Editor:
+create table if not exists festival_config (
+  key text primary key,
+  value jsonb,
+  updated_at timestamp with time zone default timezone('utc'::text, now())
+);
+
+-- Políticas para lectura y actualización pública del festival:
+alter table festival_config enable row level security;
+create policy "Lectura pública del festival" on festival_config for select using (true);
+create policy "Escritura pública del festival" on festival_config for all using (true) with check (true);
+`;
+      navigator.clipboard.writeText(sql).then(() => {
+        alert('📋 Script SQL copiado al portapapeles. Pégalo en el SQL Editor de tu proyecto Supabase y dale a RUN.');
+      }).catch(() => {
+        prompt('Copia este script SQL:', sql);
+      });
+    }
+
+    // Actualizar badge al cargar
+    setTimeout(updateCloudSyncBadge, 300);
+
+</script>
 
   <!-- ======================================================== -->
   <!-- MODAL: IMPRIMIR CARTELES QR DE LA FERIA                  -->
@@ -1891,6 +2082,83 @@
           Abrir Editor de este Puesto
         </button>
       </div>
+    </div>
+  </div>
+
+
+  <!-- ======================================================== -->
+  <!-- MODAL DE SINCRONIZACIÓN EN LA NUBE (SUPABASE)            -->
+  <!-- ======================================================== -->
+  <div id="cloudSyncModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border-2 border-sky-500/60 rounded-3xl p-6 max-w-lg w-full shadow-2xl relative space-y-4">
+      <button onclick="closeCloudSyncModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg font-bold">✕</button>
+
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-2xl bg-sky-500/20 text-sky-400 text-2xl flex items-center justify-center border border-sky-500/40">
+          ☁️
+        </div>
+        <div>
+          <h3 class="text-base font-black text-white font-display">Sincronización en la Nube (Tiempo Real)</h3>
+          <p class="text-xs text-slate-400">Permite que cualquier cambio del admin se refleje en los teléfonos de todos los asistentes en la cancha.</p>
+        </div>
+      </div>
+
+      <!-- Estado actual -->
+      <div id="cloudSyncStatusCard" class="p-3 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span id="cloudSyncStatusDot" class="w-3 h-3 rounded-full bg-slate-500"></span>
+          <span id="cloudSyncStatusText" class="text-xs font-extrabold text-slate-300">Modo Local (Solo este navegador)</span>
+        </div>
+        <button type="button" onclick="testAndSyncCloud(true)" class="text-[11px] font-bold text-sky-400 hover:text-sky-300 underline">
+          Probar Conexión
+        </button>
+      </div>
+
+      <!-- Formulario Supabase -->
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">Supabase Project URL:</label>
+          <input 
+            id="sbUrlInput" 
+            type="text" 
+            placeholder="https://xyzcompany.supabase.co" 
+            class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500"
+          />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">Supabase Anon Public Key:</label>
+          <input 
+            id="sbKeyInput" 
+            type="text" 
+            placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." 
+            class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500 font-mono"
+          />
+        </div>
+      </div>
+
+      <!-- Botones de Acción -->
+      <div class="grid grid-cols-2 gap-2 pt-2">
+        <button onclick="saveCloudCredentials()" class="py-2.5 px-3 bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white font-black text-xs rounded-xl shadow-lg transition active:scale-95 flex items-center justify-center gap-1.5">
+          <span>💾</span> Guardar y Conectar
+        </button>
+        <button onclick="syncToSupabaseNow()" class="py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs rounded-xl border border-slate-700 transition flex items-center justify-center gap-1.5">
+          <span>☁️</span> Sincronizar Ahora
+        </button>
+      </div>
+
+      <!-- Sección de Ayuda Rápida y SQL -->
+      <div class="bg-slate-950/70 p-3 rounded-2xl border border-slate-800 text-[11px] text-slate-400 space-y-2">
+        <p class="font-bold text-slate-300">💡 Instrucciones para Supabase (1 minuto gratis):</p>
+        <ol class="list-decimal pl-4 space-y-0.5 text-[10px]">
+          <li>Crea un proyecto gratis en <a href="https://supabase.com" target="_blank" class="text-sky-400 underline">supabase.com</a>.</li>
+          <li>En el <b>SQL Editor</b>, ejecuta el script de abajo.</li>
+          <li>Copia tu <b>Project URL</b> y <b>anon key</b> (Settings &gt; API) y pégalos arriba.</li>
+        </ol>
+        <button type="button" onclick="copySupabaseSql()" class="w-full py-1.5 px-2 bg-slate-900 hover:bg-slate-800 text-slate-300 text-[10px] font-bold rounded-lg border border-slate-700 flex items-center justify-center gap-1 transition">
+          <span>📋</span> Copiar Script SQL para Supabase
+        </button>
+      </div>
+
     </div>
   </div>
 
