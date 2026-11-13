@@ -39,5 +39,32 @@ Abre https://contactoandeslink-gif.github.io/mapa-festival-villa/ — funciona c
 
 ## ⚠️ Notas de seguridad
 
-- El panel `admin.html` **no tiene autenticación**: sus cambios solo se guardan en el navegador donde se editan (localStorage + BroadcastChannel entre pestañas). Para publicar cambios a TODOS los asistentes hace falta un backend compartido (ej. Supabase/Firebase).
+- El panel `admin.html` **no tiene autenticación**: sus cambios se guardan en localStorage y se suben a Supabase si lo configuraste (botón ☁️ Nube).
 - No publiques datos bancarios o personales reales en el código: el repo es público.
+
+### 🚨 Importante: política RLS de escritura pública en Supabase
+
+El script SQL del panel crea la política `"Escritura pública del festival" ... for all using (true) with check (true)`. Esto significa que **cualquier persona en internet que conozca la Project URL y la anon key** (ambas visibles en el código de la app) puede **sobreescribir o borrar** la configuración del festival: precios, stock, shows y —lo más grave— **las cuentas bancarias de los puestos** (podrían redirigir transferencias).
+
+**Mitigación recomendada (Edge Function con secreto de admin):**
+
+1. Bloquea la escritura directa (SQL Editor):
+   ```sql
+   drop policy if exists "Escritura pública del festival" on festival_config;
+   -- La lectura pública (select) se mantiene: los asistentes solo leen.
+   ```
+2. Crea la función `supabase/functions/festival-sync/index.ts`:
+   ```ts
+   import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+   Deno.serve(async (req) => {
+     if (req.headers.get('x-admin-secret') !== Deno.env.get('ADMIN_SECRET'))
+       return new Response('No autorizado', { status: 401 });
+     const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
+     const { error } = await supabase.from('festival_config').upsert(await req.json());
+     return new Response(error ? JSON.stringify(error) : 'ok', { status: error ? 400 : 200 });
+   });
+   ```
+3. Deploy: `supabase functions deploy festival-sync` y setea el secreto `ADMIN_SECRET` en los settings de la función.
+4. En `admin.html`, cambia el endpoint de `syncToSupabaseSilent`/`testAndSyncCloud` a `${cleanUrl}/functions/v1/festival-sync` y agrega el header `'x-admin-secret': ADMIN_SECRET`.
+
+**Alternativa pragmática (sin funciones):** mantener la escritura pública solo durante el día del evento y monitorear; la anon key puede rotarse en Settings > API si hay abuso.

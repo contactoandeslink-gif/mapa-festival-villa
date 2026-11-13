@@ -1160,18 +1160,28 @@
           if (Array.isArray(rows) && rows.length > 0) {
             let changed = false;
             rows.forEach(r => {
+              // Solo aplicar (y avisar) si los datos de la nube realmente difieren de los locales.
+              // Sin esta comparación, el toast y el re-render de marcadores se disparaban cada 25s.
               if (r.key === 'stands' && Array.isArray(r.value)) {
-                stands = r.value;
-                safeLSSet('festival_admin_stands', JSON.stringify(stands));
-                changed = true;
+                if (JSON.stringify(r.value) !== JSON.stringify(stands)) {
+                  stands = r.value;
+                  safeLSSet('festival_admin_stands', JSON.stringify(stands));
+                  changed = true;
+                }
               } else if (r.key === 'schedule' && Array.isArray(r.value)) {
-                stageSchedule = r.value;
-                safeLSSet('festival_admin_schedule', JSON.stringify(stageSchedule));
-                changed = true;
+                if (JSON.stringify(r.value) !== JSON.stringify(stageSchedule)) {
+                  stageSchedule = r.value;
+                  safeLSSet('festival_admin_schedule', JSON.stringify(stageSchedule));
+                  changed = true;
+                }
               } else if (r.key === 'manual_live_id') {
-                if (r.value) safeLSSet('festival_manual_live_id', String(r.value));
-                else safeLSRemove('festival_manual_live_id');
-                changed = true;
+                const incoming = r.value ? String(r.value) : null;
+                const current = safeLSGet('festival_manual_live_id');
+                if (incoming !== current) {
+                  if (incoming) safeLSSet('festival_manual_live_id', incoming);
+                  else safeLSRemove('festival_manual_live_id');
+                  changed = true;
+                }
               }
             });
             if (changed) {
