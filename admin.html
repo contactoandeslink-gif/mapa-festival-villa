@@ -8,6 +8,10 @@
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
+  <!-- Leaflet CSS & JS (con SRI: verificado sha384) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin="anonymous"></script>
+
   <!-- Google Fonts: Outfit & Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -88,6 +92,9 @@
       </button>
       <button onclick="switchAdminTab('services')" id="tab-btn-services" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition flex items-center gap-2">
         <span>🚻</span> Baños & Servicios
+      </button>
+      <button onclick="switchAdminTab('map')" id="tab-btn-map" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition flex items-center gap-2">
+        <span>🗺️</span> Diseño del Recinto
       </button>
     </div>
   </div>
@@ -211,6 +218,50 @@
         </div>
 
         <div class="space-y-3" id="adminServicesContainer"></div>
+      </div>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- PESTAÑA 4: DISEÑO VISUAL DEL RECINTO (MAP EDITOR)        -->
+    <!-- ======================================================== -->
+    <section id="admin-view-map" class="space-y-4 hidden">
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-xl space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 class="text-lg font-black text-white font-display flex items-center gap-2">
+              <span>🗺️</span> Diseño Visual del Recinto
+            </h2>
+            <p class="text-xs text-slate-400">Cada feria es distinta: arrastra los puestos, dibuja los pasillos y pinta los sectores. Los cambios se publican al instante a todos los teléfonos.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="resetLayoutDefaults()" class="px-3 py-2 bg-slate-800 hover:bg-red-950 text-slate-400 hover:text-red-400 text-xs font-bold rounded-xl border border-slate-700 transition">↺ Diseño por Defecto</button>
+          </div>
+        </div>
+
+        <!-- Barra de Herramientas del Editor -->
+        <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800 flex flex-wrap items-center gap-2" id="mapEditorToolbar">
+          <span class="text-[10px] font-black uppercase tracking-wider text-slate-500 mr-1">Herramienta:</span>
+          <button onclick="setEditorMode('move')" id="mode-btn-move" class="mode-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-orange-600 text-white shadow transition flex items-center gap-1.5">👆 Mover Puestos</button>
+          <button onclick="setEditorMode('add')" id="mode-btn-add" class="mode-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 border border-slate-700 transition flex items-center gap-1.5">➕ Agregar Puesto</button>
+          <button onclick="setEditorMode('aisle')" id="mode-btn-aisle" class="mode-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 border border-slate-700 transition flex items-center gap-1.5">🛤️ Dibujar Pasillo</button>
+          <button onclick="setEditorMode('sector')" id="mode-btn-sector" class="mode-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 border border-slate-700 transition flex items-center gap-1.5">🧩 Dibujar Sector</button>
+          <button onclick="setEditorMode('delete')" id="mode-btn-delete" class="mode-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-red-400 border border-red-900/60 transition flex items-center gap-1.5">🗑️ Eliminar</button>
+          <button onclick="finishAisleDrawing()" id="btnFinishAisle" class="hidden px-3 py-1.5 rounded-xl text-xs font-black bg-emerald-600 hover:bg-emerald-500 text-white shadow transition">✅ Finalizar Pasillo</button>
+        </div>
+
+        <!-- Pista de ayuda contextual -->
+        <p id="mapEditorHint" class="text-[11px] text-sky-300 bg-sky-950/50 border border-sky-800/60 rounded-xl px-3 py-2">👆 <b>Modo Mover:</b> arrastra cualquier puesto con el mouse o el dedo para reubicarlo. Los cambios se guardan solos.</p>
+
+        <!-- El Mapa Editor -->
+        <div id="adminMap" class="w-full h-[480px] rounded-2xl border border-slate-700 overflow-hidden shadow-inner bg-slate-950"></div>
+
+        <!-- Resumen del diseño -->
+        <div class="flex flex-wrap gap-2 text-[10px] font-bold text-slate-400">
+          <span class="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1">🏪 <span id="editorStandCount">0</span> puestos</span>
+          <span class="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1">🛤️ <span id="editorAisleCount">0</span> pasillos</span>
+          <span class="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1">🧩 <span id="editorSectorCount">0</span> sectores</span>
+          <span class="bg-emerald-950/50 border border-emerald-800/60 text-emerald-300 rounded-lg px-2.5 py-1">☁️ Se publica automáticamente a la nube</span>
+        </div>
       </div>
     </section>
 
@@ -378,6 +429,26 @@
         <div>
           <label class="font-bold text-slate-300 block mb-1">WhatsApp para Pedidos (con 56):</label>
           <input id="stWp" type="text" placeholder="56912345678" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white font-mono outline-none">
+        </div>
+
+        <!-- Ubicación en el Recinto -->
+        <div class="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
+          <span class="text-[10px] font-black uppercase tracking-wider text-emerald-400 block">📍 Ubicación en el Recinto:</span>
+          <input id="stLocationNote" type="text" placeholder="Referencia (ej: Pasillo Central #3, frente al escenario)" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white outline-none text-xs">
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="text-[9px] font-bold text-slate-500 block mb-0.5">Offset Latitud:</label>
+              <input id="stLatOffset" type="number" step="0.0000001" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white font-mono text-[11px] outline-none">
+            </div>
+            <div>
+              <label class="text-[9px] font-bold text-slate-500 block mb-0.5">Offset Longitud:</label>
+              <input id="stLngOffset" type="number" step="0.0000001" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white font-mono text-[11px] outline-none">
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="captureCurrentGpsForStand()" class="flex-1 py-1.5 bg-emerald-900/60 hover:bg-emerald-800 border border-emerald-700 text-emerald-300 rounded-lg text-[10px] font-black transition">📡 Capturar mi GPS actual</button>
+            <span class="text-[9px] text-slate-500 leading-tight">O arrástralo en la pestaña 🗺️ Diseño del Recinto</span>
+          </div>
         </div>
 
         <!-- Datos Bancarios -->
@@ -834,7 +905,7 @@
 ];
 
             // Limpiar caché vieja si la versión de datos cambió
-    const DATA_VERSION = '2026.11.fixes_v3';
+    const DATA_VERSION = '2026.11.layout_editor_v4';
     if (localStorage.getItem('festival_data_version') !== DATA_VERSION) {
       localStorage.setItem('festival_data_version', DATA_VERSION);
       localStorage.removeItem('festival_admin_schedule');
@@ -862,8 +933,10 @@
       document.getElementById('admin-view-stage').classList.add('hidden');
       document.getElementById('admin-view-stands').classList.add('hidden');
       document.getElementById('admin-view-services').classList.add('hidden');
+      const mapView = document.getElementById('admin-view-map');
+      if (mapView) mapView.classList.add('hidden');
 
-      ['stage', 'stands', 'services'].forEach(t => {
+      ['stage', 'stands', 'services', 'map'].forEach(t => {
         const btn = document.getElementById(`tab-btn-${t}`);
         if (t === tab) {
           btn.className = 'px-4 py-2 rounded-xl text-xs font-extrabold bg-orange-600 text-white transition flex items-center gap-2 shadow-md';
@@ -875,6 +948,11 @@
       if (tab === 'stage') document.getElementById('admin-view-stage').classList.remove('hidden');
       else if (tab === 'stands') document.getElementById('admin-view-stands').classList.remove('hidden');
       else if (tab === 'services') document.getElementById('admin-view-services').classList.remove('hidden');
+      else if (tab === 'map') {
+        if (mapView) mapView.classList.remove('hidden');
+        initAdminMapOnce();
+        setTimeout(() => { if (adminMap) adminMap.invalidateSize(); }, 200);
+      }
     }
 
     // ========================================================
@@ -1314,6 +1392,10 @@
 
             <!-- Botones de Acción de Puesto -->
             <div class="flex items-center gap-1.5 flex-wrap">
+              <!-- Estado rápido del puesto (se publica en vivo) -->
+              <button onclick="setStandStatusAdmin(${stand.id}, 'open')" title="Puesto disponible y atendiendo" class="px-2 py-1.5 rounded-xl text-[10px] font-black transition border ${stand.status !== 'busy' && stand.status !== 'soldout' ? 'bg-emerald-600 text-white border-emerald-400' : 'bg-slate-800 text-emerald-300 border-emerald-500/40 hover:bg-emerald-600 hover:text-white'}">🟢 OK</button>
+              <button onclick="setStandStatusAdmin(${stand.id}, 'busy')" title="Mucha fila / espera larga" class="px-2 py-1.5 rounded-xl text-[10px] font-black transition border ${stand.status === 'busy' ? 'bg-amber-500 text-slate-950 border-amber-300' : 'bg-slate-800 text-amber-300 border-amber-500/40 hover:bg-amber-500 hover:text-slate-950'}">⏳ Fila</button>
+              <button onclick="setStandStatusAdmin(${stand.id}, 'soldout')" title="Se agotó / cerró" class="px-2 py-1.5 rounded-xl text-[10px] font-black transition border ${stand.status === 'soldout' ? 'bg-red-600 text-white border-red-400' : 'bg-slate-800 text-red-300 border-red-500/40 hover:bg-red-600 hover:text-white'}">🔴 Agotado</button>
               <button onclick="captureGpsDirectlyForStand(${stand.id})" title="Fijar coordenadas GPS parado frente a este puesto" class="px-2.5 py-1.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600 text-emerald-300 hover:text-white border border-emerald-500/40 text-xs font-bold transition flex items-center gap-1 active:scale-95">
                 <span>📍</span> GPS
               </button>
@@ -1353,6 +1435,16 @@
         saveAndBroadcast();
         renderAdminStandsList();
       }
+    }
+
+    // Estado global del puesto: open / busy (mucha espera) / soldout (agotado)
+    // Se pinta en el mapa del asistente (gris tenue + AGOTADO) y viaja por sync en vivo.
+    function setStandStatusAdmin(standId, status) {
+      const stand = stands.find(s => s.id === standId);
+      if (!stand) return;
+      stand.status = status;
+      saveAndBroadcast();
+      renderAdminStandsList();
     }
 
     function updateProductNameAdmin(standId, pIdx, newName) {
@@ -1629,6 +1721,7 @@
           id: newId,
           number: number,
           name: name,
+          status: 'open',
           category: cat,
           categoryName: catNames[cat] || 'General',
           color: catColors[cat] || '#f97316',
@@ -1791,12 +1884,20 @@
     function saveAndBroadcast() {
       localStorage.setItem('festival_admin_schedule', JSON.stringify(stageSchedule));
       localStorage.setItem('festival_admin_stands', JSON.stringify(stands));
+      localStorage.setItem('festival_layout', JSON.stringify(layout));
 
       eventChannel.postMessage({
         type: 'SYNC_ALL',
         schedule: stageSchedule,
-        stands: stands
+        stands: stands,
+        layout: layout
       });
+
+      // Refrescar el mapa editor si está visible
+      if (adminMapInited) {
+        renderEditorStands();
+        renderEditorLayout();
+      }
 
       // Sincronizar automáticamente a la nube en segundo plano si está configurado
       syncToSupabaseSilent();
@@ -1837,6 +1938,352 @@
         renderAdminServices();
         alert('Restablecido a los valores por defecto con éxito.');
       }
+    }
+
+    // ========================================================
+    // DISEÑO VISUAL DEL RECINTO (MAP EDITOR)
+    // ========================================================
+    // Coordenadas base de la cancha (compartidas con index.html)
+    const DEFAULT_CENTER = [-33.4500, -70.6600];
+
+    const ADMIN_DEFAULT_LAYOUT = {
+      sectors: [
+        { id: 'sec-norte', name: '🍺 Boulevard Cervecero', color: '#f59e0b', bounds: [[DEFAULT_CENTER[0] + 0.00008, DEFAULT_CENTER[1] - 0.00040], [DEFAULT_CENTER[0] + 0.00032, DEFAULT_CENTER[1] + 0.00040]] },
+        { id: 'sec-central', name: '🍔 Boulevard Gastronómico', color: '#10b981', bounds: [[DEFAULT_CENTER[0] - 0.00010, DEFAULT_CENTER[1] - 0.00040], [DEFAULT_CENTER[0] + 0.00006, DEFAULT_CENTER[1] + 0.00040]] },
+        { id: 'sec-sur', name: '🧶 Patio Dulces & Artesanías', color: '#ec4899', bounds: [[DEFAULT_CENTER[0] - 0.00034, DEFAULT_CENTER[1] - 0.00040], [DEFAULT_CENTER[0] - 0.00014, DEFAULT_CENTER[1] + 0.00040]] }
+      ],
+      aisles: [
+        { id: 'ais-norte', name: 'Pasillo Norte', points: [[DEFAULT_CENTER[0] + 0.00005, DEFAULT_CENTER[1] - 0.00038], [DEFAULT_CENTER[0] + 0.00005, DEFAULT_CENTER[1] + 0.00038]] },
+        { id: 'ais-central', name: 'Pasillo Central', points: [[DEFAULT_CENTER[0] - 0.00012, DEFAULT_CENTER[1] - 0.00038], [DEFAULT_CENTER[0] - 0.00012, DEFAULT_CENTER[1] + 0.00038]] },
+        { id: 'ais-sur', name: 'Pasillo Sur', points: [[DEFAULT_CENTER[0] - 0.00030, DEFAULT_CENTER[1] - 0.00038], [DEFAULT_CENTER[0] - 0.00030, DEFAULT_CENTER[1] + 0.00038]] }
+      ]
+    };
+
+    let layout;
+    try { layout = JSON.parse(localStorage.getItem('festival_layout') || 'null'); } catch (e) { layout = null; }
+    if (!layout || typeof layout !== 'object' || !Array.isArray(layout.aisles)) {
+      layout = JSON.parse(JSON.stringify(ADMIN_DEFAULT_LAYOUT));
+    }
+
+    let adminMap = null;
+    let adminMapInited = false;
+    let editorMode = 'move';
+    let editorStandMarkers = [];
+    let editorLayoutLayers = [];
+    let aisleDraftPoints = [];
+    let aisleDraftLine = null;
+    let sectorFirstCorner = null;
+
+    const EDITOR_HINTS = {
+      move: '👆 <b>Modo Mover:</b> arrastra cualquier puesto con el mouse o el dedo para reubicarlo. Los cambios se guardan solos.',
+      add: '➕ <b>Modo Agregar:</b> haz clic en el mapa donde irá el nuevo puesto. Se abrirá su ficha para completar nombre, carta y datos.',
+      aisle: '🛤️ <b>Modo Pasillo:</b> haz clic para marcar los puntos del pasillo (mínimo 2) y presiona <b>✅ Finalizar Pasillo</b> para ponerle nombre.',
+      sector: '🧩 <b>Modo Sector:</b> haz clic en una esquina del sector y luego en la esquina opuesta. Se pintará la zona y podrás nombrarla.',
+      delete: '🗑️ <b>Modo Eliminar:</b> haz clic sobre un puesto, pasillo o sector para borrarlo. Se te pedirá confirmación.'
+    };
+
+    function escAdm(str) {
+      if (str === null || str === undefined) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function setEditorMode(mode) {
+      editorMode = mode;
+      ['move', 'add', 'aisle', 'sector', 'delete'].forEach(m => {
+        const btn = document.getElementById('mode-btn-' + m);
+        if (!btn) return;
+        if (m === mode) btn.className = 'mode-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-orange-600 text-white shadow transition flex items-center gap-1.5';
+        else btn.className = 'mode-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 border border-slate-700 transition flex items-center gap-1.5' + (m === 'delete' ? ' text-red-400' : '');
+      });
+      const hint = document.getElementById('mapEditorHint');
+      if (hint) hint.innerHTML = EDITOR_HINTS[mode] || '';
+      // Limpiar bocetos al cambiar de modo
+      aisleDraftPoints = [];
+      sectorFirstCorner = null;
+      if (aisleDraftLine && adminMap) { adminMap.removeLayer(aisleDraftLine); aisleDraftLine = null; }
+      const fin = document.getElementById('btnFinishAisle');
+      if (fin) fin.classList.add('hidden');
+      renderEditorStands();
+    }
+
+    function initAdminMapOnce() {
+      if (adminMapInited) return;
+      adminMapInited = true;
+      const cLat = DEFAULT_CENTER[0];
+      const cLng = DEFAULT_CENTER[1];
+
+      adminMap = L.map('adminMap', { zoomControl: true, maxZoom: 21, minZoom: 15 });
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 21, maxNativeZoom: 19, attribution: '&copy; OpenStreetMap' }).addTo(adminMap);
+
+      const stadiumBounds = L.latLngBounds([[cLat - 0.00058, cLng - 0.00042], [cLat + 0.00055, cLng + 0.00042]]);
+
+      // Fondo del recinto (igual que la app del asistente)
+      L.rectangle([[cLat - 0.00058, cLng - 0.00042], [cLat + 0.00058, cLng + 0.00042]], { color: '#1e293b', weight: 2, fillColor: '#0b0f19', fillOpacity: 1 }).addTo(adminMap);
+      L.rectangle([[cLat - 0.00044, cLng - 0.00030], [cLat + 0.00030, cLng + 0.00030]], { color: '#ffffff', weight: 1.5, fillColor: '#14532d', fillOpacity: 1 }).addTo(adminMap);
+
+      // Marcador del escenario y entrada
+      L.marker([cLat + 0.00041, cLng], { icon: L.divIcon({ className: '', html: '<div style="white-space:nowrap;background:linear-gradient(90deg,#dc2626,#f59e0b);color:#fff;font-size:10px;font-weight:900;padding:3px 10px;border-radius:9999px;border:2px solid #fff;transform:translateX(-50%);">🎸 ESCENARIO</div>', iconSize: [0, 0] }), interactive: false }).addTo(adminMap);
+      L.marker([cLat - 0.00062, cLng], { icon: L.divIcon({ className: '', html: '<div style="white-space:nowrap;background:#0f172a;color:#fbbf24;font-size:10px;font-weight:900;padding:3px 10px;border-radius:9999px;border:2px solid #fbbf24;transform:translateX(-50%);">🎟️ ENTRADA</div>', iconSize: [0, 0] }), interactive: false }).addTo(adminMap);
+
+      adminMap.fitBounds(stadiumBounds, { padding: [20, 20] });
+
+      adminMap.on('click', (e) => {
+        if (editorMode === 'add') {
+          openAddStandModal();
+          document.getElementById('stLatOffset').value = (e.latlng.lat - cLat).toFixed(7);
+          document.getElementById('stLngOffset').value = (e.latlng.lng - cLng).toFixed(7);
+        } else if (editorMode === 'aisle') {
+          aisleDraftPoints.push([e.latlng.lat, e.latlng.lng]);
+          if (aisleDraftLine) adminMap.removeLayer(aisleDraftLine);
+          aisleDraftLine = L.polyline(aisleDraftPoints, { color: '#38bdf8', weight: 4, dashArray: '8,8' }).addTo(adminMap);
+          const fin = document.getElementById('btnFinishAisle');
+          if (fin && aisleDraftPoints.length >= 2) fin.classList.remove('hidden');
+        } else if (editorMode === 'sector') {
+          if (!sectorFirstCorner) {
+            sectorFirstCorner = [e.latlng.lat, e.latlng.lng];
+            L.marker(sectorFirstCorner, { icon: L.divIcon({ className: '', html: '<div style="width:14px;height:14px;border-radius:50%;background:#38bdf8;border:2px solid #fff;"></div>', iconSize: [14, 14], iconAnchor: [7, 7] }) }).addTo(adminMap);
+          } else {
+            const a = sectorFirstCorner;
+            const b = [e.latlng.lat, e.latlng.lng];
+            sectorFirstCorner = null;
+            const bounds = [[Math.min(a[0], b[0]), Math.min(a[1], b[1])], [Math.max(a[0], b[0]), Math.max(a[1], b[1])]];
+            const name = prompt('Nombre del sector (ej: 🍺 Boulevard Cervecero):', '🧩 Nuevo Sector');
+            if (name) {
+              const color = prompt('Color del sector (hex):', '#8b5cf6') || '#8b5cf6';
+              layout.sectors.push({ id: 'sec-' + Date.now(), name, color, bounds });
+              saveLayoutAndSync();
+              renderEditorLayout();
+            }
+          }
+        }
+      });
+
+      renderEditorStands();
+      renderEditorLayout();
+      updateEditorCounts();
+    }
+
+    function metersBetweenAdm(lat1, lng1, lat2, lng2) {
+      const dLat = (lat2 - lat1) * 111320;
+      const dLng = (lng2 - lng1) * 111320 * Math.cos(lat1 * Math.PI / 180);
+      return Math.hypot(dLng, dLat);
+    }
+
+    // Proyección de un punto sobre un pasillo: distancia (m) y parámetro t del segmento más cercano
+    function projectOntoAisleAdm(lat, lng, ais) {
+      let best = null;
+      for (let i = 0; i < ais.points.length - 1; i++) {
+        const a = ais.points[i], b = ais.points[i + 1];
+        const refLat = lat, refLng = lng;
+        const kx = 111320 * Math.cos(refLat * Math.PI / 180);
+        const ax = (a[1] - refLng) * kx, ay = (a[0] - refLat) * 111320;
+        const bx = (b[1] - refLng) * kx, by = (b[0] - refLat) * 111320;
+        const px = (lng - refLng) * kx, py = (lat - refLat) * 111320;
+        const dx = bx - ax, dy = by - ay;
+        const len2 = dx * dx + dy * dy;
+        let t = len2 > 0 ? ((px - ax) * dx + (py - ay) * dy) / len2 : 0;
+        t = Math.max(0, Math.min(1, t));
+        const dist = Math.hypot(px - (ax + t * dx), py - (ay + t * dy));
+        if (!best || dist < best.dist) best = { dist, t, segIndex: i };
+      }
+      return best;
+    }
+
+    // Snap-to-grid: al soltar un puesto cerca de un pasillo, se alinea a su cuadrícula (~3.3m)
+    // y se auto-numeró ("Pasillo Central #4") según los puestos ya alineados a ese pasillo.
+    function snapStandToAisle(stand) {
+      if (stand.number === 'ESC') return false;
+      const aisles = (layout.aisles || []).filter(a => a.points && a.points.length > 1);
+      if (!aisles.length) return false;
+
+      // Pasillo más cercano
+      let best = null;
+      aisles.forEach(ais => {
+        const p = projectOntoAisleAdm(stand.lat, stand.lng, ais);
+        if (p && (!best || p.dist < best.p.dist)) best = { ais, p };
+      });
+      if (!best || best.p.dist > 25) return false;
+
+      const ais = best.ais;
+      const segA = ais.points[best.p.segIndex];
+      const segB = ais.points[best.p.segIndex + 1];
+      const segLen = metersBetweenAdm(segA[0], segA[1], segB[0], segB[1]);
+
+      // Redondear a la cuadrícula de 3.3 metros a lo largo del segmento
+      const GRID = 3.3;
+      let tSnapped = best.p.t;
+      if (segLen > 0) {
+        tSnapped = Math.round((best.p.t * segLen) / GRID) * GRID / segLen;
+        tSnapped = Math.max(0, Math.min(1, tSnapped));
+      }
+      const cLatA = DEFAULT_CENTER[0], cLngA = DEFAULT_CENTER[1];
+      stand.lat = segA[0] + (segB[0] - segA[0]) * tSnapped;
+      stand.lng = segA[1] + (segB[1] - segA[1]) * tSnapped;
+      stand.latOffset = stand.lat - cLatA;
+      stand.lngOffset = stand.lng - cLngA;
+
+      // Auto-numeración: puestos pegados a ESTE pasillo, ordenados en el sentido del recorrido
+      const orderKey = s => {
+        const p = projectOntoAisleAdm(s.lat, s.lng, ais);
+        return p ? (p.segIndex * 1000 + p.t * 100) : -1;
+      };
+      const onAisle = stands.filter(s => s !== stand && s.number !== 'ESC' && projectOntoAisleAdm(s.lat, s.lng, ais).dist < 12);
+      onAisle.push(stand);
+      onAisle.sort((x, y) => orderKey(x) - orderKey(y));
+      const rank = onAisle.indexOf(stand) + 1;
+      stand.locationNote = `${ais.name} #${rank}`;
+      return true;
+    }
+
+    function renderEditorStands() {
+      if (!adminMap) return;
+      editorStandMarkers.forEach(m => adminMap.removeLayer(m));
+      editorStandMarkers = [];
+      const cLat = DEFAULT_CENTER[0];
+      const cLng = DEFAULT_CENTER[1];
+
+      stands.forEach(stand => {
+        if (stand.lat === undefined) stand.lat = cLat + (stand.latOffset || 0);
+        if (stand.lng === undefined) stand.lng = cLng + (stand.lngOffset || 0);
+
+        const isServ = stand.category === 'service';
+        const icon = L.divIcon({
+          className: '',
+          html: isServ
+            ? `<div style="display:flex;flex-direction:column;align-items:center;cursor:pointer;filter:drop-shadow(0 4px 8px rgba(0,0,0,0.5));">
+                <span style="background:#0f172a;color:#fbbf24;font-size:8px;font-weight:900;padding:1px 5px;border-radius:9999px;border:1px solid #fff;">${escAdm(stand.number)}</span>
+                <div style="width:34px;height:34px;border-radius:50%;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:17px;background:${escAdm(stand.color || '#f59e0b')};">${stand.icon || '🏪'}</div>
+              </div>`
+            : `<div style="display:flex;flex-direction:column;align-items:center;cursor:pointer;filter:drop-shadow(0 4px 8px rgba(0,0,0,0.5));">
+                <span style="background:#0f172a;color:#fbbf24;font-size:8px;font-weight:900;padding:1px 5px;border-radius:9999px;border:1px solid #fff;">${escAdm(stand.number)}</span>
+                <div style="width:38px;height:30px;border-radius:7px;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:16px;background:${escAdm(stand.color || '#f59e0b')};">${stand.icon || '🏪'}</div>
+              </div>`,
+          iconSize: isServ ? [36, 46] : [40, 44],
+          iconAnchor: isServ ? [18, 40] : [20, 38]
+        });
+        const m = L.marker([stand.lat, stand.lng], { icon, draggable: editorMode === 'move' }).addTo(adminMap);
+
+        m.on('dragend', (ev) => {
+          const lat = ev.target.getLatLng().lat;
+          const lng = ev.target.getLatLng().lng;
+          stand.latOffset = lat - cLat;
+          stand.lngOffset = lng - cLng;
+          stand.lat = lat;
+          stand.lng = lng;
+          // Snap-to-grid: se pega al pasillo más cercano y se auto-numeró
+          const snapped = snapStandToAisle(stand);
+          saveAndBroadcast();
+          renderEditorStands();
+          renderEditorLayout();
+          if (snapped && stand.locationNote) {
+            alert(`✅ "${stand.name}" alineado a ${stand.locationNote}`);
+          }
+        });
+
+        m.on('click', () => {
+          if (editorMode === 'delete') {
+            if (stand.number === 'ESC') { alert('El Escenario es fijo del recinto y no se puede eliminar.'); return; }
+            if (confirm(`¿Eliminar el puesto "${stand.name}" (${stand.number}) del mapa y del festival?`)) {
+              deleteStand(stand.id);
+              renderEditorStands();
+              updateEditorCounts();
+            }
+          } else if (editorMode === 'move') {
+            editStandModal(stand.id);
+          }
+        });
+
+        m.bindTooltip(`${stand.number}: ${stand.name}`, { direction: 'top', offset: [0, -42] });
+        m.standId = stand.id;
+        editorStandMarkers.push(m);
+      });
+      updateEditorCounts();
+    }
+
+    function renderEditorLayout() {
+      if (!adminMap) return;
+      editorLayoutLayers.forEach(l => adminMap.removeLayer(l));
+      editorLayoutLayers = [];
+
+      (layout.sectors || []).forEach(sec => {
+        if (!sec.bounds) return;
+        const rect = L.rectangle(sec.bounds, { color: sec.color || '#f59e0b', weight: 2, dashArray: '7,7', fillColor: sec.color || '#f59e0b', fillOpacity: 0.12 });
+        rect.on('click', () => {
+          if (editorMode === 'delete' && confirm(`¿Eliminar el sector "${sec.name}"?`)) {
+            layout.sectors = layout.sectors.filter(s => s.id !== sec.id);
+            saveLayoutAndSync();
+            renderEditorLayout();
+          }
+        });
+        rect.addTo(adminMap);
+        editorLayoutLayers.push(rect);
+
+        const midLng = (sec.bounds[0][1] + sec.bounds[1][1]) / 2;
+        const lbl = L.marker([sec.bounds[1][0], midLng], {
+          icon: L.divIcon({ className: '', html: `<div style="white-space:nowrap;background:#0f172acc;border:1.5px solid ${sec.color || '#f59e0b'};color:${sec.color || '#f59e0b'};font-size:10px;font-weight:900;padding:2px 10px;border-radius:9999px;transform:translateX(-50%);">${escAdm(sec.name)}</div>`, iconSize: [0, 0] }),
+          interactive: false
+        }).addTo(adminMap);
+        editorLayoutLayers.push(lbl);
+      });
+
+      (layout.aisles || []).forEach(ais => {
+        if (!ais.points || ais.points.length < 2) return;
+        const line = L.polyline(ais.points, { color: '#e2e8f0', weight: 4, opacity: 0.6, dashArray: '2,10' });
+        line.on('click', () => {
+          if (editorMode === 'delete' && confirm(`¿Eliminar el pasillo "${ais.name}"?`)) {
+            layout.aisles = layout.aisles.filter(a => a.id !== ais.id);
+            saveLayoutAndSync();
+            renderEditorLayout();
+          }
+        });
+        line.addTo(adminMap);
+        editorLayoutLayers.push(line);
+
+        const mid = ais.points[Math.floor(ais.points.length / 2)];
+        const lbl = L.marker(mid, {
+          icon: L.divIcon({ className: '', html: `<div style="white-space:nowrap;background:#0f172acc;border:1px solid #ffffff59;color:#e2e8f0;font-size:9px;font-weight:800;padding:1px 8px;border-radius:9999px;transform:translateX(-50%);text-transform:uppercase;letter-spacing:1px;">${escAdm(ais.name)}</div>`, iconSize: [0, 0] }),
+          interactive: false
+        }).addTo(adminMap);
+        editorLayoutLayers.push(lbl);
+      });
+      updateEditorCounts();
+    }
+
+    function finishAisleDrawing() {
+      if (aisleDraftPoints.length < 2) {
+        alert('Marca al menos 2 puntos en el mapa para trazar el pasillo.');
+        return;
+      }
+      const name = prompt('Nombre del pasillo (ej: Pasillo Central):', 'Pasillo Nuevo');
+      if (!name) return;
+      layout.aisles.push({ id: 'ais-' + Date.now(), name, points: aisleDraftPoints.slice() });
+      aisleDraftPoints = [];
+      if (aisleDraftLine && adminMap) { adminMap.removeLayer(aisleDraftLine); aisleDraftLine = null; }
+      const fin = document.getElementById('btnFinishAisle');
+      if (fin) fin.classList.add('hidden');
+      saveLayoutAndSync();
+      renderEditorLayout();
+    }
+
+    function updateEditorCounts() {
+      const s = document.getElementById('editorStandCount');
+      const a = document.getElementById('editorAisleCount');
+      const sec = document.getElementById('editorSectorCount');
+      if (s) s.textContent = stands.length;
+      if (a) a.textContent = (layout.aisles || []).length;
+      if (sec) sec.textContent = (layout.sectors || []).length;
+    }
+
+    function resetLayoutDefaults() {
+      if (!confirm('¿Restaurar el diseño del recinto (sectores y pasillos) a los valores por defecto? Los puestos no se tocan.')) return;
+      layout = JSON.parse(JSON.stringify(ADMIN_DEFAULT_LAYOUT));
+      saveLayoutAndSync();
+      renderEditorLayout();
+    }
+
+    function saveLayoutAndSync() {
+      localStorage.setItem('festival_layout', JSON.stringify(layout));
+      saveAndBroadcast();
     }
 
     renderAdminArtists();
@@ -1941,7 +2388,8 @@
         const payload = [
           { key: 'stands', value: stands, updated_at: new Date().toISOString() },
           { key: 'schedule', value: stageSchedule, updated_at: new Date().toISOString() },
-          { key: 'manual_live_id', value: localStorage.getItem('festival_manual_live_id') || null, updated_at: new Date().toISOString() }
+          { key: 'manual_live_id', value: localStorage.getItem('festival_manual_live_id') || null, updated_at: new Date().toISOString() },
+          { key: 'layout', value: layout, updated_at: new Date().toISOString() }
         ];
 
         const res = await fetch(`${cleanUrl}/rest/v1/festival_config`, {
@@ -1981,7 +2429,8 @@
         const payload = [
           { key: 'stands', value: stands, updated_at: new Date().toISOString() },
           { key: 'schedule', value: stageSchedule, updated_at: new Date().toISOString() },
-          { key: 'manual_live_id', value: localStorage.getItem('festival_manual_live_id') || null, updated_at: new Date().toISOString() }
+          { key: 'manual_live_id', value: localStorage.getItem('festival_manual_live_id') || null, updated_at: new Date().toISOString() },
+          { key: 'layout', value: layout, updated_at: new Date().toISOString() }
         ];
 
         await fetch(`${cleanUrl}/rest/v1/festival_config`, {

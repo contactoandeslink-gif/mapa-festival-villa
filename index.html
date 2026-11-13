@@ -222,6 +222,95 @@
     .animate-modal-slide-up {
       animation: modalSlideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
+
+    /* Banners y rótulos del recinto NUNCA roban el toque del dedo */
+    .sector-banner-marker, .aisle-floor-label { pointer-events: none !important; }
+
+    /* PUESTOS RECTANGULARES proporcionales (tipo plano de feria profesional) */
+    .stand-rect-marker {
+      width: 56px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.5));
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .stand-rect-marker:hover, .stand-rect-marker:active {
+      transform: scale(1.14) translateY(-3px);
+      z-index: 999 !important;
+    }
+    .stand-rect-marker.stand-selected {
+      transform: scale(1.22) translateY(-5px);
+      z-index: 1000 !important;
+      filter: drop-shadow(0 0 14px rgba(251, 191, 36, 0.95)) drop-shadow(0 8px 18px rgba(0, 0, 0, 0.6));
+    }
+    .stand-rect-marker.stand-dimmed {
+      opacity: 0.3;
+      filter: grayscale(60%);
+    }
+    .stand-rect {
+      position: relative;
+      width: 44px;
+      height: 36px;
+      border-radius: 9px;
+      border: 2.5px solid #ffffff;
+      background: #0f172a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.2), 0 3px 6px rgba(0, 0, 0, 0.35);
+    }
+    .stand-rect-icon { font-size: 19px; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4)); }
+
+    /* Precio flotante (búsqueda/filtro): vitrina de precios en el mapa */
+    .stand-price-pill {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #f59e0b;
+      color: #0f172a;
+      font-size: 8px;
+      font-weight: 900;
+      padding: 1px 5px;
+      border-radius: 9999px;
+      border: 1.5px solid #ffffff;
+      white-space: nowrap;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.45);
+    }
+
+    /* Estado del puesto: Agotado / Mucha espera */
+    .stand-status-badge {
+      position: absolute;
+      bottom: -9px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 7.5px;
+      font-weight: 900;
+      padding: 1px 5px;
+      border-radius: 9999px;
+      border: 1.5px solid #ffffff;
+      white-space: nowrap;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.45);
+    }
+    .stand-status-badge.soldout { background: #dc2626; color: #ffffff; }
+    .stand-status-badge.busy { background: #f59e0b; color: #0f172a; }
+    .stand-rect-marker.stand-soldout .stand-rect { filter: grayscale(85%); opacity: 0.7; }
+    .stand-rect-marker.stand-soldout .stand-label-tag { text-decoration: line-through; opacity: 0.75; }
+
+    /* TEMA CLARO DIURNO: legible bajo el sol (eventos de día) */
+    #view-map.theme-light { background: #F1F5F9; }
+    #view-map.theme-light .stand-label-tag {
+      background: rgba(255, 255, 255, 0.95);
+      color: #0f172a;
+      border-color: rgba(15, 23, 42, 0.3);
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.18);
+    }
+    #view-map.theme-light .stand-rect {
+      background: #ffffff;
+      box-shadow: inset 0 1px 3px rgba(15, 23, 42, 0.08), 0 3px 6px rgba(15, 23, 42, 0.25);
+    }
   </style>
 </head>
 <body class="bg-slate-950 text-slate-100 flex flex-col min-h-[100dvh] relative overflow-x-hidden antialiased">
@@ -229,7 +318,7 @@
   <!-- ======================================================== -->
   <!-- BARRA SUPERIOR FIJA: BUSCADOR & ACCESOS RÁPIDOS          -->
   <!-- ======================================================== -->
-  <header class="bg-slate-900/95 backdrop-blur-2xl border-b border-slate-800 px-3.5 pt-3 pb-2.5 z-40 sticky top-0 shadow-xl">
+  <header class="bg-slate-900/95 backdrop-blur-2xl border-b border-slate-800 px-3.5 pt-2 pb-2 z-40 sticky top-0 shadow-xl">
     <div class="max-w-xl mx-auto w-full flex flex-col gap-2.5">
       
       <!-- Fila 1: Logo + Nombre del Evento + Reloj Chile + Botón QR -->
@@ -265,27 +354,14 @@
           id="globalSearchInput" 
           type="text" 
           placeholder="🔍 ¿Qué buscas? (completo, cerveza, asado, baños...)" 
-          class="w-full bg-slate-800/90 text-white rounded-xl pl-9 pr-8 py-2.5 text-xs sm:text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500 border border-slate-700/80 font-medium transition shadow-inner"
+          class="w-full bg-slate-800/90 text-white rounded-xl pl-9 pr-8 py-2 text-xs sm:text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500 border border-slate-700/80 font-medium transition shadow-inner"
         />
-        <span class="absolute left-3 top-2.5 text-slate-400 text-xs">🔍</span>
-        <button id="clearSearchBtn" class="hidden absolute right-2.5 top-2.5 text-slate-400 hover:text-white text-xs p-1">✕</button>
+        <span class="absolute left-3 top-2 text-slate-400 text-xs">🔍</span>
+        <button id="clearSearchBtn" class="hidden absolute right-2.5 top-2 text-slate-400 hover:text-white text-xs p-1">✕</button>
 
         <!-- Dropdown de resultados de búsqueda instantánea -->
         <div id="searchDropdown" class="hidden absolute top-12 left-0 right-0 bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl max-h-80 overflow-y-auto z-50 p-2 space-y-1">
         </div>
-      </div>
-
-      <!-- Fila 3: Selector de Pestañas Superior (Acceso directo inmediato) -->
-      <div class="grid grid-cols-3 gap-1.5 pt-1 border-t border-slate-800/80">
-        <button onclick="switchTab('live')" id="top-tab-live" class="py-2 px-1 rounded-xl text-center font-black text-[11px] sm:text-xs transition flex items-center justify-center gap-1.5 bg-orange-600 text-white shadow-md shadow-orange-600/30 active:scale-98">
-          <span>🎸</span> <span>En Vivo</span>
-        </button>
-        <button onclick="switchTab('map')" id="top-tab-map" class="py-2 px-1 rounded-xl text-center font-bold text-[11px] sm:text-xs transition flex items-center justify-center gap-1.5 bg-slate-800/90 text-slate-300 hover:text-white border border-slate-700/80 active:scale-98">
-          <span>🗺️</span> <span>Mapa Cancha</span>
-        </button>
-        <button onclick="switchTab('stands')" id="top-tab-stands" class="py-2 px-1 rounded-xl text-center font-bold text-[11px] sm:text-xs transition flex items-center justify-center gap-1.5 bg-slate-800/90 text-slate-300 hover:text-white border border-slate-700/80 active:scale-98">
-          <span>🍔</span> <span>Locales & Carta</span>
-        </button>
       </div>
 
     </div>
@@ -402,10 +478,10 @@
     </section>
 
     <!-- PESTAÑA 2: 🗺️ MAPA INTERACTIVO & GPS (CANCHA / VILLA) -->
-    <section id="view-map" class="h-[calc(100dvh-175px)] min-h-[500px] w-full relative overflow-hidden hidden select-none">
+    <section id="view-map" class="h-[calc(100dvh-140px)] min-h-[500px] w-full relative overflow-hidden hidden select-none">
       
       <!-- Barra Superior Flotante Sobre el Mapa: GPS + Filtros Rápidos + Centrar -->
-      <div class="absolute top-2.5 left-2.5 right-2.5 z-20 flex flex-col gap-2 pointer-events-none">
+      <div class="absolute top-2.5 left-2.5 right-2.5 z-[1001] flex flex-col gap-2 pointer-events-none">
         
         <div class="flex items-center justify-between gap-2 pointer-events-auto">
           <!-- Badge GPS -->
@@ -445,8 +521,11 @@
 
       </div>
 
-      <!-- Controles de Navegación Lateral (Brújula + Mi GPS + Agrandar/Achicar) -->
-      <div class="absolute right-3 top-28 z-20 flex flex-col gap-2 pointer-events-auto">
+      <!-- Controles de Navegación Lateral (Brújula + Mi GPS + Tema + Zoom) -->
+      <div class="absolute right-3 top-28 z-[1001] flex flex-col gap-2 pointer-events-auto">
+        <button id="mapThemeToggleBtn" onclick="toggleMapTheme()" title="Cambiar tema claro/oscuro del mapa" class="w-11 h-11 bg-slate-900/95 backdrop-blur-md text-yellow-300 rounded-xl shadow-xl flex items-center justify-center font-bold text-lg active:scale-95 transition border border-slate-700">
+          ☀️
+        </button>
         <button id="mapCompassBtn" onclick="requestCompassPermission()" title="Brújula 360°" class="w-11 h-11 bg-slate-900/95 backdrop-blur-md text-orange-400 rounded-xl shadow-xl flex items-center justify-center font-bold text-lg active:scale-95 transition border border-slate-700">
           🧭
         </button>
@@ -461,8 +540,24 @@
         </button>
       </div>
 
+      <!-- Leyenda del Recinto (sectores y servicios, colapsable) -->
+      <div id="mapLegend" class="absolute left-3 bottom-24 z-[1001] pointer-events-auto">
+        <button onclick="toggleMapLegend()" id="mapLegendToggle" class="bg-slate-900/95 backdrop-blur-md border border-slate-600 text-white text-[10px] font-black px-3 py-1.5 rounded-full shadow-xl flex items-center gap-1.5 active:scale-95 transition">
+          🗺️ Leyenda
+        </button>
+        <div id="mapLegendPanel" class="hidden mt-2 bg-slate-950/95 backdrop-blur-md border border-slate-700 rounded-2xl p-3 shadow-2xl w-52 space-y-1.5">
+          <p class="text-[9px] font-black uppercase tracking-widest text-slate-400">Sectores de la Feria</p>
+          <div id="mapLegendSectors" class="space-y-1"></div>
+          <div class="border-t border-slate-800 pt-1.5 space-y-1">
+            <p class="text-[10px] text-white flex items-center gap-1.5"><span>🎸</span> Escenario Principal</p>
+            <p class="text-[10px] text-white flex items-center gap-1.5"><span>🚻</span> Baños</p>
+            <p class="text-[10px] text-white flex items-center gap-1.5"><span>🎟️</span> Entrada al Recinto</p>
+          </div>
+        </div>
+      </div>
+
       <!-- HUD Superior de Ruta ("¿Cómo llegar?" Activo en Navegación) -->
-      <div id="navHud" class="hidden absolute top-28 left-3 right-16 z-20 bg-slate-950/95 text-white backdrop-blur-md rounded-2xl px-3.5 py-2.5 shadow-2xl flex items-center justify-between border border-orange-500/70 pointer-events-auto animate-bounce-short">
+      <div id="navHud" class="hidden absolute top-28 left-3 right-16 z-[1001] bg-slate-950/95 text-white backdrop-blur-md rounded-2xl px-3.5 py-2.5 shadow-2xl flex items-center justify-between border border-orange-500/70 pointer-events-auto animate-bounce-short">
         <div class="flex items-center gap-2.5 min-w-0">
           <div class="w-8 h-8 rounded-lg bg-orange-500/20 text-orange-400 flex items-center justify-center font-bold text-lg flex-shrink-0 animate-pulse">
             🚶
@@ -664,7 +759,7 @@
   <!-- ======================================================== -->
   <script>
     // Limpiar caché vieja si la versión de datos cambió (con try/catch: Safari privado puede bloquear localStorage)
-    const DATA_VERSION = '2026.11.fixes_v3';
+    const DATA_VERSION = '2026.11.layout_editor_v4';
     function safeLSGet(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
     function safeLSSet(key, val) { try { localStorage.setItem(key, val); } catch (e) {} }
     function safeLSRemove(key) { try { localStorage.removeItem(key); } catch (e) {} }
@@ -1102,6 +1197,7 @@
       if (event.data.type === 'SYNC_ALL') {
         stageSchedule = event.data.schedule;
         stands = event.data.stands;
+        if (event.data.layout) { layout = event.data.layout; saveLayoutLocal(); renderLayout(); renderMapLegend(); }
         renderLiveHero();
         renderScheduleList();
         renderStandsFeed();
@@ -1182,6 +1278,12 @@
                   else safeLSRemove('festival_manual_live_id');
                   changed = true;
                 }
+              } else if (r.key === 'layout' && r.value && Array.isArray(r.value.aisles)) {
+                if (JSON.stringify(r.value) !== JSON.stringify(layout)) {
+                  layout = r.value;
+                  saveLayoutLocal();
+                  changed = true;
+                }
               }
             });
             if (changed) {
@@ -1189,6 +1291,8 @@
               renderScheduleList();
               renderStandsFeed();
               renderStandsOnMap();
+              renderLayout();
+              renderMapLegend();
               showLiveToast('⚡ Información actualizada en vivo desde el festival');
             }
           }
@@ -1211,6 +1315,9 @@
       }
       if (e.key === 'festival_admin_stands' && e.newValue) {
         try { stands = JSON.parse(e.newValue); renderStandsFeed(); renderStandsOnMap(); } catch (err) {}
+      }
+      if (e.key === 'festival_layout' && e.newValue) {
+        try { layout = JSON.parse(e.newValue); renderLayout(); renderMapLegend(); } catch (err) {}
       }
     });
 
@@ -1282,6 +1389,12 @@
           setTimeout(() => {
             if (typeof map !== 'undefined' && map && map.invalidateSize) {
               map.invalidateSize();
+              // El mapa nace dentro de una sección oculta (display:none): el primer fitBounds
+              // se calcula mal. Al abrir la pestaña, encuadramos el recinto correctamente.
+              if (!window.__mapFramed) {
+                window.__mapFramed = true;
+                map.fitBounds(stadiumBounds, { padding: [15, 15] });
+              }
             }
           }, 150);
         }
@@ -1870,11 +1983,17 @@
 
       if (q.length < 2) {
         searchDropdown.classList.add('hidden');
+        // Limpiar precios flotantes del mapa
+        if (window.__searchPrices) {
+          window.__searchPrices = null;
+          renderStandsOnMap();
+        }
         return;
       }
 
       let html = '';
       let matches = 0;
+      window.__searchPrices = {};
 
       stands.forEach(stand => {
         const matchStandName = stand.name.toLowerCase().includes(q) || stand.categoryName.toLowerCase().includes(q);
@@ -1882,6 +2001,10 @@
 
         if (matchStandName || matchProducts.length > 0) {
           matches++;
+          // Precio del primer producto encontrado: se muestra flotando sobre el pin del puesto
+          if (matchProducts.length > 0) {
+            window.__searchPrices[stand.id] = matchProducts[0].price;
+          }
           html += `
             <div class="p-3 hover:bg-slate-800 rounded-xl cursor-pointer transition border border-transparent hover:border-slate-700" onclick="selectFromGlobalSearch(${stand.id})">
               <div class="flex items-center justify-between">
@@ -1926,6 +2049,8 @@
 
       searchDropdown.innerHTML = html;
       searchDropdown.classList.remove('hidden');
+      // Refrescar pines del mapa con los precios encontrados (atenuación: los no coinciden se atenúan vía filtros)
+      renderStandsOnMap();
     });
 
     function selectFromGlobalSearch(standId) {
@@ -1942,6 +2067,8 @@
       searchInput.value = '';
       clearSearchBtn.classList.add('hidden');
       searchDropdown.classList.add('hidden');
+      window.__searchPrices = null;
+      renderStandsOnMap();
     });
 
     // ========================================================
@@ -1979,160 +2106,325 @@
       attribution: '&copy; OpenStreetMap'
     });
 
-    // 2. RECINTO DEL ESTADIO & CANCHA ILUSTRADA (Capa Vectorial Firme)
+    // 2. RECINTO DEL ESTADIO & CANCHA ILUSTRADA (Capa Vectorial Firme, tematizable)
     const stadiumGroup = L.layerGroup().addTo(map);
 
-    // A. Recinto Exterior & Pista Atlética de Tartán Rojo
-    L.rectangle([[cLat - 0.00058, cLng - 0.00042], [cLat + 0.00058, cLng + 0.00042]], {
-      color: '#1e293b',
-      weight: 2,
-      fillColor: '#0b0f19',
-      fillOpacity: 1
-    }).addTo(stadiumGroup);
-
-    // Pista de atletismo terracota
-    L.rectangle([[cLat - 0.00052, cLng - 0.00038], [cLat + 0.00052, cLng + 0.00038]], {
-      color: '#ffffff',
-      weight: 1.5,
-      opacity: 0.35,
-      fillColor: '#991b1b',
-      fillOpacity: 0.85
-    }).addTo(stadiumGroup);
-
-    // B. Cancha de Césped Verde Profesional con Franjas de Corte
-    const pitchNorth = cLat + 0.00032;
-    const pitchSouth = cLat - 0.00044;
-    const pitchWest  = cLng - 0.00034;
-    const pitchEast  = cLng + 0.00034;
-
-    L.rectangle([[pitchSouth, pitchWest], [pitchNorth, pitchEast]], {
-      color: '#15803d',
-      weight: 2,
-      fillColor: '#166534',
-      fillOpacity: 0.98
-    }).addTo(stadiumGroup);
-
-    // Franjas de corte de césped
-    const numStripes = 6;
-    const stripeHeight = (pitchNorth - pitchSouth) / numStripes;
-    for (let i = 0; i < numStripes; i++) {
-      if (i % 2 === 1) {
-        const sSouth = pitchSouth + i * stripeHeight;
-        const sNorth = sSouth + stripeHeight;
-        L.rectangle([[sSouth, pitchWest], [sNorth, pitchEast]], {
-          stroke: false,
-          fillColor: '#15803d',
-          fillOpacity: 0.65
-        }).addTo(stadiumGroup);
+    // Paletas: light = legible bajo el sol (por defecto), dark = evento nocturno
+    const MAP_THEMES = {
+      light: {
+        pageBg: '#F1F5F9',
+        outerFill: '#E2E8F0', outerLine: '#94A3B8',
+        trackFill: '#F8FAFC', trackLine: '#CBD5E1',
+        pitchFill: '#22C55E', pitchLine: '#15803D', pitchStripe: '#16A34A',
+        lineWhite: 'rgba(255,255,255,0.95)',
+        walkFill: '#FFFFFF', walkLine: '#F59E0B',
+        aisleLine: '#64748B',
+        aisleLabelBg: 'rgba(255,255,255,0.92)', aisleLabelText: '#334155', aisleLabelBorder: 'rgba(100,116,139,0.5)'
+      },
+      dark: {
+        pageBg: '#0f172a',
+        outerFill: '#0b0f19', outerLine: '#1e293b',
+        trackFill: '#991b1b', trackLine: '#ffffff',
+        pitchFill: '#166534', pitchLine: '#15803d', pitchStripe: '#15803d',
+        lineWhite: 'rgba(255,255,255,0.7)',
+        walkFill: '#334155', walkLine: '#f59e0b',
+        aisleLine: '#e2e8f0',
+        aisleLabelBg: 'rgba(15,23,42,0.75)', aisleLabelText: '#e2e8f0', aisleLabelBorder: 'rgba(255,255,255,0.35)'
       }
+    };
+    let currentMapTheme = safeLSGet('festival_map_theme') || 'light';
+    if (!MAP_THEMES[currentMapTheme]) currentMapTheme = 'light';
+    function mapP() { return MAP_THEMES[currentMapTheme]; }
+
+    function drawStadium() {
+      stadiumGroup.clearLayers();
+      const P = mapP();
+
+      // A. Recinto Exterior & Pista Atlética
+      L.rectangle([[cLat - 0.00058, cLng - 0.00042], [cLat + 0.00058, cLng + 0.00042]], {
+        color: P.outerLine,
+        weight: 2,
+        fillColor: P.outerFill,
+        fillOpacity: 1
+      }).addTo(stadiumGroup);
+
+      L.rectangle([[cLat - 0.00052, cLng - 0.00038], [cLat + 0.00052, cLng + 0.00038]], {
+        color: P.trackLine,
+        weight: 1.5,
+        opacity: 0.35,
+        fillColor: P.trackFill,
+        fillOpacity: 0.85
+      }).addTo(stadiumGroup);
+
+      // B. Cancha de Césped con Franjas de Corte
+      const pitchNorth = cLat + 0.00032;
+      const pitchSouth = cLat - 0.00044;
+      const pitchWest  = cLng - 0.00034;
+      const pitchEast  = cLng + 0.00034;
+
+      L.rectangle([[pitchSouth, pitchWest], [pitchNorth, pitchEast]], {
+        color: P.pitchLine,
+        weight: 2,
+        fillColor: P.pitchFill,
+        fillOpacity: 0.98
+      }).addTo(stadiumGroup);
+
+      const numStripes = 6;
+      const stripeHeight = (pitchNorth - pitchSouth) / numStripes;
+      for (let i = 0; i < numStripes; i++) {
+        if (i % 2 === 1) {
+          const sSouth = pitchSouth + i * stripeHeight;
+          const sNorth = sSouth + stripeHeight;
+          L.rectangle([[sSouth, pitchWest], [sNorth, pitchEast]], {
+            stroke: false,
+            fillColor: P.pitchStripe,
+            fillOpacity: 0.65
+          }).addTo(stadiumGroup);
+        }
+      }
+
+      // C. Líneas Reglamentarias
+      L.rectangle([[pitchSouth, pitchWest], [pitchNorth, pitchEast]], {
+        color: P.lineWhite,
+        weight: 2,
+        opacity: 0.7,
+        fill: false
+      }).addTo(stadiumGroup);
+
+      const pitchCenterLat = (pitchNorth + pitchSouth) / 2;
+      L.polyline([[pitchCenterLat, pitchWest], [pitchCenterLat, pitchEast]], {
+        color: P.lineWhite,
+        weight: 2,
+        opacity: 0.7
+      }).addTo(stadiumGroup);
+
+      L.circle([pitchCenterLat, cLng], {
+        radius: 9.15,
+        color: P.lineWhite,
+        weight: 2,
+        opacity: 0.7,
+        fill: false
+      }).addTo(stadiumGroup);
+
+      L.circle([pitchCenterLat, cLng], {
+        radius: 1,
+        color: P.lineWhite,
+        fillColor: '#ffffff',
+        fillOpacity: 0.9,
+        weight: 1
+      }).addTo(stadiumGroup);
+
+      // D. Bulevar Central Peatonal Iluminado
+      const walkWest = cLng - 0.00007;
+      const walkEast = cLng + 0.00007;
+      L.rectangle([[pitchSouth - 0.00004, walkWest], [pitchNorth, walkEast]], {
+        color: P.walkLine,
+        weight: 2,
+        dashArray: '3, 4',
+        opacity: 0.85,
+        fillColor: P.walkFill,
+        fillOpacity: 0.92
+      }).addTo(stadiumGroup);
+
+      const festoonStep = 0.00007;
+      for (let fLat = pitchSouth; fLat <= pitchNorth - 0.00003; fLat += festoonStep) {
+        L.circleMarker([fLat, walkWest], { radius: 2.5, color: '#fbbf24', fillColor: '#fef08a', fillOpacity: 0.95, weight: 1 }).addTo(stadiumGroup);
+        L.circleMarker([fLat, walkEast], { radius: 2.5, color: '#fbbf24', fillColor: '#fef08a', fillOpacity: 0.95, weight: 1 }).addTo(stadiumGroup);
+      }
+
+      // E. Escenario Principal al Norte (Concert Stage)
+      L.rectangle([[pitchNorth, cLng - 0.00020], [cLat + 0.00050, cLng + 0.00020]], {
+        color: '#dc2626',
+        weight: 2.5,
+        fillColor: '#09090b',
+        fillOpacity: 1
+      }).addTo(stadiumGroup);
+
+      L.rectangle([[pitchNorth + 0.00002, cLng - 0.00023], [pitchNorth + 0.00010, cLng - 0.00019]], {
+        color: '#eab308',
+        weight: 2,
+        fillColor: '#18181b',
+        fillOpacity: 1
+      }).addTo(stadiumGroup);
+      L.rectangle([[pitchNorth + 0.00002, cLng + 0.00019], [pitchNorth + 0.00010, cLng + 0.00023]], {
+        color: '#eab308',
+        weight: 2,
+        fillColor: '#18181b',
+        fillOpacity: 1
+      }).addTo(stadiumGroup);
+
+      const stageBannerIcon = L.divIcon({
+        className: 'stage-central-marker',
+        html: `
+          <div class="px-3.5 py-1.5 rounded-full bg-gradient-to-r from-red-600 via-rose-600 to-amber-500 text-white text-[11px] font-black shadow-xl border-2 border-white flex items-center gap-1.5 whitespace-nowrap cursor-pointer hover:scale-105 transition" onclick="onStageMarkerClick()">
+            <span class="text-sm">🎸</span> ESCENARIO PRINCIPAL <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          </div>
+        `,
+        iconAnchor: [85, 14]
+      });
+      L.marker([cLat + 0.00041, cLng], { icon: stageBannerIcon, zIndexOffset: 850 }).addTo(stadiumGroup);
+
+      // F. Acceso Principal al Recinto (Sur)
+      const entranceBannerIcon = L.divIcon({
+        className: 'entrance-central-marker',
+        html: `
+          <div class="px-3 py-1 rounded-full bg-slate-900/95 text-amber-400 text-[10px] font-black border-2 border-amber-400 shadow-xl flex items-center gap-1 whitespace-nowrap">
+            <span>🎟️</span> ACCESO AL RECINTO
+          </div>
+        `,
+        iconAnchor: [70, 12]
+      });
+      L.marker([pitchSouth - 0.00005, cLng], { icon: entranceBannerIcon, zIndexOffset: 800 }).addTo(stadiumGroup);
     }
+    drawStadium();
 
-    // C. Líneas Reglamentarias de Fútbol Blancas
-    L.rectangle([[pitchSouth, pitchWest], [pitchNorth, pitchEast]], {
-      color: '#ffffff',
-      weight: 2,
-      opacity: 0.7,
-      fill: false
-    }).addTo(stadiumGroup);
-
-    const pitchCenterLat = (pitchNorth + pitchSouth) / 2;
-    L.polyline([[pitchCenterLat, pitchWest], [pitchCenterLat, pitchEast]], {
-      color: '#ffffff',
-      weight: 2,
-      opacity: 0.7
-    }).addTo(stadiumGroup);
-
-    L.circle([pitchCenterLat, cLng], {
-      radius: 9.15,
-      color: '#ffffff',
-      weight: 2,
-      opacity: 0.7,
-      fill: false
-    }).addTo(stadiumGroup);
-
-    L.circle([pitchCenterLat, cLng], {
-      radius: 1,
-      color: '#ffffff',
-      fillColor: '#ffffff',
-      fillOpacity: 0.9,
-      weight: 1
-    }).addTo(stadiumGroup);
-
-    // D. Bulevar Central Peatonal Iluminado
-    const walkWest = cLng - 0.00007;
-    const walkEast = cLng + 0.00007;
-    L.rectangle([[pitchSouth - 0.00004, walkWest], [pitchNorth, walkEast]], {
-      color: '#f59e0b',
-      weight: 2,
-      dashArray: '3, 4',
-      opacity: 0.85,
-      fillColor: '#334155',
-      fillOpacity: 0.92
-    }).addTo(stadiumGroup);
-
-    // Guirnaldas de luces festivas
-    const festoonStep = 0.00007;
-    for (let fLat = pitchSouth; fLat <= pitchNorth - 0.00003; fLat += festoonStep) {
-      L.circleMarker([fLat, walkWest], { radius: 2.5, color: '#fbbf24', fillColor: '#fef08a', fillOpacity: 0.95, weight: 1 }).addTo(stadiumGroup);
-      L.circleMarker([fLat, walkEast], { radius: 2.5, color: '#fbbf24', fillColor: '#fef08a', fillOpacity: 0.95, weight: 1 }).addTo(stadiumGroup);
+    // Aplicar tema al lienzo (fondo exterior del recinto)
+    function applyMapTheme() {
+      const P = mapP();
+      const vm = document.getElementById('view-map');
+      if (vm) {
+        vm.style.background = P.pageBg;
+        vm.classList.toggle('theme-light', currentMapTheme === 'light');
+      }
+      const btn = document.getElementById('mapThemeToggleBtn');
+      if (btn) btn.textContent = currentMapTheme === 'light' ? '☀️' : '🌙';
     }
-
-    // E. Escenario Principal al Norte (Concert Stage)
-    L.rectangle([[pitchNorth, cLng - 0.00020], [cLat + 0.00050, cLng + 0.00020]], {
-      color: '#dc2626',
-      weight: 2.5,
-      fillColor: '#09090b',
-      fillOpacity: 1
-    }).addTo(stadiumGroup);
-
-    // Torres de sonido Line Array
-    L.rectangle([[pitchNorth + 0.00002, cLng - 0.00023], [pitchNorth + 0.00010, cLng - 0.00019]], {
-      color: '#eab308',
-      weight: 2,
-      fillColor: '#18181b',
-      fillOpacity: 1
-    }).addTo(stadiumGroup);
-    L.rectangle([[pitchNorth + 0.00002, cLng + 0.00019], [pitchNorth + 0.00010, cLng + 0.00023]], {
-      color: '#eab308',
-      weight: 2,
-      fillColor: '#18181b',
-      fillOpacity: 1
-    }).addTo(stadiumGroup);
-
-    // Cartel Centrado del Escenario Principal
-    const stageBannerIcon = L.divIcon({
-      className: 'stage-central-marker',
-      html: `
-        <div class="px-3.5 py-1.5 rounded-full bg-gradient-to-r from-red-600 via-rose-600 to-amber-500 text-white text-[11px] font-black shadow-xl border-2 border-white flex items-center gap-1.5 whitespace-nowrap cursor-pointer hover:scale-105 transition" onclick="onStageMarkerClick()">
-          <span class="text-sm">🎸</span> ESCENARIO PRINCIPAL <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-        </div>
-      `,
-      iconAnchor: [85, 14]
-    });
-    L.marker([cLat + 0.00041, cLng], { icon: stageBannerIcon, zIndexOffset: 850 }).addTo(stadiumGroup);
-
-    // F. Acceso Principal al Recinto (Sur)
-    const entranceBannerIcon = L.divIcon({
-      className: 'entrance-central-marker',
-      html: `
-        <div class="px-3 py-1 rounded-full bg-slate-900/95 text-amber-400 text-[10px] font-black border-2 border-amber-400 shadow-xl flex items-center gap-1 whitespace-nowrap">
-          <span>🎟️</span> ACCESO AL RECINTO
-        </div>
-      `,
-      iconAnchor: [70, 12]
-    });
-    L.marker([pitchSouth - 0.00005, cLng], { icon: entranceBannerIcon, zIndexOffset: 800 }).addTo(stadiumGroup);
+    function toggleMapTheme() {
+      currentMapTheme = (currentMapTheme === 'light') ? 'dark' : 'light';
+      safeLSSet('festival_map_theme', currentMapTheme);
+      applyMapTheme();
+      drawStadium();
+      renderLayout();
+      renderStandsOnMap();
+      renderMapLegend();
+    }
+    applyMapTheme();
 
     // Encuadre inicial automático de la cancha completa
     map.fitBounds(stadiumBounds, { padding: [15, 15] });
 
     function resetMapView() {
+      window.__mapFramed = true;
       closeStandModal();
       mapFilterCategory('all');
       map.flyToBounds(stadiumBounds, { padding: [15, 15], duration: 0.6 });
     }
 
+    // ========================================================
+    // 2b. DISEÑO DEL RECINTO: SECTORES Y PASILLOS (editable desde el admin)
+    // ========================================================
+    const DEFAULT_LAYOUT = {
+      sectors: [
+        { id: 'sec-norte', name: '🍺 Boulevard Cervecero', color: '#f59e0b', bounds: [[cLat + 0.00008, cLng - 0.00040], [cLat + 0.00032, cLng + 0.00040]] },
+        { id: 'sec-central', name: '🍔 Boulevard Gastronómico', color: '#10b981', bounds: [[cLat - 0.00010, cLng - 0.00040], [cLat + 0.00006, cLng + 0.00040]] },
+        { id: 'sec-sur', name: '🧶 Patio Dulces & Artesanías', color: '#ec4899', bounds: [[cLat - 0.00034, cLng - 0.00040], [cLat - 0.00014, cLng + 0.00040]] }
+      ],
+      aisles: [
+        { id: 'ais-norte', name: 'Pasillo Norte', points: [[cLat + 0.00005, cLng - 0.00038], [cLat + 0.00005, cLng + 0.00038]] },
+        { id: 'ais-central', name: 'Pasillo Central', points: [[cLat - 0.00012, cLng - 0.00038], [cLat - 0.00012, cLng + 0.00038]] },
+        { id: 'ais-sur', name: 'Pasillo Sur', points: [[cLat - 0.00030, cLng - 0.00038], [cLat - 0.00030, cLng + 0.00038]] }
+      ]
+    };
+
+    let layout;
+    try { layout = JSON.parse(safeLSGet('festival_layout') || 'null'); } catch (e) { layout = null; }
+    if (!layout || typeof layout !== 'object' || !Array.isArray(layout.aisles)) {
+      layout = JSON.parse(JSON.stringify(DEFAULT_LAYOUT));
+    }
+
+    function saveLayoutLocal() {
+      safeLSSet('festival_layout', JSON.stringify(layout));
+    }
+
+    let layoutLayers = [];
+    let aisleLabelMarkers = [];
+    function renderLayout() {
+      layoutLayers.forEach(l => map.removeLayer(l));
+      layoutLayers = [];
+      aisleLabelMarkers = [];
+      const P = mapP();
+
+      // Sectores: zona sombreada translúcida + banner con su nombre
+      (layout.sectors || []).forEach(sec => {
+        if (!sec.bounds) return;
+        const rect = L.rectangle(sec.bounds, {
+          color: sec.color || '#f59e0b',
+          weight: 2,
+          dashArray: '7,7',
+          fillColor: sec.color || '#f59e0b',
+          fillOpacity: currentMapTheme === 'light' ? 0.07 : 0.09,
+          interactive: false
+        }).addTo(map);
+        layoutLayers.push(rect);
+
+        const northLat = sec.bounds[1][0];
+        const midLng = (sec.bounds[0][1] + sec.bounds[1][1]) / 2;
+        const banner = L.divIcon({
+          className: 'sector-banner-marker',
+          html: `<div style="transform:translateX(-50%);white-space:nowrap;background:${sec.color || '#f59e0b'}22;border:1.5px solid ${sec.color || '#f59e0b'};color:${sec.color || '#f59e0b'};font-size:10px;font-weight:900;padding:2px 10px;border-radius:9999px;text-shadow:0 1px 3px rgba(0,0,0,0.7);backdrop-filter:blur(2px);">${esc(sec.name)}</div>`,
+          iconSize: [0, 0],
+          iconAnchor: [0, 0]
+        });
+        const m = L.marker([northLat, midLng], { icon: banner, interactive: false, zIndexOffset: 480 }).addTo(map);
+        layoutLayers.push(m);
+      });
+
+      // Pasillos: línea punteada clara + rótulo en el punto medio (visible al acercar)
+      (layout.aisles || []).forEach(ais => {
+        if (!ais.points || ais.points.length < 2) return;
+        const line = L.polyline(ais.points, {
+          color: P.aisleLine,
+          weight: 3,
+          opacity: 0.45,
+          dashArray: '2,10',
+          interactive: false
+        }).addTo(map);
+        layoutLayers.push(line);
+
+        const mid = ais.points[Math.floor(ais.points.length / 2)];
+        const lbl = L.divIcon({
+          className: 'aisle-floor-label',
+          html: `<div style="transform:translateX(-50%);white-space:nowrap;background:${P.aisleLabelBg};border:1px solid ${P.aisleLabelBorder};color:${P.aisleLabelText};font-size:9px;font-weight:800;letter-spacing:1px;padding:1px 8px;border-radius:9999px;text-transform:uppercase;">${esc(ais.name)}</div>`,
+          iconSize: [0, 0],
+          iconAnchor: [0, 0]
+        });
+        const m = L.marker(mid, { icon: lbl, interactive: false, zIndexOffset: 460 }).addTo(map);
+        layoutLayers.push(m);
+        aisleLabelMarkers.push(m);
+      });
+      updateAisleLabelVisibility();
+    }
+
+    // Los nombres de pasillo aparecen al acercar el zoom (como calles en Google Maps)
+    function updateAisleLabelVisibility() {
+      const show = map.getZoom() >= 18;
+      aisleLabelMarkers.forEach(m => {
+        const el = m.getElement();
+        if (el) el.style.display = show ? '' : 'none';
+      });
+    }
+    map.on('zoomend', updateAisleLabelVisibility);
+    renderLayout();
+    renderMapLegend();
+
+    function renderMapLegend() {
+      const box = document.getElementById('mapLegendSectors');
+      if (!box) return;
+      box.innerHTML = (layout.sectors || []).map(sec => `
+        <p class="text-[10px] text-white flex items-center gap-1.5">
+          <span class="w-2.5 h-2.5 rounded-sm inline-block border border-white/40" style="background:${sec.color || '#f59e0b'}"></span>
+          ${esc(sec.name)}
+        </p>
+      `).join('') || '<p class="text-[10px] text-slate-500 italic">Sin sectores definidos</p>';
+    }
+    function toggleMapLegend() {
+      const p = document.getElementById('mapLegendPanel');
+      if (p) p.classList.toggle('hidden');
+    }
+
+    // ========================================================
     // 3. Usuario & GPS en Cancha (Siempre visible desde el primer instante)
+    // ========================================================
     let userLocation = [cLat - 0.00038, cLng];
     let userMarker = null;
     let userAccuracyCircle = null;
@@ -2279,12 +2571,78 @@
     // Posición inicial inmediata
     updateUserPosition(userLocation[0], userLocation[1], 4);
 
+    // Geometría local en metros (equirectangular, escala de feria)
+    function geoToMeters(lat, lng, refLat, refLng) {
+      const mPerDegLat = 111320;
+      const mPerDegLng = 111320 * Math.cos(refLat * Math.PI / 180);
+      return { x: (lng - refLng) * mPerDegLng, y: (lat - refLat) * mPerDegLat };
+    }
+    function nearestOnSegmentMeters(p, a, b, refLat, refLng) {
+      const am = geoToMeters(a[0], a[1], refLat, refLng);
+      const bm = geoToMeters(b[0], b[1], refLat, refLng);
+      const pm = geoToMeters(p[0], p[1], refLat, refLng);
+      const dx = bm.x - am.x, dy = bm.y - am.y;
+      const len2 = dx * dx + dy * dy;
+      let t = len2 > 0 ? ((pm.x - am.x) * dx + (pm.y - am.y) * dy) / len2 : 0;
+      t = Math.max(0, Math.min(1, t));
+      const qx = am.x + t * dx, qy = am.y + t * dy;
+      const mPerDegLat = 111320;
+      const mPerDegLng = 111320 * Math.cos(refLat * Math.PI / 180);
+      return { dist: Math.hypot(pm.x - qx, pm.y - qy), lat: refLat + qy / mPerDegLat, lng: refLng + qx / mPerDegLng };
+    }
+    // Snap a pasillos: si el usuario está a menos de 8m de un pasillo, su punto se pega a su centro
+    // (mismo truco que Google Maps con el auto pegado a la calle)
+    function snapToAisles(lat, lng) {
+      const aisles = (typeof layout !== 'undefined' && layout.aisles || []).filter(a => a.points && a.points.length > 1);
+      if (!aisles.length) return { lat, lng };
+      let best = null;
+      aisles.forEach(ais => {
+        for (let i = 0; i < ais.points.length - 1; i++) {
+          const r = nearestOnSegmentMeters([lat, lng], ais.points[i], ais.points[i + 1], lat, lng);
+          if (!best || r.dist < best.dist) best = r;
+        }
+      });
+      if (best && best.dist < 8) return { lat: best.lat, lng: best.lng, snapped: true };
+      return { lat, lng };
+    }
+
     let gpsErrorNotified = false;
+    let userHereAnnounced = false;
+    let smoothedUserPos = null;
     function initGps() {
       if ('geolocation' in navigator) {
         navigator.geolocation.watchPosition(
           (pos) => {
-            updateUserPosition(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy || 4, pos.coords.heading);
+            const rawLat = pos.coords.latitude;
+            const rawLng = pos.coords.longitude;
+            const acc = pos.coords.accuracy || 4;
+
+            // 1) Suavizado anti-saltos: promedio exponencial + rechazo de teletransportes
+            if (!smoothedUserPos) {
+              smoothedUserPos = { lat: rawLat, lng: rawLng };
+            } else {
+              const jump = calculateDistanceMeters(smoothedUserPos.lat, smoothedUserPos.lng, rawLat, rawLng);
+              if (jump <= Math.max(acc * 1.5, 15)) {
+                const a = 0.35;
+                smoothedUserPos.lat += (rawLat - smoothedUserPos.lat) * a;
+                smoothedUserPos.lng += (rawLng - smoothedUserPos.lng) * a;
+              }
+              // Si el salto es absurdo (fuera del radio de precisión), se mantiene la posición suavizada
+            }
+
+            // 2) Snap a pasillos (solo si está muy cerca de uno)
+            const sn = snapToAisles(smoothedUserPos.lat, smoothedUserPos.lng);
+
+            // 3) Rumbo: caminando (>0.5 m/s) el curso del GPS es más estable que la brújula
+            if (pos.coords.heading !== null && pos.coords.heading !== undefined && (pos.coords.speed || 0) > 0.5) {
+              setHeadingAngle(Math.round(pos.coords.heading));
+            }
+
+            updateUserPosition(sn.lat, sn.lng, acc, pos.coords.heading);
+            if (!userHereAnnounced) {
+              userHereAnnounced = true;
+              showMapToast('📍 ¡Usted está aquí!');
+            }
           },
           (err) => {
             console.warn('GPS no disponible, usando posición en la cancha:', err.message);
@@ -2312,11 +2670,7 @@
         if (stand.number === 'ESC' || stand.id === 7) return;
 
         const cat = stand.category;
-        const toldoClass = cat === 'food' ? 'toldo-food'
-          : cat === 'beer' ? 'toldo-beer'
-          : cat === 'sweets' ? 'toldo-sweets'
-          : 'toldo-service';
-
+        const isService = cat === 'service';
         const categoryColor = cat === 'beer' ? '#f59e0b'
           : cat === 'food' ? '#10b981'
           : cat === 'sweets' ? '#ec4899'
@@ -2325,28 +2679,54 @@
         const shortName = stand.number === 'WC' ? 'Baños' 
           : stand.name.replace('Food Truck ', '').replace('Cervecería Artesanal ', '').replace('La Barra ', '').replace('Sabor Mexicano: ', '').split(' ')[0] + ' ' + (stand.name.split(' ')[1] || '');
 
-        const iconHtml = `
-          <div class="stand-booth-marker" data-stand-id="${stand.id}" data-category="${stand.category}">
-            <!-- Toldo rayado de feria -->
-            <div class="stand-toldo ${toldoClass}"></div>
-            <!-- Píldora del número nítida -->
-            <span class="stand-number-badge">${esc(stand.number)}</span>
-            <!-- Círculo interior con icono/foto -->
-            <div class="stand-booth-circle" style="background: radial-gradient(circle, ${categoryColor} 25%, #0f172a 100%);">
-              <span class="text-2xl select-none filter drop-shadow">${stand.icon}</span>
+        let iconHtml, iconSize, iconAnchor;
+        if (isService) {
+          // Servicios (WC, etc.): pin circular tradicional
+          const toldoClass = cat === 'service' ? 'toldo-service' : 'toldo-food';
+          iconHtml = `
+            <div class="stand-booth-marker" data-stand-id="${stand.id}" data-category="${stand.category}">
+              <div class="stand-toldo ${toldoClass}"></div>
+              <span class="stand-number-badge">${esc(stand.number)}</span>
+              <div class="stand-booth-circle" style="background: radial-gradient(circle, ${categoryColor} 25%, #0f172a 100%);">
+                <span class="text-2xl select-none filter drop-shadow">${stand.icon}</span>
+              </div>
+              <div class="stand-booth-pointer"></div>
+              <span class="stand-label-tag">${esc(shortName)}</span>
             </div>
-            <!-- Puntero al suelo -->
-            <div class="stand-booth-pointer"></div>
-            <!-- Nombre visible del local -->
-            <span class="stand-label-tag">${esc(shortName)}</span>
-          </div>
-        `;
+          `;
+          iconSize = [52, 68];
+          iconAnchor = [26, 64];
+        } else {
+          // Puestos comerciales: rectángulo proporcional tipo plano de feria profesional
+          const statusCls = stand.status === 'soldout' ? 'stand-soldout' : '';
+          const statusBadge = stand.status === 'soldout'
+            ? '<span class="stand-status-badge soldout">AGOTADO</span>'
+            : stand.status === 'busy'
+            ? '<span class="stand-status-badge busy">⏳ FILA</span>'
+            : '';
+          const pricePill = (window.__searchPrices && window.__searchPrices[stand.id])
+            ? `<span class="stand-price-pill">${esc(window.__searchPrices[stand.id])}</span>`
+            : '';
+          iconHtml = `
+            <div class="stand-rect-marker ${statusCls}" data-stand-id="${stand.id}" data-category="${stand.category}">
+              <span class="stand-number-badge">${esc(stand.number)}</span>
+              <div class="stand-rect" style="border-color:${categoryColor};">
+                <span class="stand-rect-icon">${stand.icon}</span>
+                ${pricePill}
+                ${statusBadge}
+              </div>
+              <span class="stand-label-tag">${esc(shortName)}</span>
+            </div>
+          `;
+          iconSize = [56, 62];
+          iconAnchor = [28, 56];
+        }
 
         const icon = L.divIcon({
           className: 'stand-pin-leaflet-icon',
           html: iconHtml,
-          iconSize: [52, 68],
-          iconAnchor: [26, 64]
+          iconSize: iconSize,
+          iconAnchor: iconAnchor
         });
 
         const m = L.marker([stand.lat, stand.lng], { icon: icon, zIndexOffset: 450 }).addTo(map);
@@ -2398,6 +2778,20 @@
         numBadge.style.backgroundColor = stand.color || '#f59e0b';
       }
       if (catEl) catEl.textContent = stand.categoryName;
+      // Estado del puesto (Disponible / Mucha espera / Agotado)
+      const statusEl = document.getElementById('modalStandStatus');
+      if (statusEl) {
+        if (stand.status === 'soldout') {
+          statusEl.textContent = '🔴 Agotado';
+          statusEl.className = 'text-[9px] font-black uppercase px-1.5 py-0.5 rounded-full bg-red-600 text-white animate-pulse';
+        } else if (stand.status === 'busy') {
+          statusEl.textContent = '⏳ Mucha espera';
+          statusEl.className = 'text-[9px] font-black uppercase px-1.5 py-0.5 rounded-full bg-amber-500 text-slate-950';
+        } else {
+          statusEl.textContent = '';
+          statusEl.className = 'hidden';
+        }
+      }
       if (nameEl) nameEl.textContent = stand.name;
       if (prepEl) prepEl.textContent = '⏱️ ' + stand.prepTime;
       if (descEl) descEl.textContent = stand.desc;
@@ -2524,6 +2918,7 @@
 
     // 6. FILTRO RÁPIDO 1-TOQUE EN EL MAPA
     function mapFilterCategory(cat) {
+      window.__mapFramed = true;
       document.querySelectorAll('.map-filter-chip').forEach(btn => btn.classList.remove('active', 'bg-gradient-to-r', 'from-orange-500', 'to-amber-500'));
       const activeBtn = document.getElementById('mapPill-' + cat);
       if (activeBtn) activeBtn.classList.add('active', 'bg-gradient-to-r', 'from-orange-500', 'to-amber-500');
@@ -2585,14 +2980,42 @@
       }
     });
 
+    // Construye la ruta peatonal: si hay pasillos dibujados, la ruta los sigue
+    // (usuario → pasillo más conveniente → pasillo del puesto → puesto)
+    function buildRoutePoints(from, to) {
+      const aisles = (layout.aisles || []).filter(a => a.points && a.points.length > 1);
+      if (!aisles.length) return [from, to];
+      let best = null;
+      aisles.forEach(ais => {
+        // Mejor par de vértices (entrada A cercana al usuario, salida B cercana al puesto)
+        for (let i = 0; i < ais.points.length; i++) {
+          const dA = calculateDistanceMeters(from[0], from[1], ais.points[i][0], ais.points[i][1]);
+          for (let j = 0; j < ais.points.length; j++) {
+            const dB = calculateDistanceMeters(to[0], to[1], ais.points[j][0], ais.points[j][1]);
+            const cost = dA + dB;
+            if (!best || cost < best.cost) {
+              // Recorrer el pasillo de i a j siguiendo los vértices intermedios
+              const step = i <= j ? 1 : -1;
+              const walk = [];
+              for (let k = i; k !== j + step; k += step) walk.push(ais.points[k]);
+              best = { cost, walk };
+            }
+          }
+        }
+      });
+      if (!best) return [from, to];
+      return [from, ...best.walk, to];
+    }
+
     // 7. Navegación en Ruta con Línea Animada
     function startNavigation(stand) {
+      window.__mapFramed = true;
       activeNavStand = stand;
       if (!userLocation) {
         userLocation = [cLat - 0.00038, cLng];
       }
 
-      const points = [userLocation, [stand.lat, stand.lng]];
+      const points = buildRoutePoints(userLocation, [stand.lat, stand.lng]);
 
       if (navRoutePolyline) map.removeLayer(navRoutePolyline);
 
@@ -2615,10 +3038,18 @@
 
     function updateNavigationDistance() {
       if (!activeNavStand || !userLocation) return;
-      const m = calculateDistanceMeters(userLocation[0], userLocation[1], activeNavStand.lat, activeNavStand.lng);
+      // Distancia REAL caminando: suma de los tramos de la ruta por pasillos (no línea recta)
+      let walkMeters = calculateDistanceMeters(userLocation[0], userLocation[1], activeNavStand.lat, activeNavStand.lng);
+      if (navRoutePolyline) {
+        const pts = navRoutePolyline.getLatLngs();
+        walkMeters = 0;
+        for (let i = 0; i < pts.length - 1; i++) {
+          walkMeters += calculateDistanceMeters(pts[i].lat, pts[i].lng, pts[i + 1].lat, pts[i + 1].lng);
+        }
+      }
       const distEl = document.getElementById('navDistance');
-      if (distEl) distEl.textContent = m > 999 ? 'Fuera del recinto (activa tu GPS en la cancha)' : 'A ' + m + ' metros caminando';
-      if (navRoutePolyline) navRoutePolyline.setLatLngs([userLocation, [activeNavStand.lat, activeNavStand.lng]]);
+      if (distEl) distEl.textContent = walkMeters > 999 ? 'Fuera del recinto (activa tu GPS en la cancha)' : 'A ' + Math.round(walkMeters) + ' metros caminando';
+      if (navRoutePolyline) navRoutePolyline.setLatLngs(buildRoutePoints(userLocation, [activeNavStand.lat, activeNavStand.lng]));
     }
 
     function cancelNavigation() {
@@ -2877,6 +3308,7 @@
                 <span id="modalStandCategory" class="text-xs font-extrabold text-amber-300">
                   Comidas & Asados
                 </span>
+                <span id="modalStandStatus" class="hidden text-[9px] font-black uppercase px-1.5 py-0.5 rounded-full"></span>
               </div>
               <h3 id="modalStandName" class="text-lg font-black text-white leading-tight mt-0.5">
                 Nombre del Local
