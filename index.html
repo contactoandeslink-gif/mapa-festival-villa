@@ -313,19 +313,20 @@
     }
   
     /* ======================================================== */
-    /* PÍLDORAS INTELIGENTES DE PUESTOS (ZOOM ADAPTATIVO)       */
+    /* ======================================================== */
+    /* PÍLDORAS VECTORIALES CON LOGO (NITIDEZ INFINITA 4K)      */
     /* ======================================================== */
     .stand-pill-marker {
       cursor: pointer;
       user-select: none;
-      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
     .stand-pill-marker:hover {
-      transform: scale(1.12);
-      z-index: 900 !important;
+      transform: scale(1.18);
+      z-index: 990 !important;
     }
     .stand-pill-marker:active {
-      transform: scale(0.95);
+      transform: scale(0.94);
     }
     
     .stand-pill-box {
@@ -333,11 +334,11 @@
       align-items: center;
       gap: 5px;
       background: rgba(15, 23, 42, 0.94);
-      border: 1.5px solid rgba(255, 255, 255, 0.85);
+      border: 1.8px solid rgba(255, 255, 255, 0.9);
       border-radius: 9999px;
       padding: 3px 8px;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(4px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.65), 0 0 10px rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(5px);
       white-space: nowrap;
       transition: all 0.25s ease;
     }
@@ -351,15 +352,17 @@
     }
 
     .stand-pill-icon {
-      width: 20px;
-      height: 20px;
+      width: 22px;
+      height: 22px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.35);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 11px;
+      font-size: 12px;
       flex-shrink: 0;
+      box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.25);
     }
 
     .stand-pill-name {
@@ -383,7 +386,7 @@
       margin-left: 2px;
     }
 
-    /* Vista Cercana (Zoom >= 19): Se expande la píldora para mostrar nombre y estado */
+    /* Vista Cercana (Zoom >= 19): Se expande la píldora mostrando nombre y estado */
     .map-zoom-detailed .stand-pill-name {
       display: inline-block;
       max-width: 140px;
@@ -396,14 +399,15 @@
       padding: 4px 10px;
       border-color: #f59e0b;
       background: rgba(15, 23, 42, 0.98);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7);
     }
 
     /* Puesto Seleccionado en el Mapa */
     .stand-selected .stand-pill-box {
       background: #f59e0b !important;
       border-color: #ffffff !important;
-      box-shadow: 0 0 22px rgba(245, 158, 11, 0.9) !important;
-      transform: scale(1.15);
+      box-shadow: 0 0 24px rgba(245, 158, 11, 0.95), 0 4px 14px rgba(0,0,0,0.7) !important;
+      transform: scale(1.2);
     }
     .stand-selected .stand-pill-number,
     .stand-selected .stand-pill-name {
@@ -412,7 +416,7 @@
 
     /* Puesto Atenuado por Filtro */
     .stand-dimmed {
-      opacity: 0.22 !important;
+      opacity: 0.18 !important;
       filter: grayscale(85%) !important;
       pointer-events: none !important;
     }
@@ -904,7 +908,7 @@
   <!-- ======================================================== -->
   <script>
     // Limpiar caché vieja si la versión de datos cambió (con try/catch: Safari privado puede bloquear localStorage)
-    const DATA_VERSION = '2026.18.aerial_photorealistic_map_v1';
+    const DATA_VERSION = '2026.20.vector_master_hd_v1';
     function safeLSGet(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
     function safeLSSet(key, val) { try { localStorage.setItem(key, val); } catch (e) {} }
     function safeLSRemove(key) { try { localStorage.removeItem(key); } catch (e) {} }
@@ -1041,8 +1045,8 @@
     "prepTime": "5 - 8 min",
     "isOpen": true,
     "side": "west",
-    "latOffset": 0.000298,
-    "lngOffset": -0.00019,
+    "latOffset": 0.000329,
+    "lngOffset": -0.000275,
     "locationNote": "Bloque Oeste #1 (Primera carpa junto al Escenario)",
     "whatsapp": "56987654321",
     "bankData": {
@@ -1095,8 +1099,8 @@
     "prepTime": "6 - 9 min",
     "isOpen": true,
     "side": "west",
-    "latOffset": 0.000223,
-    "lngOffset": -0.00019,
+    "latOffset": 0.000247,
+    "lngOffset": -0.000269,
     "locationNote": "Bloque Oeste #2 (Frente a Cervecerías del Este)",
     "whatsapp": "56976543210",
     "bankData": {
@@ -1144,8 +1148,8 @@
     "prepTime": "8 - 12 min",
     "isOpen": true,
     "side": "west",
-    "latOffset": 0.000148,
-    "lngOffset": -0.00019,
+    "latOffset": 0.000166,
+    "lngOffset": -0.000284,
     "locationNote": "Bloque Oeste #3 (Frente a Mesas de Picnic)",
     "whatsapp": "56965432109",
     "bankData": {
@@ -1193,8 +1197,8 @@
     "prepTime": "3 - 5 min",
     "isOpen": true,
     "side": "west",
-    "latOffset": 0.000073,
-    "lngOffset": -0.00019,
+    "latOffset": 0.000085,
+    "lngOffset": -0.000269,
     "locationNote": "Bloque Oeste #4 (Cerca del Pasillo Transversal)",
     "whatsapp": "56954321098",
     "bankData": {
@@ -1242,8 +1246,8 @@
     "prepTime": "6 - 9 min",
     "isOpen": true,
     "side": "west",
-    "latOffset": -0.000002,
-    "lngOffset": -0.00019,
+    "latOffset": 0.000003,
+    "lngOffset": -0.000275,
     "locationNote": "Bloque Oeste #5 (Esquina Pasillo Transversal)",
     "whatsapp": "56943210987",
     "bankData": {
@@ -1292,7 +1296,7 @@
     "isOpen": true,
     "side": "west",
     "latOffset": -0.000078,
-    "lngOffset": -0.00019,
+    "lngOffset": -0.000284,
     "locationNote": "Bloque Oeste #6 (Frente a Patio de Comidas Sur)",
     "whatsapp": "56932109876",
     "bankData": {
@@ -1335,8 +1339,8 @@
     "prepTime": "4 - 7 min",
     "isOpen": true,
     "side": "west",
-    "latOffset": -0.000153,
-    "lngOffset": -0.00019,
+    "latOffset": -0.000159,
+    "lngOffset": -0.000275,
     "locationNote": "Bloque Oeste #7 (Frente a Mesas de Picnic)",
     "whatsapp": "56921098765",
     "bankData": {
@@ -1379,8 +1383,8 @@
     "prepTime": "5 - 8 min",
     "isOpen": true,
     "side": "west",
-    "latOffset": -0.000228,
-    "lngOffset": -0.00019,
+    "latOffset": -0.00024,
+    "lngOffset": -0.000269,
     "locationNote": "Bloque Oeste #8 (Pasillo Sur Peatonal)",
     "whatsapp": "56910987654",
     "bankData": {
@@ -1428,8 +1432,8 @@
     "prepTime": "7 - 10 min",
     "isOpen": true,
     "side": "west",
-    "latOffset": -0.000303,
-    "lngOffset": -0.00019,
+    "latOffset": -0.000322,
+    "lngOffset": -0.000284,
     "locationNote": "Bloque Oeste #9 (Cerca del Acceso Principal)",
     "whatsapp": "56909876543",
     "bankData": {
@@ -1472,8 +1476,8 @@
     "prepTime": "7 - 11 min",
     "isOpen": true,
     "side": "west",
-    "latOffset": -0.000379,
-    "lngOffset": -0.00019,
+    "latOffset": -0.000403,
+    "lngOffset": -0.000269,
     "locationNote": "Bloque Oeste #10 (Junto al Acceso Sur)",
     "whatsapp": "56998765432",
     "bankData": {
@@ -1516,8 +1520,8 @@
     "prepTime": "2 - 4 min",
     "isOpen": true,
     "side": "east",
-    "latOffset": 0.000298,
-    "lngOffset": 0.000224,
+    "latOffset": 0.000329,
+    "lngOffset": 0.000275,
     "locationNote": "Bloque Este #11 (Esquina Norte frente al Escenario)",
     "whatsapp": "56987651234",
     "bankData": {
@@ -1565,8 +1569,8 @@
     "prepTime": "2 - 3 min",
     "isOpen": true,
     "side": "east",
-    "latOffset": 0.000223,
-    "lngOffset": 0.000224,
+    "latOffset": 0.000247,
+    "lngOffset": 0.000284,
     "locationNote": "Bloque Este #12 (Frente a Mesas de Picnic Norte)",
     "whatsapp": "56976542345",
     "bankData": {
@@ -1609,8 +1613,8 @@
     "prepTime": "3 - 5 min",
     "isOpen": true,
     "side": "east",
-    "latOffset": 0.000148,
-    "lngOffset": 0.000224,
+    "latOffset": 0.000166,
+    "lngOffset": 0.000275,
     "locationNote": "Bloque Este #13 (Frente al Patio de Comidas)",
     "whatsapp": "56965433456",
     "bankData": {
@@ -1653,8 +1657,8 @@
     "prepTime": "2 - 4 min",
     "isOpen": true,
     "side": "east",
-    "latOffset": 0.000073,
-    "lngOffset": 0.000224,
+    "latOffset": 0.000085,
+    "lngOffset": 0.000269,
     "locationNote": "Bloque Este #14 (Junto al Pasillo Transversal)",
     "whatsapp": "56954324567",
     "bankData": {
@@ -1702,8 +1706,8 @@
     "prepTime": "3 - 5 min",
     "isOpen": true,
     "side": "east",
-    "latOffset": -0.000002,
-    "lngOffset": 0.000224,
+    "latOffset": 0.000003,
+    "lngOffset": 0.000284,
     "locationNote": "Bloque Este #15 (Frente al Cruce Central)",
     "whatsapp": "56943215678",
     "bankData": {
@@ -1752,7 +1756,7 @@
     "isOpen": true,
     "side": "east",
     "latOffset": -0.000078,
-    "lngOffset": 0.000224,
+    "lngOffset": 0.000269,
     "locationNote": "Bloque Este #16 (Frente a Patio de Comidas Sur)",
     "whatsapp": "56932106789",
     "bankData": {
@@ -1795,8 +1799,8 @@
     "prepTime": "4 - 7 min",
     "isOpen": true,
     "side": "east",
-    "latOffset": -0.000153,
-    "lngOffset": 0.000224,
+    "latOffset": -0.000159,
+    "lngOffset": 0.000275,
     "locationNote": "Bloque Este #17 (Frente a Mesas de Picnic)",
     "whatsapp": "56921097890",
     "bankData": {
@@ -1844,8 +1848,8 @@
     "prepTime": "3 - 5 min",
     "isOpen": true,
     "side": "east",
-    "latOffset": -0.000228,
-    "lngOffset": 0.000224,
+    "latOffset": -0.00024,
+    "lngOffset": 0.000284,
     "locationNote": "Bloque Este #18 (Pasillo Sur)",
     "whatsapp": "56910988901",
     "bankData": {
@@ -1893,8 +1897,8 @@
     "prepTime": "3 - 5 min",
     "isOpen": true,
     "side": "east",
-    "latOffset": -0.000303,
-    "lngOffset": 0.000224,
+    "latOffset": -0.000322,
+    "lngOffset": 0.000275,
     "locationNote": "Bloque Este #19 (Frente a Baños y Salida)",
     "whatsapp": "56909879012",
     "bankData": {
@@ -1942,8 +1946,8 @@
     "prepTime": "1 - 2 min",
     "isOpen": true,
     "side": "east",
-    "latOffset": -0.000379,
-    "lngOffset": 0.000224,
+    "latOffset": -0.000403,
+    "lngOffset": 0.000269,
     "locationNote": "Bloque Este #20 (Junto al Acceso Principal)",
     "whatsapp": "56998760123",
     "bankData": {
@@ -1986,8 +1990,8 @@
     "prepTime": "Acceso Inmediato",
     "isOpen": true,
     "side": "east",
-    "latOffset": -0.000479,
-    "lngOffset": 0.000371,
+    "latOffset": -0.00044,
+    "lngOffset": 0.000331,
     "locationNote": "Costado Sureste (Junto a Salida y Primeros Auxilios)",
     "whatsapp": "",
     "bankData": null,
@@ -2008,7 +2012,7 @@
     "prepTime": "En Vivo Ahora",
     "isOpen": true,
     "side": "center",
-    "latOffset": 0.000412,
+    "latOffset": 0.000394,
     "lngOffset": 0,
     "locationNote": "Cabecera Norte (Escenario Central de la Cancha)",
     "whatsapp": "",
@@ -2030,8 +2034,8 @@
     "prepTime": "250 Cupos",
     "isOpen": true,
     "side": "east",
-    "latOffset": 0.000466,
-    "lngOffset": 0.000385,
+    "latOffset": 0.000542,
+    "lngOffset": 0.000334,
     "locationNote": "Sector Noreste (Ingreso por Pasaje Los Tamarugos)",
     "whatsapp": "",
     "bankData": null,
@@ -2052,7 +2056,7 @@
     "prepTime": "Entrada Peatonal",
     "isOpen": true,
     "side": "center",
-    "latOffset": -0.000519,
+    "latOffset": -0.000508,
     "lngOffset": 0,
     "locationNote": "Cabecera Sur (Ingreso desde Calle Los Aromos)",
     "whatsapp": "",
@@ -2969,16 +2973,16 @@
 
     // Delimitación del recinto completo: Cancha, Carpas, Ramadas, Estacionamiento y Acceso
     const stadiumBounds = L.latLngBounds([
-      [cLat - 0.00062, cLng - 0.00051], // Esquina Sur (Acceso)
-      [cLat + 0.00058, cLng + 0.00051]  // Esquina Norte (Escenario & Estacionamiento)
+      [cLat - 0.00062, cLng - 0.00050], // Sur (Acceso)
+      [cLat + 0.00062, cLng + 0.00050]  // Norte (Escenario & Estacionamiento)
     ]);
 
     const map = L.map('map', {
       zoomControl: false,
-      maxZoom: 21,
+      maxZoom: 22,
       minZoom: 16,
-      maxBounds: stadiumBounds.pad(0.20),
-      maxBoundsViscosity: 0.9,
+      maxBounds: stadiumBounds.pad(0.18),
+      maxBoundsViscosity: 0.92,
       bounceAtZoomLimits: true
     });
 
@@ -2993,69 +2997,66 @@
     const stadiumGroup = L.layerGroup().addTo(map);
 
     // ========================================================
-    // FOTOGRAFÍA AÉREA REAL DEL FESTIVAL (CERO DIBUJO DE NIÑOS)
+    // PLANO VECTORIAL MAESTRO (SVG 4K NITIDEZ INFINITA)
     // ========================================================
-    const aerialImageBounds = [
-      [cLat - 0.00062, cLng - 0.00051],
-      [cLat + 0.00058, cLng + 0.00051]
+    const vectorVenueBounds = [
+      [cLat - 0.00062, cLng - 0.00050], // Sur (Acceso)
+      [cLat + 0.00062, cLng + 0.00050]  // Norte (Escenario & Estacionamiento)
     ];
 
-    // Capa de Fotografía Aérea Real en Alta Definición
-    const aerialOverlay = L.imageOverlay('mapa-festival-aereo.jpg', aerialImageBounds, {
+    // Capa Vectorial de Alta Definición (Cero Pixelación a Cualquier Nivel de Zoom)
+    const venueMasterOverlay = L.imageOverlay('plano-festival-master.svg', vectorVenueBounds, {
       opacity: 1,
-      alt: 'Fotografía Aérea Oficial del Gran Festival de la Villa',
+      alt: 'Plano Vectorial Maestro Oficial del Gran Festival de la Villa',
       interactive: false,
       zIndex: 100
     }).addTo(stadiumGroup);
 
-    // Ruta de Navegación Activa (Línea discontinua luminosa que se dibuja al pedir "¿Cómo llegar?")
-    let navWalkRoute = null;
-
-    // Servicios Principales Clickables sobre la Foto Aérea
+    // Hitboxes Interactivas Clickeables sobre los 4 Puntos Clave del Recinto
     // A. Escenario Principal
-    const stageHitbox = L.circleMarker([cLat + 0.000412, cLng], {
-      radius: 28,
+    const stageHitbox = L.circleMarker([cLat + 0.000446, cLng], {
+      radius: 30,
       color: '#dc2626',
       weight: 2,
-      opacity: 0.85,
+      opacity: 0.7,
       fillColor: '#dc2626',
-      fillOpacity: 0.15,
+      fillOpacity: 0.08,
       className: 'poi-hitbox'
     }).addTo(stadiumGroup);
     stageHitbox.on('click', onStageMarkerClick);
 
     // B. Estacionamiento
-    const parkingHitbox = L.circleMarker([cLat + 0.000466, cLng + 0.000385], {
-      radius: 32,
+    const parkingHitbox = L.circleMarker([cLat + 0.000471, cLng + 0.000334], {
+      radius: 34,
       color: '#38bdf8',
       weight: 2,
-      opacity: 0.85,
+      opacity: 0.7,
       fillColor: '#38bdf8',
-      fillOpacity: 0.15,
+      fillOpacity: 0.08,
       className: 'poi-hitbox'
     }).addTo(stadiumGroup);
     parkingHitbox.on('click', onParkingMarkerClick);
 
     // C. Baños / WC
-    const wcHitbox = L.circleMarker([cLat - 0.000479, cLng + 0.000371], {
-      radius: 26,
+    const wcHitbox = L.circleMarker([cLat - 0.000440, cLng + 0.000331], {
+      radius: 28,
       color: '#0284c7',
       weight: 2,
-      opacity: 0.85,
+      opacity: 0.7,
       fillColor: '#0284c7',
-      fillOpacity: 0.15,
+      fillOpacity: 0.08,
       className: 'poi-hitbox'
     }).addTo(stadiumGroup);
     wcHitbox.on('click', onWcMarkerClick);
 
     // D. Acceso Principal
-    const accessHitbox = L.circleMarker([cLat - 0.000519, cLng], {
-      radius: 24,
+    const accessHitbox = L.circleMarker([cLat - 0.000508, cLng], {
+      radius: 26,
       color: '#16a34a',
       weight: 2,
-      opacity: 0.85,
+      opacity: 0.7,
       fillColor: '#16a34a',
-      fillOpacity: 0.15,
+      fillOpacity: 0.08,
       className: 'poi-hitbox'
     }).addTo(stadiumGroup);
     accessHitbox.on('click', onAccessMarkerClick);
@@ -3077,7 +3078,7 @@
       if (stand) openStandModal(stand);
     }
 
-    // Zoom listener
+    // Zoom listener: conmuta clase para expandir / compactar píldoras
     function updateZoomLevelClass() {
       const currentZoom = map.getZoom();
       const mapEl = document.getElementById('map');
@@ -3217,7 +3218,7 @@
     // ========================================================
     // 3. Usuario & GPS en Cancha (Siempre visible desde el primer instante)
     // ========================================================
-    let userLocation = [cLat - 0.00054, cLng];
+    let userLocation = [cLat - 0.000508, cLng];
     let userMarker = null;
     let userAccuracyCircle = null;
     let isAdjusting = false;

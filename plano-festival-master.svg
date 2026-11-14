@@ -1,0 +1,1628 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 2000" width="1600" height="2000">
+  <defs>
+    <!-- Filtros de Sombras y Relieve -->
+    <filter id="softShadow" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="3" dy="5" stdDeviation="4" flood-color="#000000" flood-opacity="0.38"/>
+    </filter>
+    <filter id="treeShadow" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="6" dy="10" stdDeviation="7" flood-color="#051a08" flood-opacity="0.55"/>
+    </filter>
+    <filter id="carShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="4" stdDeviation="3" flood-color="#0f172a" flood-opacity="0.45"/>
+    </filter>
+
+    <!-- Degradados del Césped -->
+    <linearGradient id="grassGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3d6d24"/>
+      <stop offset="35%" stop-color="#4e822d"/>
+      <stop offset="70%" stop-color="#3f7226"/>
+      <stop offset="100%" stop-color="#345e1f"/>
+    </linearGradient>
+
+    <!-- Franjas de corte de césped -->
+    <pattern id="mowingStripes" width="1600" height="90" patternUnits="userSpaceOnUse">
+      <rect width="1600" height="45" fill="rgba(255,255,255,0.035)"/>
+      <rect y="45" width="1600" height="45" fill="rgba(0,0,0,0.035)"/>
+    </pattern>
+
+    <!-- Maicillo / Tierra de la Avenida Central -->
+    <linearGradient id="dirtRoadGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ab8f62"/>
+      <stop offset="10%" stop-color="#ceb385"/>
+      <stop offset="50%" stop-color="#dfcaa2"/>
+      <stop offset="90%" stop-color="#ceb385"/>
+      <stop offset="100%" stop-color="#ab8f62"/>
+    </linearGradient>
+
+    <!-- Bordillo / Zanja del Camino -->
+    <linearGradient id="curbGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8a6e45"/>
+      <stop offset="100%" stop-color="#5a4529"/>
+    </linearGradient>
+
+    <!-- Árboles Realistas: Canopia Esférica Iluminada -->
+    <radialGradient id="treeCanopy1" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#52a435"/>
+      <stop offset="40%" stop-color="#2d6e1c"/>
+      <stop offset="85%" stop-color="#194810"/>
+      <stop offset="100%" stop-color="#0f2b09"/>
+    </radialGradient>
+    <radialGradient id="treeCanopy2" cx="38%" cy="32%" r="68%">
+      <stop offset="0%" stop-color="#5fb83d"/>
+      <stop offset="45%" stop-color="#367e23"/>
+      <stop offset="85%" stop-color="#1d5012"/>
+      <stop offset="100%" stop-color="#11330b"/>
+    </radialGradient>
+    <radialGradient id="treeCanopy3" cx="32%" cy="28%" r="72%">
+      <stop offset="0%" stop-color="#448d2a"/>
+      <stop offset="45%" stop-color="#245d16"/>
+      <stop offset="85%" stop-color="#143c0c"/>
+      <stop offset="100%" stop-color="#0a2006"/>
+    </radialGradient>
+
+    <!-- Asfalto y Grava del Estacionamiento -->
+    <linearGradient id="asphaltGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3a424e"/>
+      <stop offset="50%" stop-color="#475262"/>
+      <stop offset="100%" stop-color="#333b47"/>
+    </linearGradient>
+
+    <!-- Madera de Mesas y Pergolas -->
+    <linearGradient id="woodGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#a16226"/>
+      <stop offset="50%" stop-color="#844a17"/>
+      <stop offset="100%" stop-color="#69370c"/>
+    </linearGradient>
+
+    <!-- Escenario Principal: Truss Metálico y Lona Blanca -->
+    <linearGradient id="stageRoofGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="45%" stop-color="#f1f5f9"/>
+      <stop offset="80%" stop-color="#cbd5e1"/>
+      <stop offset="100%" stop-color="#94a3b8"/>
+    </linearGradient>
+    <linearGradient id="stageDeckGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#090d16"/>
+      <stop offset="60%" stop-color="#111827"/>
+      <stop offset="100%" stop-color="#030712"/>
+    </linearGradient>
+    <linearGradient id="ledScreenGlow" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="50%" stop-color="#a855f7"/>
+      <stop offset="100%" stop-color="#ec4899"/>
+    </linearGradient>
+  </defs>
+
+  <!-- ======================================================== -->
+  <!-- 1. BASE DEL PARQUE: CÉSPED NATURAL CON CORTE PROFESIONAL -->
+  <!-- ======================================================== -->
+  <rect width="1600" height="2000" fill="url(#grassGrad)"/>
+  <rect width="1600" height="2000" fill="url(#mowingStripes)"/>
+
+  <!-- ======================================================== -->
+  <!-- 2. AVENIDA CENTRAL PEATONAL & PASILLOS DE MAICILLO      -->
+  <!-- ======================================================== -->
+  <!-- Sombra ambiental de las calzadas -->
+  <rect x="718" y="375" width="164" height="1425" rx="14" fill="#000000" opacity="0.18"/>
+  <rect x="250" y="1025" width="1100" height="90" rx="12" fill="#000000" opacity="0.18"/>
+  <rect x="250" y="375" width="1100" height="70" rx="10" fill="#000000" opacity="0.18"/>
+  <rect x="250" y="1725" width="1100" height="70" rx="10" fill="#000000" opacity="0.18"/>
+
+  <!-- Pasillo Norte frente a Escenario -->
+  <rect x="255" y="370" width="1090" height="66" rx="8" fill="url(#dirtRoadGrad)"/>
+  <!-- Pasillo Central Transversal -->
+  <rect x="255" y="1020" width="1090" height="86" rx="10" fill="url(#dirtRoadGrad)"/>
+  <!-- Pasillo Sur frente a Acceso -->
+  <rect x="255" y="1720" width="1090" height="66" rx="8" fill="url(#dirtRoadGrad)"/>
+
+  <!-- Gran Avenida Peatonal Central -->
+  <rect x="725" y="370" width="150" height="1420" rx="12" fill="url(#dirtRoadGrad)"/>
+
+  <!-- Bordillos de piedra / maicillo compactado -->
+  <line x1="725" y1="370" x2="725" y2="1790" stroke="#997b4f" stroke-width="3" stroke-dasharray="8, 4"/>
+  <line x1="875" y1="370" x2="875" y2="1790" stroke="#997b4f" stroke-width="3" stroke-dasharray="8, 4"/>
+
+  <!-- Línea guía punteada en el centro de la avenida -->
+  <line x1="800" y1="1750" x2="800" y2="430" stroke="#ffffff" stroke-width="3.5" stroke-dasharray="14, 14" opacity="0.65"/>
+  <!-- Flechas direccionales blancas sutiles -->
+  <polygon points="800,1260 792,1275 808,1275" fill="#ffffff" opacity="0.7"/>
+  <polygon points="800,880 792,895 808,895" fill="#ffffff" opacity="0.7"/>
+  <polygon points="800,520 792,535 808,535" fill="#ffffff" opacity="0.7"/>
+
+  <!-- Línea punteada que dobla hacia el bloque este (Cervezas) -->
+  <path d="M 800,430 L 1150,430" fill="none" stroke="#ffffff" stroke-width="3" stroke-dasharray="12, 12" opacity="0.65"/>
+  <polygon points="1160,430 1145,424 1145,436" fill="#ffffff" opacity="0.7"/>
+
+  <!-- Marcas de Distancia Vectoriales en el Suelo -->
+  <!-- 110 m -->
+  <g transform="translate(800, 1430)" filter="url(#softShadow)">
+    <rect x="-38" y="-14" width="76" height="28" rx="14" fill="#0f172a" stroke="#cbd5e1" stroke-width="2"/>
+    <text x="0" y="4.5" fill="#ffffff" font-family="'Outfit', sans-serif" font-weight="900" font-size="13" text-anchor="middle">110 m</text>
+  </g>
+  <!-- 60 m -->
+  <g transform="translate(800, 1170)" filter="url(#softShadow)">
+    <rect x="-34" y="-14" width="68" height="28" rx="14" fill="#0f172a" stroke="#cbd5e1" stroke-width="2"/>
+    <text x="0" y="4.5" fill="#ffffff" font-family="'Outfit', sans-serif" font-weight="900" font-size="13" text-anchor="middle">60 m</text>
+  </g>
+
+  <!-- ======================================================== -->
+  <!-- 3. PATIO DE COMIDAS: MESAS DE PICNIC Y BANCOS DE MADERA -->
+  <!-- ======================================================== -->
+  <g id="picnicTables">
+
+    <!-- Mesa (420, 510) -->
+    <g transform="translate(420, 510)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (520, 510) -->
+    <g transform="translate(520, 510)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (620, 510) -->
+    <g transform="translate(620, 510)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (980, 510) -->
+    <g transform="translate(980, 510)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (1080, 510) -->
+    <g transform="translate(1080, 510)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (1180, 510) -->
+    <g transform="translate(1180, 510)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (420, 600) -->
+    <g transform="translate(420, 600)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (520, 600) -->
+    <g transform="translate(520, 600)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (620, 600) -->
+    <g transform="translate(620, 600)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (980, 600) -->
+    <g transform="translate(980, 600)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (1080, 600) -->
+    <g transform="translate(1080, 600)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (1180, 600) -->
+    <g transform="translate(1180, 600)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (420, 690) -->
+    <g transform="translate(420, 690)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (520, 690) -->
+    <g transform="translate(520, 690)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (620, 690) -->
+    <g transform="translate(620, 690)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (980, 690) -->
+    <g transform="translate(980, 690)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (1080, 690) -->
+    <g transform="translate(1080, 690)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (1180, 690) -->
+    <g transform="translate(1180, 690)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (420, 780) -->
+    <g transform="translate(420, 780)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (520, 780) -->
+    <g transform="translate(520, 780)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (620, 780) -->
+    <g transform="translate(620, 780)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (980, 780) -->
+    <g transform="translate(980, 780)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (1080, 780) -->
+    <g transform="translate(1080, 780)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (1180, 780) -->
+    <g transform="translate(1180, 780)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (420, 870) -->
+    <g transform="translate(420, 870)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (520, 870) -->
+    <g transform="translate(520, 870)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (620, 870) -->
+    <g transform="translate(620, 870)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (980, 870) -->
+    <g transform="translate(980, 870)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (1080, 870) -->
+    <g transform="translate(1080, 870)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (1180, 870) -->
+    <g transform="translate(1180, 870)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (420, 960) -->
+    <g transform="translate(420, 960)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (520, 960) -->
+    <g transform="translate(520, 960)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (620, 960) -->
+    <g transform="translate(620, 960)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (980, 960) -->
+    <g transform="translate(980, 960)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (1080, 960) -->
+    <g transform="translate(1080, 960)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (1180, 960) -->
+    <g transform="translate(1180, 960)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (420, 1160) -->
+    <g transform="translate(420, 1160)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (520, 1160) -->
+    <g transform="translate(520, 1160)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (620, 1160) -->
+    <g transform="translate(620, 1160)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (980, 1160) -->
+    <g transform="translate(980, 1160)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (1080, 1160) -->
+    <g transform="translate(1080, 1160)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (1180, 1160) -->
+    <g transform="translate(1180, 1160)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (420, 1250) -->
+    <g transform="translate(420, 1250)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (520, 1250) -->
+    <g transform="translate(520, 1250)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (620, 1250) -->
+    <g transform="translate(620, 1250)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (980, 1250) -->
+    <g transform="translate(980, 1250)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (1080, 1250) -->
+    <g transform="translate(1080, 1250)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (1180, 1250) -->
+    <g transform="translate(1180, 1250)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (420, 1340) -->
+    <g transform="translate(420, 1340)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (520, 1340) -->
+    <g transform="translate(520, 1340)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (620, 1340) -->
+    <g transform="translate(620, 1340)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (980, 1340) -->
+    <g transform="translate(980, 1340)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (1080, 1340) -->
+    <g transform="translate(1080, 1340)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (1180, 1340) -->
+    <g transform="translate(1180, 1340)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (420, 1430) -->
+    <g transform="translate(420, 1430)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (520, 1430) -->
+    <g transform="translate(520, 1430)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (620, 1430) -->
+    <g transform="translate(620, 1430)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (980, 1430) -->
+    <g transform="translate(980, 1430)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (1080, 1430) -->
+    <g transform="translate(1080, 1430)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (1180, 1430) -->
+    <g transform="translate(1180, 1430)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (420, 1520) -->
+    <g transform="translate(420, 1520)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (520, 1520) -->
+    <g transform="translate(520, 1520)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (620, 1520) -->
+    <g transform="translate(620, 1520)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (980, 1520) -->
+    <g transform="translate(980, 1520)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (1080, 1520) -->
+    <g transform="translate(1080, 1520)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (1180, 1520) -->
+    <g transform="translate(1180, 1520)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (420, 1610) -->
+    <g transform="translate(420, 1610)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (520, 1610) -->
+    <g transform="translate(520, 1610)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (620, 1610) -->
+    <g transform="translate(620, 1610)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (980, 1610) -->
+    <g transform="translate(980, 1610)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (1080, 1610) -->
+    <g transform="translate(1080, 1610)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+    <!-- Mesa (1180, 1610) -->
+    <g transform="translate(1180, 1610)">
+      <!-- Sombra de la mesa y bancos -->
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.22"/>
+      <!-- Banco Superior -->
+      <rect x="-22" y="-16" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+      <!-- Tablero Central de la Mesa con tablones -->
+      <rect x="-22" y="-7" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#522305" stroke-width="0.7"/>
+      <line x1="-20" y1="2" x2="20" y2="2" stroke="#522305" stroke-width="0.7"/>
+      <!-- Banco Inferior -->
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)" stroke="#451a03" stroke-width="0.8"/>
+    </g>
+  </g>
+
+  <!-- ======================================================== -->
+  <!-- 4. ESCENARIO PRINCIPAL (CONCIERTOS & SHOWS EN VIVO)      -->
+  <!-- ======================================================== -->
+  <g id="mainStage" filter="url(#softShadow)">
+    <!-- Backstage / Área Técnica (Camiones y Carpas Negras de Producción) -->
+    <rect x="580" y="130" width="440" height="120" rx="6" fill="#1e293b" stroke="#0f172a" stroke-width="2"/>
+    <!-- Vans de producción detrás del escenario -->
+    <rect x="610" y="145" width="55" height="30" rx="4" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+    <rect x="680" y="145" width="55" height="30" rx="4" fill="#94a3b8" stroke="#475569" stroke-width="1.5"/>
+    <rect x="870" y="145" width="60" height="32" rx="4" fill="#1e293b" stroke="#0f172a" stroke-width="1.5"/>
+    <rect x="945" y="145" width="55" height="30" rx="4" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+
+    <!-- Tarima del Escenario Principal -->
+    <rect x="590" y="220" width="420" height="150" rx="8" fill="url(#stageDeckGrad)" stroke="#dc2626" stroke-width="2.5"/>
+
+    <!-- Pantalla Gigante LED Trasera con Glow -->
+    <rect x="650" y="235" width="300" height="40" rx="4" fill="url(#ledScreenGlow)"/>
+    <text x="800" y="260" fill="#ffffff" font-family="'Outfit', sans-serif" font-weight="900" font-size="15" text-anchor="middle" letter-spacing="2">★ FESTIVAL VILLA 2026 ★</text>
+
+    <!-- Marquesina / Techo Arquitectónico Blanco de la Tarima -->
+    <polygon points="580,350 800,280 1020,350 1010,250 800,200 590,250" fill="url(#stageRoofGrad)" stroke="#475569" stroke-width="2"/>
+    <line x1="800" y1="200" x2="800" y2="280" stroke="#94a3b8" stroke-width="2"/>
+    <line x1="590" y1="250" x2="800" y2="280" stroke="#cbd5e1" stroke-width="1.5"/>
+    <line x1="1010" y1="250" x2="800" y2="280" stroke="#cbd5e1" stroke-width="1.5"/>
+
+    <!-- Torres de Sonido Line Array (Izquierda y Derecha) -->
+    <!-- Torre Izquierda -->
+    <g transform="translate(555, 270)">
+      <rect x="-14" y="-45" width="28" height="90" rx="4" fill="#030712" stroke="#475569" stroke-width="1.5"/>
+      <line x1="-10" y1="-25" x2="10" y2="-25" stroke="#334155" stroke-width="2"/>
+      <line x1="-10" y1="-5" x2="10" y2="-5" stroke="#334155" stroke-width="2"/>
+      <line x1="-10" y1="15" x2="10" y2="15" stroke="#334155" stroke-width="2"/>
+      <line x1="-10" y1="35" x2="10" y2="35" stroke="#334155" stroke-width="2"/>
+    </g>
+    <!-- Torre Derecha -->
+    <g transform="translate(1045, 270)">
+      <rect x="-14" y="-45" width="28" height="90" rx="4" fill="#030712" stroke="#475569" stroke-width="1.5"/>
+      <line x1="-10" y1="-25" x2="10" y2="-25" stroke="#334155" stroke-width="2"/>
+      <line x1="-10" y1="-5" x2="10" y2="-5" stroke="#334155" stroke-width="2"/>
+      <line x1="-10" y1="15" x2="10" y2="15" stroke="#334155" stroke-width="2"/>
+      <line x1="-10" y1="35" x2="10" y2="35" stroke="#334155" stroke-width="2"/>
+    </g>
+
+    <!-- Cartel Superior del Escenario -->
+    <g transform="translate(800, 365)">
+      <rect x="-110" y="-16" width="220" height="32" rx="16" fill="#090d16" stroke="#ffffff" stroke-width="2"/>
+      <text x="0" y="5.5" fill="#ffffff" font-family="'Outfit', sans-serif" font-weight="900" font-size="13" text-anchor="middle">🎸 ESCENARIO PRINCIPAL</text>
+    </g>
+  </g>
+
+  <!-- ======================================================== -->
+  <!-- 5. ESTACIONAMIENTO OFICIAL (NORESTE - ARRIBA A LA DERECHA)-->
+  <!-- ======================================================== -->
+  <g id="parkingLot" filter="url(#softShadow)">
+    <!-- Explanada de Asfalto y Grava -->
+    <rect x="1140" y="110" width="390" height="300" rx="12" fill="url(#asphaltGrad)" stroke="#1e293b" stroke-width="3"/>
+
+    <!-- Líneas Blancas de Cajones de Estacionamiento -->
+    <g stroke="#ffffff" stroke-width="2.5" opacity="0.85">
+      <!-- Fila 1 -->
+      <line x1="1160" y1="130" x2="1160" y2="200"/>
+      <line x1="1205" y1="130" x2="1205" y2="200"/>
+      <line x1="1250" y1="130" x2="1250" y2="200"/>
+      <line x1="1295" y1="130" x2="1295" y2="200"/>
+      <line x1="1340" y1="130" x2="1340" y2="200"/>
+      <line x1="1385" y1="130" x2="1385" y2="200"/>
+      <line x1="1430" y1="130" x2="1430" y2="200"/>
+      <line x1="1475" y1="130" x2="1475" y2="200"/>
+      <line x1="1510" y1="130" x2="1510" y2="200"/>
+
+      <!-- Fila 2 -->
+      <line x1="1160" y1="230" x2="1160" y2="300"/>
+      <line x1="1205" y1="230" x2="1205" y2="300"/>
+      <line x1="1250" y1="230" x2="1250" y2="300"/>
+      <line x1="1295" y1="230" x2="1295" y2="300"/>
+      <line x1="1340" y1="230" x2="1340" y2="300"/>
+      <line x1="1385" y1="230" x2="1385" y2="300"/>
+      <line x1="1430" y1="230" x2="1430" y2="300"/>
+      <line x1="1475" y1="230" x2="1475" y2="300"/>
+      <line x1="1510" y1="230" x2="1510" y2="300"/>
+
+      <!-- Fila 3 -->
+      <line x1="1250" y1="325" x2="1250" y2="395"/>
+      <line x1="1295" y1="325" x2="1295" y2="395"/>
+      <line x1="1340" y1="325" x2="1340" y2="395"/>
+      <line x1="1385" y1="325" x2="1385" y2="395"/>
+      <line x1="1430" y1="325" x2="1430" y2="395"/>
+      <line x1="1475" y1="325" x2="1475" y2="395"/>
+      <line x1="1510" y1="325" x2="1510" y2="395"/>
+    </g>
+
+    <!-- Auto en (1182, 165) -->
+    <g transform="translate(1182, 165)" filter="url(#carShadow)">
+      <!-- Chasis del Auto -->
+      <rect x="-16" y="-28" width="32" height="56" rx="7" fill="#ef4444" stroke="#0f172a" stroke-width="1.2"/>
+      <!-- Techo del Auto -->
+      <rect x="-12" y="-14" width="24" height="28" rx="4" fill="rgba(0,0,0,0.18)"/>
+      <!-- Parabrisas Delantero -->
+      <rect x="-11" y="-21" width="22" height="6" rx="2" fill="#67e8f9" opacity="0.85"/>
+      <!-- Luneta Trasera -->
+      <rect x="-11" y="15" width="22" height="5" rx="2" fill="#67e8f9" opacity="0.85"/>
+      <!-- Luces Delanteras -->
+      <circle cx="-11" cy="-27" r="2" fill="#fef08a"/>
+      <circle cx="11" cy="-27" r="2" fill="#fef08a"/>
+    </g>
+    <!-- Auto en (1227, 165) -->
+    <g transform="translate(1227, 165)" filter="url(#carShadow)">
+      <!-- Chasis del Auto -->
+      <rect x="-16" y="-28" width="32" height="56" rx="7" fill="#f8fafc" stroke="#0f172a" stroke-width="1.2"/>
+      <!-- Techo del Auto -->
+      <rect x="-12" y="-14" width="24" height="28" rx="4" fill="rgba(0,0,0,0.18)"/>
+      <!-- Parabrisas Delantero -->
+      <rect x="-11" y="-21" width="22" height="6" rx="2" fill="#67e8f9" opacity="0.85"/>
+      <!-- Luneta Trasera -->
+      <rect x="-11" y="15" width="22" height="5" rx="2" fill="#67e8f9" opacity="0.85"/>
+      <!-- Luces Delanteras -->
+      <circle cx="-11" cy="-27" r="2" fill="#fef08a"/>
+      <circle cx="11" cy="-27" r="2" fill="#fef08a"/>
+    </g>
+    <!-- Auto en (1272, 165) -->
+    <g transform="translate(1272, 165)" filter="url(#carShadow)">
+      <!-- Chasis del Auto -->
+      <rect x="-16" y="-28" width="32" height="56" rx="7" fill="#3b82f6" stroke="#0f172a" stroke-width="1.2"/>
+      <!-- Techo del Auto -->
+      <rect x="-12" y="-14" width="24" height="28" rx="4" fill="rgba(0,0,0,0.18)"/>
+      <!-- Parabrisas Delantero -->
+      <rect x="-11" y="-21" width="22" height="6" rx="2" fill="#67e8f9" opacity="0.85"/>
+      <!-- Luneta Trasera -->
+      <rect x="-11" y="15" width="22" height="5" rx="2" fill="#67e8f9" opacity="0.85"/>
+      <!-- Luces Delanteras -->
+      <circle cx="-11" cy="-27" r="2" fill="#fef08a"/>
+      <circle cx="11" cy="-27" r="2" fill="#fef08a"/>
+    </g>
+    <!-- Auto en (1317, 165) -->
+    <g transform="translate(1317, 165)" filter="url(#carShadow)">
+      <!-- Chasis del Auto -->
+      <rect x="-16" y="-28" width="32" height="56" rx="7" fill="#0f172a" stroke="#0f172a" stroke-width="1.2"/>
+      <!-- Techo del Auto -->
+      <rect x="-12" y="-14" width="24" height="28" rx="4" fill="rgba(0,0,0,0.18)"/>
+      <!-- Parabrisas Delantero -->
+      <rect x="-11" y="-21" width="22" height="6" rx="2" fill="#67e8f9" opacity="0.85"/>
+      <!-- Luneta Trasera -->
+      <rect x="-11" y="15" width="22" height="5" rx="2" fill="#67e8f9" opacity="0.85"/>
+      <!-- Luces Delanteras -->
+      <circle cx="-11" cy="-27" r="2" fill="#fef08a"/>
+      <circle cx="11" cy="-27" r="2" fill="#fef08a"/>
+    </g>
+    <!-- Auto en (1362, 165) -->
+    <g transform="translate(1362, 165)" filter="url(#carShadow)">
+      <!-- Chasis del Auto -->
+      <rect x="-16" y="-28" width="32" height="56" rx="7" fill="#94a3b8" stroke="#0f172a" stroke-width="1.2"/>
+      <!-- Techo del Auto -->
+      <rect x="-12" y="-14" width="24" height="28" rx="4" fill="rgba(0,0,0,0.18)"/>
+      <!-- Parabrisas Delantero -->
+      <rect x="-11" y="-21" width="22" height="6" rx="2" fill="#67e8f9" opacity="0.85"/>
+      <!-- Luneta Trasera -->
+      <rect x="-11" y="15" width="22" height="5" rx="2" fill="#67e8f9" opacity="0.85"/>
+      <!-- Luces Delanteras -->
+      <circle cx="-11" cy="-27" r="2" fill="#fef08a"/>
+      <circle cx="11" cy="-27" r="2" fill="#fef08a"/>
+    </g>
+    <!-- Auto en (1407, 165) -->
+    <g transform="translate(1407, 165)" filter="url(#carShadow)">
+      <!-- Chasis del Auto -->
+      <rect x="-16" y="-28" width="32" height="56" rx="7" fill="#eab308" stroke="#0f172a" stroke-width="1.2"/>
+      <!-- Techo del Auto -->
+      <rect x="-12" y="-14" width="24" height="28" rx="4" fill="rgba(0,0,0,0.18)"/>
+      <!-- Parabrisas Delantero -->
+      <rect x="-11" y="-21" width="22" height="6" rx="2" fill="#67e8f9" opacity="0.85"/>
+      <!-- Luneta Trasera -->
+      <rect x="-11" y="15" width="22" height="5" rx="2" fill="#67e8f9" opacity="0.85"/>
+      <!-- Luces Delanteras -->
+      <circle cx="-11" cy="-27" r="2" fill="#fef08a"/>
+      <circle cx="11" cy="-27" r="2" fill="#fef08a"/>
+    </g>
+    <!-- Auto en (1452, 165) -->
+    <g transform="translate(1452, 165)" filter="url(#carShadow)">
+      <!-- Chasis del Auto -->
+      <rect x="-16" y="-28" width="32" height="56" rx="7" fill="#10b981" stroke="#0f172a" stroke-width="1.2"/>
+      <!-- Techo del Auto -->
+      <rect x="-12" y="-14" width="24" height="28" rx="4" fill="rgba(0,0,0,0.18)"/>
+      <!-- Parabrisas Delantero -->
+      <rect x="-11" y="-21" width="22" height="6" rx="2" fill="#67e8f9" opacity="0.85"/>
+      <!-- Luneta Trasera -->
+      <rect x="-11" y="15" width="22" height="5" rx="2" fill="#67e8f9" opacity="0.85"/>
+      <!-- Luces Delanteras -->
+      <circle cx="-11" cy="-27" r="2" fill="#fef08a"/>
+      <circle cx="11" cy="-27" r="2" fill="#fef08a"/>
+    </g>
+    <!-- Auto en (1492, 165) -->
+    <g transform="translate(1492, 165)" filter="url(#carShadow)">
+      <!-- Chasis del Auto -->
+      <rect x="-16" y="-28" width="32" height="56" rx="7" fill="#f8fafc" stroke="#0f172a" stroke-width="1.2"/>
+      <!-- Techo del Auto -->
+      <rect x="-12" y="-14" width="24" height="28" rx="4" fill="rgba(0,0,0,0.18)"/>
+      <!-- Parabrisas Delantero -->
+      <rect x="-11" y="-21" width="22" height="6" rx="2" fill="#67e8f9" opacity="0.85"/>
+      <!-- Luneta Trasera -->
+      <rect x="-11" y="15" width="22" height="5" rx="2" fill="#67e8f9" opacity="0.85"/>
+      <!-- Luces Delanteras -->
+      <circle cx="-11" cy="-27" r="2" fill="#fef08a"/>
+      <circle cx="11" cy="-27" r="2" fill="#fef08a"/>
+    </g>
+    <!-- Auto en (1182, 265) -->
+    <g transform="translate(1182, 265)" filter="url(#carShadow)">
+      <!-- Chasis del Auto -->
+      <rect x="-16" y="-28" width="32" height="56" rx="7" fill="#3b82f6" stroke="#0f172a" stroke-width="1.2"/>
+      <!-- Techo del Auto -->
+      <rect x="-12" y="-14" width="24" height="28" rx="4" fill="rgba(0,0,0,0.18)"/>
+      <!-- Parabrisas Delantero -->
+      <rect x="-11" y="-21" width="22" height="6" rx="2" fill="#67e8f9" opacity="0.85"/>
+      <!-- Luneta Trasera -->
+      <rect x="-11" y="15" width="22" height="5" rx="2" fill="#67e8f9" opacity="0.85"/>
+      <!-- Luces Delanteras -->
+      <circle cx="-11" cy="-27" r="2" fill="#fef08a"/>
+      <circle cx="11" cy="-27" r="2" fill="#fef08a"/>
+    </g>
+    <!-- Auto en (1227, 265) -->
+    <g transform="translate(1227, 265)" filter="url(#carShadow)">
+      <!-- Chasis del Auto -->
+      <rect x="-16" y="-28" width="32" height="56" rx="7" fill="#ef4444" stroke="#0f172a" stroke-width="1.2"/>
+      <!-- Techo del Auto -->
+      <rect x="-12" y="-14" width="24" height="28" rx="4" fill="rgba(0,0,0,0.18)"/>
+      <!-- Parabrisas Delantero -->
+      <rect x="-11" y="-21" width="22" height="6" rx="2" fill="#67e8f9" opacity="0.85"/>
+      <!-- Luneta Trasera -->
+      <rect x="-11" y="15" width="22" height="5" rx="2" fill="#67e8f9" opacity="0.85"/>
+      <!-- Luces Delanteras -->
+      <circle cx="-11" cy="-27" r="2" fill="#fef08a"/>
+      <circle cx="11" cy="-27" r="2" fill="#fef08a"/>
+    </g>
+    <!-- Auto en (1272, 265) -->
+    <g transform="translate(1272, 265)" filter="url(#carShadow)">
+      <!-- Chasis del Auto -->
+      <rect x="-16" y="-28" width="32" height="56" rx="7" fill="#f8fafc" stroke="#0f172a" stroke-width="1.2"/>
+      <!-- Techo del Auto -->
+      <rect x="-12" y="-14" width="24" height="28" rx="4" fill="rgba(0,0,0,0.18)"/>
+      <!-- Parabrisas Delantero -->
+      <rect x="-11" y="-21" width="22" height="6" rx="2" fill="#67e8f9" opacity="0.85"/>
+      <!-- Luneta Trasera -->
+      <rect x="-11" y="15" width="22" height="5" rx="2" fill="#67e8f9" opacity="0.85"/>
+      <!-- Luces Delanteras -->
+      <circle cx="-11" cy="-27" r="2" fill="#fef08a"/>
+      <circle cx="11" cy="-27" r="2" fill="#fef08a"/>
+    </g>
+    <!-- Auto en (1317, 265) -->
+    <g transform="translate(1317, 265)" filter="url(#carShadow)">
+      <!-- Chasis del Auto -->
+      <rect x="-16" y="-28" width="32" height="56" rx="7" fill="#64748b" stroke="#0f172a" stroke-width="1.2"/>
+      <!-- Techo del Auto -->
+      <rect x="-12" y="-14" width="24" height="28" rx="4" fill="rgba(0,0,0,0.18)"/>
+      <!-- Parabrisas Delantero -->
+      <rect x="-11" y="-21" width="22" height="6" rx="2" fill="#67e8f9" opacity="0.85"/>
+      <!-- Luneta Trasera -->
+      <rect x="-11" y="15" width="22" height="5" rx="2" fill="#67e8f9" opacity="0.85"/>
+      <!-- Luces Delanteras -->
+      <circle cx="-11" cy="-27" r="2" fill="#fef08a"/>
+      <circle cx="11" cy="-27" r="2" fill="#fef08a"/>
+    </g>
+    <!-- Auto en (1362, 265) -->
+    <g transform="translate(1362, 265)" filter="url(#carShadow)">
+      <!-- Chasis del Auto -->
+      <rect x="-16" y="-28" width="32" height="56" rx="7" fill="#0f172a" stroke="#0f172a" stroke-width="1.2"/>
+      <!-- Techo del Auto -->
+      <rect x="-12" y="-14" width="24" height="28" rx="4" fill="rgba(0,0,0,0.18)"/>
+      <!-- Parabrisas Delantero -->
+      <rect x="-11" y="-21" width="22" height="6" rx="2" fill="#67e8f9" opacity="0.85"/>
+      <!-- Luneta Trasera -->
+      <rect x="-11" y="15" width="22" height="5" rx="2" fill="#67e8f9" opacity="0.85"/>
+      <!-- Luces Delanteras -->
+      <circle cx="-11" cy="-27" r="2" fill="#fef08a"/>
+      <circle cx="11" cy="-27" r="2" fill="#fef08a"/>
+    </g>
+    <!-- Auto en (1407, 265) -->
+    <g transform="translate(1407, 265)" filter="url(#carShadow)">
+      <!-- Chasis del Auto -->
+      <rect x="-16" y="-28" width="32" height="56" rx="7" fill="#a855f7" stroke="#0f172a" stroke-width="1.2"/>
+      <!-- Techo del Auto -->
+      <rect x="-12" y="-14" width="24" height="28" rx="4" fill="rgba(0,0,0,0.18)"/>
+      <!-- Parabrisas Delantero -->
+      <rect x="-11" y="-21" width="22" height="6" rx="2" fill="#67e8f9" opacity="0.85"/>
+      <!-- Luneta Trasera -->
+      <rect x="-11" y="15" width="22" height="5" rx="2" fill="#67e8f9" opacity="0.85"/>
+      <!-- Luces Delanteras -->
+      <circle cx="-11" cy="-27" r="2" fill="#fef08a"/>
+      <circle cx="11" cy="-27" r="2" fill="#fef08a"/>
+    </g>
+    <!-- Auto en (1452, 265) -->
+    <g transform="translate(1452, 265)" filter="url(#carShadow)">
+      <!-- Chasis del Auto -->
+      <rect x="-16" y="-28" width="32" height="56" rx="7" fill="#f8fafc" stroke="#0f172a" stroke-width="1.2"/>
+      <!-- Techo del Auto -->
+      <rect x="-12" y="-14" width="24" height="28" rx="4" fill="rgba(0,0,0,0.18)"/>
+      <!-- Parabrisas Delantero -->
+      <rect x="-11" y="-21" width="22" height="6" rx="2" fill="#67e8f9" opacity="0.85"/>
+      <!-- Luneta Trasera -->
+      <rect x="-11" y="15" width="22" height="5" rx="2" fill="#67e8f9" opacity="0.85"/>
+      <!-- Luces Delanteras -->
+      <circle cx="-11" cy="-27" r="2" fill="#fef08a"/>
+      <circle cx="11" cy="-27" r="2" fill="#fef08a"/>
+    </g>
+    <!-- Auto en (1492, 265) -->
+    <g transform="translate(1492, 265)" filter="url(#carShadow)">
+      <!-- Chasis del Auto -->
+      <rect x="-16" y="-28" width="32" height="56" rx="7" fill="#ef4444" stroke="#0f172a" stroke-width="1.2"/>
+      <!-- Techo del Auto -->
+      <rect x="-12" y="-14" width="24" height="28" rx="4" fill="rgba(0,0,0,0.18)"/>
+      <!-- Parabrisas Delantero -->
+      <rect x="-11" y="-21" width="22" height="6" rx="2" fill="#67e8f9" opacity="0.85"/>
+      <!-- Luneta Trasera -->
+      <rect x="-11" y="15" width="22" height="5" rx="2" fill="#67e8f9" opacity="0.85"/>
+      <!-- Luces Delanteras -->
+      <circle cx="-11" cy="-27" r="2" fill="#fef08a"/>
+      <circle cx="11" cy="-27" r="2" fill="#fef08a"/>
+    </g>
+    <!-- Auto en (1272, 360) -->
+    <g transform="translate(1272, 360)" filter="url(#carShadow)">
+      <!-- Chasis del Auto -->
+      <rect x="-16" y="-28" width="32" height="56" rx="7" fill="#f8fafc" stroke="#0f172a" stroke-width="1.2"/>
+      <!-- Techo del Auto -->
+      <rect x="-12" y="-14" width="24" height="28" rx="4" fill="rgba(0,0,0,0.18)"/>
+      <!-- Parabrisas Delantero -->
+      <rect x="-11" y="-21" width="22" height="6" rx="2" fill="#67e8f9" opacity="0.85"/>
+      <!-- Luneta Trasera -->
+      <rect x="-11" y="15" width="22" height="5" rx="2" fill="#67e8f9" opacity="0.85"/>
+      <!-- Luces Delanteras -->
+      <circle cx="-11" cy="-27" r="2" fill="#fef08a"/>
+      <circle cx="11" cy="-27" r="2" fill="#fef08a"/>
+    </g>
+    <!-- Auto en (1317, 360) -->
+    <g transform="translate(1317, 360)" filter="url(#carShadow)">
+      <!-- Chasis del Auto -->
+      <rect x="-16" y="-28" width="32" height="56" rx="7" fill="#3b82f6" stroke="#0f172a" stroke-width="1.2"/>
+      <!-- Techo del Auto -->
+      <rect x="-12" y="-14" width="24" height="28" rx="4" fill="rgba(0,0,0,0.18)"/>
+      <!-- Parabrisas Delantero -->
+      <rect x="-11" y="-21" width="22" height="6" rx="2" fill="#67e8f9" opacity="0.85"/>
+      <!-- Luneta Trasera -->
+      <rect x="-11" y="15" width="22" height="5" rx="2" fill="#67e8f9" opacity="0.85"/>
+      <!-- Luces Delanteras -->
+      <circle cx="-11" cy="-27" r="2" fill="#fef08a"/>
+      <circle cx="11" cy="-27" r="2" fill="#fef08a"/>
+    </g>
+    <!-- Auto en (1362, 360) -->
+    <g transform="translate(1362, 360)" filter="url(#carShadow)">
+      <!-- Chasis del Auto -->
+      <rect x="-16" y="-28" width="32" height="56" rx="7" fill="#0f172a" stroke="#0f172a" stroke-width="1.2"/>
+      <!-- Techo del Auto -->
+      <rect x="-12" y="-14" width="24" height="28" rx="4" fill="rgba(0,0,0,0.18)"/>
+      <!-- Parabrisas Delantero -->
+      <rect x="-11" y="-21" width="22" height="6" rx="2" fill="#67e8f9" opacity="0.85"/>
+      <!-- Luneta Trasera -->
+      <rect x="-11" y="15" width="22" height="5" rx="2" fill="#67e8f9" opacity="0.85"/>
+      <!-- Luces Delanteras -->
+      <circle cx="-11" cy="-27" r="2" fill="#fef08a"/>
+      <circle cx="11" cy="-27" r="2" fill="#fef08a"/>
+    </g>
+    <!-- Auto en (1407, 360) -->
+    <g transform="translate(1407, 360)" filter="url(#carShadow)">
+      <!-- Chasis del Auto -->
+      <rect x="-16" y="-28" width="32" height="56" rx="7" fill="#94a3b8" stroke="#0f172a" stroke-width="1.2"/>
+      <!-- Techo del Auto -->
+      <rect x="-12" y="-14" width="24" height="28" rx="4" fill="rgba(0,0,0,0.18)"/>
+      <!-- Parabrisas Delantero -->
+      <rect x="-11" y="-21" width="22" height="6" rx="2" fill="#67e8f9" opacity="0.85"/>
+      <!-- Luneta Trasera -->
+      <rect x="-11" y="15" width="22" height="5" rx="2" fill="#67e8f9" opacity="0.85"/>
+      <!-- Luces Delanteras -->
+      <circle cx="-11" cy="-27" r="2" fill="#fef08a"/>
+      <circle cx="11" cy="-27" r="2" fill="#fef08a"/>
+    </g>
+    <!-- Auto en (1452, 360) -->
+    <g transform="translate(1452, 360)" filter="url(#carShadow)">
+      <!-- Chasis del Auto -->
+      <rect x="-16" y="-28" width="32" height="56" rx="7" fill="#f8fafc" stroke="#0f172a" stroke-width="1.2"/>
+      <!-- Techo del Auto -->
+      <rect x="-12" y="-14" width="24" height="28" rx="4" fill="rgba(0,0,0,0.18)"/>
+      <!-- Parabrisas Delantero -->
+      <rect x="-11" y="-21" width="22" height="6" rx="2" fill="#67e8f9" opacity="0.85"/>
+      <!-- Luneta Trasera -->
+      <rect x="-11" y="15" width="22" height="5" rx="2" fill="#67e8f9" opacity="0.85"/>
+      <!-- Luces Delanteras -->
+      <circle cx="-11" cy="-27" r="2" fill="#fef08a"/>
+      <circle cx="11" cy="-27" r="2" fill="#fef08a"/>
+    </g>
+    <!-- Cartel del Estacionamiento -->
+    <g transform="translate(1335, 125)">
+      <rect x="-95" y="-14" width="190" height="28" rx="14" fill="#0f172a" stroke="#ffffff" stroke-width="2"/>
+      <text x="0" y="4.5" fill="#ffffff" font-family="'Outfit', sans-serif" font-weight="900" font-size="12" text-anchor="middle">🚗 ESTACIONAMIENTO</text>
+    </g>
+  </g>
+
+  <!-- ======================================================== -->
+  <!-- 6. BATERÍA DE BAÑOS QUÍMICOS (WC - SURESTE)              -->
+  <!-- ======================================================== -->
+  <g id="wcSector" filter="url(#softShadow)" transform="translate(1330, 1710)">
+    <!-- Módulo Sanitario Blanco -->
+    <rect x="-150" y="-80" width="300" height="150" rx="10" fill="#f8fafc" stroke="#0284c7" stroke-width="3"/>
+    
+    <!-- Cabinas Sanitarias Individuales -->
+    <g stroke="#94a3b8" stroke-width="1.5" fill="#f1f5f9">
+      <rect x="-140" y="-70" width="35" height="55" rx="3"/>
+      <rect x="-100" y="-70" width="35" height="55" rx="3"/>
+      <rect x="-60" y="-70" width="35" height="55" rx="3"/>
+      <rect x="-20" y="-70" width="35" height="55" rx="3"/>
+      <rect x="20" y="-70" width="35" height="55" rx="3"/>
+      <rect x="60" y="-70" width="35" height="55" rx="3"/>
+      <rect x="100" y="-70" width="40" height="55" rx="3" fill="#e0f2fe" stroke="#0284c7" stroke-width="2"/> <!-- Accesible -->
+    </g>
+    <!-- Ícono silla de ruedas en cabina accesible -->
+    <text x="120" y="-38" font-size="16" text-anchor="middle">♿</text>
+
+    <!-- Mesón Central de Lavamanos con espejos -->
+    <rect x="-110" y="5" width="220" height="20" rx="4" fill="#cbd5e1" stroke="#64748b" stroke-width="1.5"/>
+    <circle cx="-80" cy="15" r="5" fill="#38bdf8"/>
+    <circle cx="-30" cy="15" r="5" fill="#38bdf8"/>
+    <circle cx="20" cy="15" r="5" fill="#38bdf8"/>
+    <circle cx="70" cy="15" r="5" fill="#38bdf8"/>
+
+    <!-- Cartel de Baños -->
+    <g transform="translate(0, 52)">
+      <rect x="-70" y="-14" width="140" height="28" rx="14" fill="#0284c7" stroke="#ffffff" stroke-width="2"/>
+      <text x="0" y="4.5" fill="#ffffff" font-family="'Outfit', sans-serif" font-weight="900" font-size="12" text-anchor="middle">🚻 WC / BAÑOS</text>
+    </g>
+  </g>
+
+  <!-- ======================================================== -->
+  <!-- 7. ACCESO PRINCIPAL AL RECINTO (PÓRTICO DE MADERA SUR)  -->
+  <!-- ======================================================== -->
+  <g id="accessGate" filter="url(#softShadow)" transform="translate(800, 1820)">
+    <!-- Explanada de Entrada -->
+    <rect x="-120" y="-20" width="240" height="80" rx="8" fill="#a18249" stroke="#71592f" stroke-width="2"/>
+    
+    <!-- Pérgola / Pórtico de Madera -->
+    <rect x="-110" y="-15" width="25" height="25" rx="3" fill="url(#woodGrad)" stroke="#451a03" stroke-width="1.5"/>
+    <rect x="85" y="-15" width="25" height="25" rx="3" fill="url(#woodGrad)" stroke="#451a03" stroke-width="1.5"/>
+    <!-- Viga Superior -->
+    <rect x="-120" y="-30" width="240" height="18" rx="4" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="2"/>
+    <!-- Banderitas Chilenas en el pórtico -->
+    <text x="-80" y="-36" font-size="18">🇨🇱</text>
+    <text x="0" y="-36" font-size="18">🇨🇱</text>
+    <text x="80" y="-36" font-size="18">🇨🇱</text>
+
+    <!-- Cartel de Acceso -->
+    <g transform="translate(0, 22)">
+      <rect x="-65" y="-14" width="130" height="28" rx="14" fill="#0f172a" stroke="#10b981" stroke-width="2"/>
+      <text x="0" y="4.5" fill="#10b981" font-family="'Outfit', sans-serif" font-weight="900" font-size="12" text-anchor="middle">🎟️ ACCESO</text>
+    </g>
+  </g>
+
+  <!-- ======================================================== -->
+  <!-- 8. ARBOLEDA PERIMETRAL: EUCALIPTOS & ÁLAMOS REALISTAS    -->
+  <!-- ======================================================== -->
+  <g id="forestPerimeter" filter="url(#treeShadow)">
+    <circle cx="110" cy="80" r="72" fill="url(#treeCanopy3)"/>
+    <circle cx="180" cy="120" r="64" fill="url(#treeCanopy3)"/>
+    <circle cx="110" cy="175" r="65" fill="url(#treeCanopy2)"/>
+    <circle cx="180" cy="215" r="57" fill="url(#treeCanopy2)"/>
+    <circle cx="110" cy="270" r="58" fill="url(#treeCanopy1)"/>
+    <circle cx="180" cy="310" r="50" fill="url(#treeCanopy1)"/>
+    <circle cx="110" cy="365" r="69" fill="url(#treeCanopy3)"/>
+    <circle cx="180" cy="405" r="61" fill="url(#treeCanopy3)"/>
+    <circle cx="110" cy="460" r="62" fill="url(#treeCanopy2)"/>
+    <circle cx="180" cy="500" r="54" fill="url(#treeCanopy2)"/>
+    <circle cx="110" cy="555" r="73" fill="url(#treeCanopy1)"/>
+    <circle cx="180" cy="595" r="65" fill="url(#treeCanopy1)"/>
+    <circle cx="110" cy="650" r="66" fill="url(#treeCanopy3)"/>
+    <circle cx="180" cy="690" r="58" fill="url(#treeCanopy3)"/>
+    <circle cx="110" cy="745" r="59" fill="url(#treeCanopy2)"/>
+    <circle cx="180" cy="785" r="51" fill="url(#treeCanopy2)"/>
+    <circle cx="110" cy="840" r="70" fill="url(#treeCanopy1)"/>
+    <circle cx="180" cy="880" r="62" fill="url(#treeCanopy1)"/>
+    <circle cx="110" cy="935" r="63" fill="url(#treeCanopy3)"/>
+    <circle cx="180" cy="975" r="55" fill="url(#treeCanopy3)"/>
+    <circle cx="110" cy="1030" r="74" fill="url(#treeCanopy2)"/>
+    <circle cx="180" cy="1070" r="66" fill="url(#treeCanopy2)"/>
+    <circle cx="110" cy="1125" r="67" fill="url(#treeCanopy1)"/>
+    <circle cx="180" cy="1165" r="59" fill="url(#treeCanopy1)"/>
+    <circle cx="110" cy="1220" r="60" fill="url(#treeCanopy3)"/>
+    <circle cx="180" cy="1260" r="52" fill="url(#treeCanopy3)"/>
+    <circle cx="110" cy="1315" r="71" fill="url(#treeCanopy2)"/>
+    <circle cx="180" cy="1355" r="63" fill="url(#treeCanopy2)"/>
+    <circle cx="110" cy="1410" r="64" fill="url(#treeCanopy1)"/>
+    <circle cx="180" cy="1450" r="56" fill="url(#treeCanopy1)"/>
+    <circle cx="110" cy="1505" r="75" fill="url(#treeCanopy3)"/>
+    <circle cx="180" cy="1545" r="67" fill="url(#treeCanopy3)"/>
+    <circle cx="110" cy="1600" r="68" fill="url(#treeCanopy2)"/>
+    <circle cx="180" cy="1640" r="60" fill="url(#treeCanopy2)"/>
+    <circle cx="110" cy="1695" r="61" fill="url(#treeCanopy1)"/>
+    <circle cx="180" cy="1735" r="53" fill="url(#treeCanopy1)"/>
+    <circle cx="110" cy="1790" r="72" fill="url(#treeCanopy3)"/>
+    <circle cx="180" cy="1830" r="64" fill="url(#treeCanopy3)"/>
+    <circle cx="110" cy="1885" r="65" fill="url(#treeCanopy2)"/>
+    <circle cx="180" cy="1925" r="57" fill="url(#treeCanopy2)"/>
+    <circle cx="120" cy="70" r="60" fill="url(#treeCanopy2)"/>
+    <circle cx="215" cy="70" r="75" fill="url(#treeCanopy1)"/>
+    <circle cx="310" cy="70" r="70" fill="url(#treeCanopy3)"/>
+    <circle cx="405" cy="70" r="65" fill="url(#treeCanopy2)"/>
+    <circle cx="500" cy="70" r="60" fill="url(#treeCanopy1)"/>
+    <circle cx="595" cy="70" r="75" fill="url(#treeCanopy3)"/>
+    <circle cx="690" cy="70" r="70" fill="url(#treeCanopy2)"/>
+    <circle cx="785" cy="70" r="65" fill="url(#treeCanopy1)"/>
+    <circle cx="880" cy="70" r="60" fill="url(#treeCanopy3)"/>
+    <circle cx="975" cy="70" r="75" fill="url(#treeCanopy2)"/>
+    <circle cx="1070" cy="70" r="70" fill="url(#treeCanopy1)"/>
+    <circle cx="1165" cy="70" r="65" fill="url(#treeCanopy3)"/>
+    <circle cx="1260" cy="70" r="60" fill="url(#treeCanopy2)"/>
+    <circle cx="1355" cy="70" r="75" fill="url(#treeCanopy1)"/>
+    <circle cx="1450" cy="70" r="70" fill="url(#treeCanopy3)"/>
+    <circle cx="1490" cy="460" r="60" fill="url(#treeCanopy1)"/>
+    <circle cx="1430" cy="500" r="52" fill="url(#treeCanopy1)"/>
+    <circle cx="1490" cy="555" r="61" fill="url(#treeCanopy3)"/>
+    <circle cx="1430" cy="595" r="53" fill="url(#treeCanopy3)"/>
+    <circle cx="1490" cy="650" r="62" fill="url(#treeCanopy2)"/>
+    <circle cx="1430" cy="690" r="54" fill="url(#treeCanopy2)"/>
+    <circle cx="1490" cy="745" r="63" fill="url(#treeCanopy1)"/>
+    <circle cx="1430" cy="785" r="55" fill="url(#treeCanopy1)"/>
+    <circle cx="1490" cy="840" r="64" fill="url(#treeCanopy3)"/>
+    <circle cx="1430" cy="880" r="56" fill="url(#treeCanopy3)"/>
+    <circle cx="1490" cy="935" r="65" fill="url(#treeCanopy2)"/>
+    <circle cx="1430" cy="975" r="57" fill="url(#treeCanopy2)"/>
+    <circle cx="1490" cy="1030" r="66" fill="url(#treeCanopy1)"/>
+    <circle cx="1430" cy="1070" r="58" fill="url(#treeCanopy1)"/>
+    <circle cx="1490" cy="1125" r="67" fill="url(#treeCanopy3)"/>
+    <circle cx="1430" cy="1165" r="59" fill="url(#treeCanopy3)"/>
+    <circle cx="1490" cy="1220" r="68" fill="url(#treeCanopy2)"/>
+    <circle cx="1430" cy="1260" r="60" fill="url(#treeCanopy2)"/>
+    <circle cx="1490" cy="1315" r="69" fill="url(#treeCanopy1)"/>
+    <circle cx="1430" cy="1355" r="61" fill="url(#treeCanopy1)"/>
+    <circle cx="1490" cy="1410" r="70" fill="url(#treeCanopy3)"/>
+    <circle cx="1430" cy="1450" r="62" fill="url(#treeCanopy3)"/>
+    <circle cx="1490" cy="1505" r="71" fill="url(#treeCanopy2)"/>
+    <circle cx="1430" cy="1545" r="63" fill="url(#treeCanopy2)"/>
+
+  </g>
+
+</svg>

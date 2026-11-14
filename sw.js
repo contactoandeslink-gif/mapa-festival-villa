@@ -16,6 +16,7 @@ const SHELL_ASSETS = [
   './manifest.webmanifest',
   './icon.svg',
   './icon-192.png',
+  './plano-festival-master.svg',
   './mapa-festival-aereo.jpg',
   './icon-512.png',
   './apple-touch-icon.png'
