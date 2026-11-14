@@ -4,7 +4,7 @@
 //  - Teselas del mapa (OpenStreetMap, CartoDB Voyager, MapTiler): cache-first con límite de entradas (funcionan offline tras visitarlas).
 //  - Imágenes externas (Unsplash) y fuentes/CDN: stale-while-revalidate (resistentes a red lenta en la cancha).
 
-const CACHE_SHELL = 'festival-shell-v4';
+const CACHE_SHELL = 'festival-shell-v5';
 const CACHE_TILES = 'festival-tiles-v4';
 const CACHE_MEDIA = 'festival-media-v4';
 const MAX_TILES = 500;
@@ -16,6 +16,7 @@ const SHELL_ASSETS = [
   './manifest.webmanifest',
   './icon.svg',
   './icon-192.png',
+  './mapa-festival-4k.jpg',
   './plano-festival-master.svg',
   './mapa-festival-aereo.jpg',
   './icon-512.png',
