@@ -190,6 +190,12 @@
           <button onclick="openAddStandModal()" class="px-4 py-2 bg-gradient-to-r from-orange-600 to-amber-600 hover:brightness-110 text-white text-xs font-black rounded-xl shadow-lg shadow-orange-600/30 flex items-center gap-1.5 transition active:scale-95">
             <span>➕</span> Nuevo Local
           </button>
+          <button onclick="clearCanchaStands()" class="px-3 py-2 bg-red-950/80 hover:bg-red-900 border border-red-500/50 text-red-300 text-xs font-black rounded-xl shadow flex items-center gap-1.5 transition active:scale-95" title="Vaciar la cancha y dejar en cero para nuevo evento">
+            <span>🧹</span> Vaciar Cancha
+          </button>
+          <button onclick="restoreSampleStands()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs font-bold rounded-xl flex items-center gap-1.5 transition active:scale-95" title="Restaurar los 20 locales de muestra">
+            <span>📥</span> Muestra (20)
+          </button>
         </div>
       </div>
 
@@ -2660,6 +2666,26 @@
       a.href = url;
       a.download = `festival_villa_backup_${new Date().toISOString().slice(0, 10)}.json`;
       a.click();
+    }
+
+    function clearCanchaStands() {
+      if (confirm('🧹 ¿Vaciar la cancha para empezar un nuevo evento desde cero?\n\nSe eliminarán los locales de muestra y la cancha quedará completamente limpia lista para agregar tus puestos reales con solo su logo.')) {
+        stands = stands.filter(s => s.category === 'service' || s.number === 'ESC' || s.number === 'WC' || s.number === 'ACC' || s.number === 'EST');
+        saveAndBroadcast();
+        renderAdminStandsList();
+        if (adminMapInited) renderEditorStands();
+        alert('✅ Cancha vaciada exitosamente. Ahora puedes plantar tus puestos reales con su logo donde tú quieras.');
+      }
+    }
+
+    function restoreSampleStands() {
+      if (confirm('¿Cargar los 20 locales chilenos de muestra?')) {
+        stands = JSON.parse(JSON.stringify(DEFAULT_STANDS));
+        saveAndBroadcast();
+        renderAdminStandsList();
+        if (adminMapInited) renderEditorStands();
+        alert('✅ 20 locales de muestra cargados.');
+      }
     }
 
     function resetDefaultData() {
