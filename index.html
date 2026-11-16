@@ -760,14 +760,9 @@
           </div>
 
           <!-- Botón Centrar Recinto / Volver a ver todo -->
-          <div class="flex items-center gap-1.5">
-            <button id="btnToggleMapStyle" onclick="toggleMapStyle()" title="Alternar entre Foto Satelital 4K y Plano Vectorial" class="bg-slate-900/95 backdrop-blur-md border border-emerald-500/60 text-emerald-300 hover:text-white px-2.5 sm:px-3 py-1.5 rounded-xl shadow-lg text-xs font-black flex items-center gap-1 active:scale-95 transition">
-              <span id="mapStyleBtnIcon">📸</span> <span id="mapStyleBtnText">Satélite 4K</span>
-            </button>
-            <button onclick="resetMapView()" title="Ver toda la cancha" class="bg-slate-900/95 backdrop-blur-md border border-amber-500/60 text-amber-300 hover:text-white px-2.5 sm:px-3 py-1.5 rounded-xl shadow-lg text-xs font-black flex items-center gap-1 active:scale-95 transition">
-              🔄 Centrar
-            </button>
-          </div>
+          <button onclick="resetMapView()" title="Ver toda la cancha" class="bg-slate-900/95 backdrop-blur-md border border-amber-500/60 text-amber-300 hover:text-white px-3 py-1.5 rounded-xl shadow-lg text-xs font-black flex items-center gap-1 active:scale-95 transition">
+            🔄 Recinto Completo
+          </button>
         </div>
 
         <!-- Píldoras de Acceso Rápido 1-Toque (Escenario, Baños, Comidas, Cervezas) -->
@@ -1038,7 +1033,7 @@
   <!-- ======================================================== -->
   <script>
     // Limpiar caché vieja si la versión de datos cambió (con try/catch: Safari privado puede bloquear localStorage)
-    const DATA_VERSION = '2026.28.satellite_hd_v1';
+    const DATA_VERSION = '2026.29.straight_vector_hd_v1';
     function safeLSGet(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
     function safeLSSet(key, val) { try { localStorage.setItem(key, val); } catch (e) {} }
     function safeLSRemove(key) { try { localStorage.removeItem(key); } catch (e) {} }
@@ -1175,8 +1170,8 @@
     "prepTime": "5 - 8 min",
     "isOpen": true,
     "side": "west",
-    "latOffset": 0.0003918,
-    "lngOffset": 0.0001045,
+    "latOffset": 0.0003975,
+    "lngOffset": -0.0003395,
     "locationNote": "Costado Poniente #1 (Food Trucks)",
     "whatsapp": "56987654321",
     "bankData": {
@@ -1229,8 +1224,8 @@
     "prepTime": "6 - 9 min",
     "isOpen": true,
     "side": "west",
-    "latOffset": 0.0003431,
-    "lngOffset": 3.58e-05,
+    "latOffset": 0.000309,
+    "lngOffset": -0.0003395,
     "locationNote": "Costado Poniente #2 (Sector Comidas)",
     "whatsapp": "56976543210",
     "bankData": {
@@ -1278,8 +1273,8 @@
     "prepTime": "8 - 12 min",
     "isOpen": true,
     "side": "west",
-    "latOffset": 0.0002944,
-    "lngOffset": -3.28e-05,
+    "latOffset": 0.0002205,
+    "lngOffset": -0.0003395,
     "locationNote": "Costado Poniente #3 (Frente al Centro de Cancha)",
     "whatsapp": "56965432109",
     "bankData": {
@@ -1327,8 +1322,8 @@
     "prepTime": "3 - 5 min",
     "isOpen": true,
     "side": "west",
-    "latOffset": 0.0002457,
-    "lngOffset": -0.0001015,
+    "latOffset": 0.000132,
+    "lngOffset": -0.0003395,
     "locationNote": "Costado Poniente #4 (Completos & Ases)",
     "whatsapp": "56954321098",
     "bankData": {
@@ -1376,8 +1371,8 @@
     "prepTime": "6 - 9 min",
     "isOpen": true,
     "side": "west",
-    "latOffset": 0.000197,
-    "lngOffset": -0.0001701,
+    "latOffset": 4.35e-05,
+    "lngOffset": -0.0003395,
     "locationNote": "Costado Poniente #5 (Frente al Área Norte)",
     "whatsapp": "56943210987",
     "bankData": {
@@ -1425,8 +1420,8 @@
     "prepTime": "8 - 12 min",
     "isOpen": true,
     "side": "west",
-    "latOffset": 0.0001483,
-    "lngOffset": -0.0002388,
+    "latOffset": -4.5e-05,
+    "lngOffset": -0.0003395,
     "locationNote": "Costado Poniente #6 (Junto al Escenario)",
     "whatsapp": "56932109876",
     "bankData": {
@@ -1469,8 +1464,8 @@
     "prepTime": "4 - 7 min",
     "isOpen": true,
     "side": "west",
-    "latOffset": 9.97e-05,
-    "lngOffset": -0.0003074,
+    "latOffset": -0.0001335,
+    "lngOffset": -0.0003395,
     "locationNote": "Paseo Central Poniente (Waffles & Crepes)",
     "whatsapp": "56921098765",
     "bankData": {
@@ -1513,8 +1508,8 @@
     "prepTime": "5 - 8 min",
     "isOpen": true,
     "side": "west",
-    "latOffset": 5.1e-05,
-    "lngOffset": -0.0003761,
+    "latOffset": -0.000222,
+    "lngOffset": -0.0003395,
     "locationNote": "Paseo Central (Helados Artesanales)",
     "whatsapp": "56910987654",
     "bankData": {
@@ -1562,8 +1557,8 @@
     "prepTime": "7 - 10 min",
     "isOpen": true,
     "side": "west",
-    "latOffset": 2.3e-06,
-    "lngOffset": -0.0004448,
+    "latOffset": -0.0003105,
+    "lngOffset": -0.0003395,
     "locationNote": "Paseo Central Oriente (Cafetería)",
     "whatsapp": "56909876543",
     "bankData": {
@@ -1606,8 +1601,8 @@
     "prepTime": "7 - 11 min",
     "isOpen": true,
     "side": "west",
-    "latOffset": -4.64e-05,
-    "lngOffset": -0.0005134,
+    "latOffset": -0.000399,
+    "lngOffset": -0.0003395,
     "locationNote": "Paseo Central (Churros & Dulces)",
     "whatsapp": "56998765432",
     "bankData": {
@@ -1650,8 +1645,8 @@
     "prepTime": "2 - 4 min",
     "isOpen": true,
     "side": "east",
-    "latOffset": 4.64e-05,
-    "lngOffset": 0.0005134,
+    "latOffset": 0.0003975,
+    "lngOffset": 0.0003395,
     "locationNote": "Costado Oriente #1 (Boulevard Cervecero)",
     "whatsapp": "56987651234",
     "bankData": {
@@ -1699,8 +1694,8 @@
     "prepTime": "2 - 3 min",
     "isOpen": true,
     "side": "east",
-    "latOffset": -2.3e-06,
-    "lngOffset": 0.0004448,
+    "latOffset": 0.000309,
+    "lngOffset": 0.0003395,
     "locationNote": "Costado Oriente #2 (Cervezas del Sur)",
     "whatsapp": "56976542345",
     "bankData": {
@@ -1743,8 +1738,8 @@
     "prepTime": "3 - 5 min",
     "isOpen": true,
     "side": "east",
-    "latOffset": -5.1e-05,
-    "lngOffset": 0.0003761,
+    "latOffset": 0.0002205,
+    "lngOffset": 0.0003395,
     "locationNote": "Costado Oriente #3 (Barra Central)",
     "whatsapp": "56965433456",
     "bankData": {
@@ -1787,8 +1782,8 @@
     "prepTime": "2 - 4 min",
     "isOpen": true,
     "side": "east",
-    "latOffset": -9.97e-05,
-    "lngOffset": 0.0003074,
+    "latOffset": 0.000132,
+    "lngOffset": 0.0003395,
     "locationNote": "Costado Oriente #4 (Cervecería Artesanal)",
     "whatsapp": "56954324567",
     "bankData": {
@@ -1836,8 +1831,8 @@
     "prepTime": "3 - 5 min",
     "isOpen": true,
     "side": "east",
-    "latOffset": -0.0001483,
-    "lngOffset": 0.0002388,
+    "latOffset": 4.35e-05,
+    "lngOffset": 0.0003395,
     "locationNote": "Costado Oriente #5 (Terremotos & Tragos)",
     "whatsapp": "56943215678",
     "bankData": {
@@ -1885,8 +1880,8 @@
     "prepTime": "2 - 3 min",
     "isOpen": true,
     "side": "east",
-    "latOffset": -0.000197,
-    "lngOffset": 0.0001701,
+    "latOffset": -4.5e-05,
+    "lngOffset": 0.0003395,
     "locationNote": "Costado Oriente #6 (Junto al Escenario)",
     "whatsapp": "56932106789",
     "bankData": {
@@ -1929,8 +1924,8 @@
     "prepTime": "4 - 7 min",
     "isOpen": true,
     "side": "east",
-    "latOffset": -0.0002457,
-    "lngOffset": 0.0001015,
+    "latOffset": -0.0001335,
+    "lngOffset": 0.0003395,
     "locationNote": "Pista Oriente (Maderas Nativas)",
     "whatsapp": "56921097890",
     "bankData": {
@@ -1978,8 +1973,8 @@
     "prepTime": "3 - 5 min",
     "isOpen": true,
     "side": "east",
-    "latOffset": -0.0002944,
-    "lngOffset": 3.28e-05,
+    "latOffset": -0.000222,
+    "lngOffset": 0.0003395,
     "locationNote": "Pista Oriente (Tejidos Tradicionales)",
     "whatsapp": "56910988901",
     "bankData": {
@@ -2027,8 +2022,8 @@
     "prepTime": "3 - 5 min",
     "isOpen": true,
     "side": "east",
-    "latOffset": -0.0003431,
-    "lngOffset": -3.58e-05,
+    "latOffset": -0.0003105,
+    "lngOffset": 0.0003395,
     "locationNote": "Pista Oriente (Orfebrería del Lago)",
     "whatsapp": "56909879012",
     "bankData": {
@@ -2076,8 +2071,8 @@
     "prepTime": "1 - 2 min",
     "isOpen": true,
     "side": "east",
-    "latOffset": -0.0003918,
-    "lngOffset": -0.0001045,
+    "latOffset": -0.000399,
+    "lngOffset": 0.0003395,
     "locationNote": "Pista Oriente (Souvenirs Villarrica)",
     "whatsapp": "56998760123",
     "bankData": {
@@ -2120,8 +2115,8 @@
     "prepTime": "Acceso Inmediato",
     "isOpen": true,
     "side": "east",
-    "latOffset": 0.000487,
-    "lngOffset": -7.14e-05,
+    "latOffset": -0.0006188,
+    "lngOffset": 0.0006159,
     "locationNote": "Sector Norte de la Pista (Baños / WC)",
     "whatsapp": "",
     "bankData": null,
@@ -2142,8 +2137,8 @@
     "prepTime": "En Vivo Ahora",
     "isOpen": true,
     "side": "center",
-    "latOffset": 0.0003165,
-    "lngOffset": 0.0004463,
+    "latOffset": 0.000645,
+    "lngOffset": 0.0,
     "locationNote": "Frente Norte de la Cancha (Escenario Principal)",
     "whatsapp": "",
     "bankData": null,
@@ -2164,8 +2159,8 @@
     "prepTime": "250 Cupos",
     "isOpen": true,
     "side": "east",
-    "latOffset": -0.0005927,
-    "lngOffset": -8.7e-06,
+    "latOffset": 0.00057,
+    "lngOffset": 0.0006111,
     "locationNote": "Costado Sur-Poniente (Estacionamiento calle Epulef)",
     "whatsapp": "",
     "bankData": null,
@@ -2186,8 +2181,8 @@
     "prepTime": "Entrada Peatonal",
     "isOpen": true,
     "side": "center",
-    "latOffset": -0.0003774,
-    "lngOffset": -0.0005321,
+    "latOffset": -0.000765,
+    "lngOffset": 0.0,
     "locationNote": "Pórtico Sur (Acceso Principal desde calle Epulef)",
     "whatsapp": "",
     "bankData": null,
@@ -3110,10 +3105,7 @@
 
     // Delimitación del recinto completo: Cancha, Carpas, Ramadas, Estacionamiento y Acceso
     // Delimitación exacta del Estadio Municipal de Villarrica (Cancha, Pista, Tribuna y Accesos)
-    const stadiumBounds = L.latLngBounds([
-      [-39.2902201, -72.2224762], // Esquina Sur-Poniente
-      [-39.2879679, -72.2195658]  // Esquina Nor-Oriente
-    ]);
+    const stadiumBounds = L.latLngBounds([[-39.2900465, -72.221797], [-39.2882465, -72.220245]]);
 
     const map = L.map('map', {
       zoomControl: false,
@@ -3127,70 +3119,35 @@
     });
 
     // ========================================================
-    // CANCHA REALISTA 4K Y PLANO VECTORIAL (ESTADIO VILLARRICA)
+    // CANCHA DERECHA (VERTICAL 100% ALINEADA) Y VECTORIAL HD
+    // CERO PIXELACION AL ACERCAR O ALEJAR EL ZOOM
     // ========================================================
-    const photoBounds = L.latLngBounds([
-      [-39.289650, -72.222105], // Suroeste
-      [-39.288438, -72.220007]  // Noreste
-    ]);
-
-    // Capa 1: Fotografía Satelital Cenital 4K Nítida (Generada por IA según el mapa)
-    const stadiumPhotoLayer = L.imageOverlay('estadio-villarrica-hd.jpg', photoBounds, {
+    let stadiumVectorOverlay = L.imageOverlay('estadio-villarrica-derecho.svg', stadiumBounds, {
       opacity: 1,
       interactive: false,
       zIndex: 10
     }).addTo(map);
 
-    // Capa 2: Plano Vectorial HD (SVG)
-    let stadiumVectorOverlay = null;
-    function getOrCreateVectorOverlay() {
-      if (!stadiumVectorOverlay) {
-        stadiumVectorOverlay = L.imageOverlay('estadio-villarrica-vector-hd.svg', stadiumBounds, {
-          opacity: 1,
-          interactive: false,
-          zIndex: 10
-        });
-        try {
-          fetch('estadio-villarrica-vector-hd.svg')
-            .then(r => r.text())
-            .then(svgStr => {
-              const parser = new DOMParser();
-              const svgDoc = parser.parseFromString(svgStr, 'image/svg+xml');
-              const svgEl = svgDoc.documentElement;
-              if (stadiumVectorOverlay && map.hasLayer(stadiumVectorOverlay)) map.removeLayer(stadiumVectorOverlay);
-              stadiumVectorOverlay = L.svgOverlay(svgEl, stadiumBounds, { opacity: 1, interactive: false, zIndex: 10 });
-              if (currentMapStyle === 'vector') stadiumVectorOverlay.addTo(map);
-            }).catch(() => {});
-        } catch (e) {}
-      }
-      return stadiumVectorOverlay;
-    }
+    try {
+      fetch('estadio-villarrica-derecho.svg')
+        .then(r => r.text())
+        .then(svgStr => {
+          const parser = new DOMParser();
+          const svgDoc = parser.parseFromString(svgStr, 'image/svg+xml');
+          const svgEl = svgDoc.documentElement;
+          if (stadiumVectorOverlay && map.hasLayer(stadiumVectorOverlay)) map.removeLayer(stadiumVectorOverlay);
+          stadiumVectorOverlay = L.svgOverlay(svgEl, stadiumBounds, {
+            opacity: 1,
+            interactive: false,
+            zIndex: 10
+          }).addTo(map);
+        })
+        .catch(() => {});
+    } catch (e) {}
 
-    let currentMapStyle = 'photo'; // Default: la foto satelital 4K nítida
-    window.toggleMapStyle = function() {
-      const btnIcon = document.getElementById('mapStyleBtnIcon');
-      const btnText = document.getElementById('mapStyleBtnText');
-      if (currentMapStyle === 'photo') {
-        currentMapStyle = 'vector';
-        if (map.hasLayer(stadiumPhotoLayer)) map.removeLayer(stadiumPhotoLayer);
-        const vec = getOrCreateVectorOverlay();
-        if (!map.hasLayer(vec)) vec.addTo(map);
-        if (btnIcon) btnIcon.textContent = '📐';
-        if (btnText) btnText.textContent = 'Vectorial';
-        showMapToast('📐 Modo: Plano Vectorial HD');
-      } else {
-        currentMapStyle = 'photo';
-        if (stadiumVectorOverlay && map.hasLayer(stadiumVectorOverlay)) map.removeLayer(stadiumVectorOverlay);
-        if (!map.hasLayer(stadiumPhotoLayer)) stadiumPhotoLayer.addTo(map);
-        if (btnIcon) btnIcon.textContent = '📸';
-        if (btnText) btnText.textContent = 'Satélite 4K';
-        showMapToast('📸 Modo: Foto Satelital 4K');
-      }
-    };
+    map.fitBounds(stadiumBounds);
 
-    map.fitBounds(photoBounds.pad(0.08));
-
-    const stageHitbox = L.circleMarker([cLat + 0.0003165, cLng + 0.0004463], {
+    const stageHitbox = L.circleMarker([cLat + 0.000645, cLng], {
       radius: 34,
       color: '#dc2626',
       weight: 2.5,
@@ -3202,7 +3159,7 @@
     stageHitbox.on('click', onStageMarkerClick);
 
     // B. Estacionamiento (Costado Sur-Poniente de calle Epulef)
-    const parkingHitbox = L.circleMarker([cLat - 0.0005927, cLng - 0.0000087], {
+    const parkingHitbox = L.circleMarker([cLat + 0.000570, cLng + 0.0006111], {
       radius: 36,
       color: '#38bdf8',
       weight: 2.5,
@@ -3214,7 +3171,7 @@
     parkingHitbox.on('click', onParkingMarkerClick);
 
     // C. Baños / WC (Sector Norte de la pista)
-    const wcHitbox = L.circleMarker([cLat + 0.0004870, cLng - 0.0000714], {
+    const wcHitbox = L.circleMarker([cLat - 0.0006188, cLng + 0.0006159], {
       radius: 32,
       color: '#0284c7',
       weight: 2.5,
@@ -3226,7 +3183,7 @@
     wcHitbox.on('click', onWcMarkerClick);
 
     // D. Acceso Principal (Pórtico Sur hacia Epulef)
-    const accessHitbox = L.circleMarker([cLat - 0.0003774, cLng - 0.0005321], {
+    const accessHitbox = L.circleMarker([cLat - 0.000765, cLng], {
       radius: 32,
       color: '#16a34a',
       weight: 2.5,
@@ -3289,9 +3246,9 @@
         { id: 'sec-sur', name: '🧶 Patio Dulces & Artesanías', color: '#ec4899', bounds: [[cLat - 0.00034, cLng - 0.00040], [cLat - 0.00014, cLng + 0.00040]] }
       ],
       aisles: [
-        { id: 'ais-central', name: 'Boulevard Central (Maicillo)', points: [[cLat - 0.0003774, cLng - 0.0005321], [cLat + 0.0003165, cLng + 0.0004463]] },
-        { id: 'ais-norte', name: 'Pasillo Escenario', points: [[cLat + 0.0003918, cLng + 0.0001045], [cLat + 0.0000464, cLng + 0.0005134]] },
-        { id: 'ais-sur', name: 'Pasillo Acceso', points: [[cLat - 0.0000464, cLng - 0.0005134], [cLat - 0.0003918, cLng - 0.0001045]] }
+        { id: 'ais-central', name: 'Boulevard Central (Maicillo)', points: [[cLat - 0.00070, cLng], [cLat + 0.00055, cLng]] },
+        { id: 'ais-cruce', name: 'Paso Peatonal Central', points: [[cLat, cLng - 0.00034], [cLat, cLng + 0.00034]] },
+        { id: 'ais-acceso', name: 'Acceso Sur', points: [[cLat - 0.000765, cLng], [cLat - 0.00060, cLng]] }
       ]
     };
 

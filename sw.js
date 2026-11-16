@@ -4,7 +4,7 @@
 //  - Teselas del mapa (OpenStreetMap, CartoDB Voyager, MapTiler): cache-first con límite de entradas (funcionan offline tras visitarlas).
 //  - Imágenes externas (Unsplash) y fuentes/CDN: stale-while-revalidate (resistentes a red lenta en la cancha).
 
-const CACHE_SHELL = 'festival-shell-v10';
+const CACHE_SHELL = 'festival-shell-v11';
 const CACHE_TILES = 'festival-tiles-v4';
 const CACHE_MEDIA = 'festival-media-v4';
 const MAX_TILES = 500;
@@ -13,6 +13,7 @@ const MAX_MEDIA = 100;
 const SHELL_ASSETS = [
   './',
   './index.html',
+  './estadio-villarrica-derecho.svg',
   './estadio-villarrica-hd.jpg',
   './estadio-villarrica-vector-hd.svg',
   './estadio-villarrica-vector.svg',
@@ -113,7 +114,8 @@ self.addEventListener('fetch', (event) => {
       fetch(event.request)
         .then((fresh) => {
           const copy = fresh.clone();
-          caches.open(CACHE_SHELL).then(cache => cache.put('./index.html', copy));
+          caches.open(CACHE_SHELL).then(cache => cache.put('./index.html',
+  './estadio-villarrica-derecho.svg', copy));
           return fresh;
         })
         .catch(() => caches.match('./index.html').then(r => r || caches.match('./')))
