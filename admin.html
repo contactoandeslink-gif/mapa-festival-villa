@@ -2776,14 +2776,16 @@
       const cLat = DEFAULT_CENTER[0];
       const cLng = DEFAULT_CENTER[1];
 
-      adminMap = L.map('adminMap', { zoomControl: true, maxZoom: 21, minZoom: 15 });
-      L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', { maxZoom: 20, maxNativeZoom: 19, attribution: '&copy; Google Maps Satelital' }).addTo(adminMap);
+      adminMap = L.map('adminMap', { zoomControl: true, maxZoom: 22, minZoom: 15 });
 
-      const stadiumBounds = L.latLngBounds([[cLat - 0.00058, cLng - 0.00042], [cLat + 0.00055, cLng + 0.00042]]);
+      const stadiumBounds = L.latLngBounds([[-39.2900465, -72.221797], [-39.2882465, -72.220245]]);
 
-      // Fondo del recinto (igual que la app del asistente)
-      L.rectangle([[cLat - 0.00058, cLng - 0.00042], [cLat + 0.00058, cLng + 0.00042]], { color: '#1e293b', weight: 2, fillColor: '#0b0f19', fillOpacity: 1 }).addTo(adminMap);
-      L.rectangle([[cLat - 0.00044, cLng - 0.00030], [cLat + 0.00030, cLng + 0.00030]], { color: '#ffffff', weight: 1.5, fillColor: '#14532d', fillOpacity: 1 }).addTo(adminMap);
+      // Cancha 100% Derecha Vectorial HD (Cero Pixelación)
+      L.imageOverlay('estadio-villarrica-derecho.svg', stadiumBounds, {
+        opacity: 1,
+        interactive: false,
+        zIndex: 10
+      }).addTo(adminMap);
 
       // Marcador del escenario y entrada
       L.marker([cLat + 0.00041, cLng], { icon: L.divIcon({ className: '', html: '<div style="white-space:nowrap;background:linear-gradient(90deg,#dc2626,#f59e0b);color:#fff;font-size:10px;font-weight:900;padding:3px 10px;border-radius:9999px;border:2px solid #fff;transform:translateX(-50%);">🎸 ESCENARIO</div>', iconSize: [0, 0] }), interactive: false }).addTo(adminMap);

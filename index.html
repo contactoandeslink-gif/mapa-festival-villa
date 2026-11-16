@@ -3122,6 +3122,7 @@
     // CANCHA DERECHA (VERTICAL 100% ALINEADA) Y VECTORIAL HD
     // CERO PIXELACION AL ACERCAR O ALEJAR EL ZOOM
     // ========================================================
+    // 1. Capa Vectorial de Alta Fidelidad del Estadio (Cero Pixelación)
     let stadiumVectorOverlay = L.imageOverlay('estadio-villarrica-derecho.svg', stadiumBounds, {
       opacity: 1,
       interactive: false,
@@ -3134,16 +3135,23 @@
         .then(svgStr => {
           const parser = new DOMParser();
           const svgDoc = parser.parseFromString(svgStr, 'image/svg+xml');
-          const svgEl = svgDoc.documentElement;
-          if (stadiumVectorOverlay && map.hasLayer(stadiumVectorOverlay)) map.removeLayer(stadiumVectorOverlay);
-          stadiumVectorOverlay = L.svgOverlay(svgEl, stadiumBounds, {
-            opacity: 1,
-            interactive: false,
-            zIndex: 10
-          }).addTo(map);
+          if (svgDoc && svgDoc.documentElement) {
+            const svgEl = document.importNode(svgDoc.documentElement, true);
+            if (stadiumVectorOverlay && map.hasLayer(stadiumVectorOverlay)) map.removeLayer(stadiumVectorOverlay);
+            stadiumVectorOverlay = L.svgOverlay(svgEl, stadiumBounds, {
+              opacity: 1,
+              interactive: false,
+              zIndex: 10
+            }).addTo(map);
+          }
+          renderStandsOnMap();
         })
-        .catch(() => {});
-    } catch (e) {}
+        .catch(() => {
+          renderStandsOnMap();
+        });
+    } catch (e) {
+      renderStandsOnMap();
+    }
 
     map.fitBounds(stadiumBounds);
 
@@ -3193,6 +3201,11 @@
       className: 'poi-hitbox'
     }).addTo(stadiumGroup);
     accessHitbox.on('click', onAccessMarkerClick);
+
+    // ========================================================
+    // RENDERIZADO OBLIGATORIO DE LOCALES EN CÓDIGO SOBRE EL MAPA
+    // ========================================================
+    renderStandsOnMap();
 
     function onStageMarkerClick() {
       const stand = stands.find(s => s.number === 'ESC');
@@ -4160,6 +4173,7 @@
     }
     // Auto-detección al escanear QR físico de puesto (ej: index.html?stand=P-01)
     window.addEventListener('DOMContentLoaded', () => {
+      renderStandsOnMap();
       const urlParams = new URLSearchParams(window.location.search);
       const standParam = urlParams.get('from') || urlParams.get('origen') || urlParams.get('stand') || urlParams.get('puesto') || urlParams.get('p');
       if (standParam) {
