@@ -3150,7 +3150,7 @@
     });
 
     // 2. Capa Vectorial Cancha Limpia (Sin puestos en el pasto)
-    const vectorCleanOverlay = L.imageOverlay('plano-festival-master.svg', aerial4kBounds, {
+    const vectorCleanOverlay = L.imageOverlay('estadio-villarrica-vector.svg', aerial4kBounds, {
       opacity: 1,
       alt: 'Plano Vectorial Limpio del Recinto',
       interactive: false,
@@ -4192,7 +4192,7 @@
     // Auto-detección al escanear QR físico de puesto (ej: index.html?stand=P-01)
     window.addEventListener('DOMContentLoaded', () => {
       const urlParams = new URLSearchParams(window.location.search);
-      const standParam = urlParams.get('stand') || urlParams.get('puesto') || urlParams.get('p');
+      const standParam = urlParams.get('from') || urlParams.get('origen') || urlParams.get('stand') || urlParams.get('puesto') || urlParams.get('p');
       if (standParam) {
         const found = stands.find(s => s.number === standParam || String(s.id) === standParam);
         if (found) {

@@ -1,0 +1,537 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2000 2600" width="2000" height="2600">
+  <defs>
+    <!-- Filtros de Relieve y Sombras Suaves -->
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#000000" flood-opacity="0.45"/>
+    </filter>
+    <filter id="deepShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="#000000" flood-opacity="0.6"/>
+    </filter>
+    <filter id="treeShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="8" dy="14" stdDeviation="8" flood-color="#071a0b" flood-opacity="0.5"/>
+    </filter>
+    <filter id="glowGold" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feColorMatrix type="matrix" values="1 0 0 0 0.98  0 1 0 0 0.75  0 0 1 0 0.18  0 0 0 0.8 0"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Degradados de Terreno y Pasto -->
+    <radialGradient id="turfRadial" cx="50%" cy="48%" r="60%">
+      <stop offset="0%" stop-color="#46882c"/>
+      <stop offset="60%" stop-color="#366e20"/>
+      <stop offset="90%" stop-color="#2a5818"/>
+      <stop offset="100%" stop-color="#1e4210"/>
+    </radialGradient>
+    <linearGradient id="grassStripeLight" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#4e9632"/>
+      <stop offset="100%" stop-color="#43832a"/>
+    </linearGradient>
+    <linearGradient id="grassStripeDark" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3b7424"/>
+      <stop offset="100%" stop-color="#32631e"/>
+    </linearGradient>
+
+    <!-- Pista Atlética Terra Cotta / Ladrillo de Estadio -->
+    <linearGradient id="trackGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#c2410c"/>
+      <stop offset="40%" stop-color="#9a3412"/>
+      <stop offset="80%" stop-color="#7c2d12"/>
+      <stop offset="100%" stop-color="#64240d"/>
+    </linearGradient>
+
+    <!-- Calzada y Maicillo Peatonal -->
+    <linearGradient id="walkwayGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#b89a6c"/>
+      <stop offset="25%" stop-color="#d4b886"/>
+      <stop offset="50%" stop-color="#dfcaa2"/>
+      <stop offset="75%" stop-color="#d4b886"/>
+      <stop offset="100%" stop-color="#b89a6c"/>
+    </linearGradient>
+
+    <!-- Asfalto y Calles Circundantes -->
+    <linearGradient id="asphaltGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="50%" stop-color="#334155"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+
+    <!-- Madera de Mesas de Picnic -->
+    <linearGradient id="woodGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#92400e"/>
+      <stop offset="50%" stop-color="#78350f"/>
+      <stop offset="100%" stop-color="#451a03"/>
+    </linearGradient>
+
+    <!-- Tribuna Techada del Estadio -->
+    <linearGradient id="grandstandRoofGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="30%" stop-color="#e2e8f0"/>
+      <stop offset="70%" stop-color="#94a3b8"/>
+      <stop offset="100%" stop-color="#475569"/>
+    </linearGradient>
+
+    <!-- Árboles Nativos del Sur de Chile (Copa Tridimensional) -->
+    <radialGradient id="treeCanopyDense" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#5bb33b"/>
+      <stop offset="35%" stop-color="#387a22"/>
+      <stop offset="75%" stop-color="#1e4e11"/>
+      <stop offset="100%" stop-color="#0e2908"/>
+    </radialGradient>
+    <radialGradient id="treeCanopyPine" cx="40%" cy="30%" r="65%">
+      <stop offset="0%" stop-color="#3f8a4a"/>
+      <stop offset="45%" stop-color="#235c2e"/>
+      <stop offset="85%" stop-color="#113a1a"/>
+      <stop offset="100%" stop-color="#09210e"/>
+    </radialGradient>
+
+    <!-- Patrón de Franjas de Césped Cortado Profesional -->
+    <pattern id="mowingPattern" width="2000" height="90" patternUnits="userSpaceOnUse">
+      <rect width="2000" height="45" fill="rgba(255,255,255,0.04)"/>
+      <rect y="45" width="2000" height="45" fill="rgba(0,0,0,0.04)"/>
+    </pattern>
+  </defs>
+
+  <!-- ======================================================== -->
+  <!-- 1. FONDO GENERAL: TERRENO EXTERIOR Y CALLES              -->
+  <!-- ======================================================== -->
+  <!-- Tierra y grava de los alrededores -->
+  <rect width="2000" height="2600" fill="#1c2419"/>
+
+  <!-- Bloque de Asfalto: Calle Saturnino Epulef (Acceso Sur) -->
+  <rect x="0" y="2400" width="2000" height="200" fill="url(#asphaltGrad)"/>
+  <line x1="0" y1="2500" x2="2000" y2="2500" stroke="#facc15" stroke-width="4" stroke-dasharray="30, 20"/>
+  <text x="1000" y="2540" fill="#94a3b8" font-family="'Outfit', sans-serif" font-weight="800" font-size="22" letter-spacing="4" text-anchor="middle">CALLE SATURNINO EPULEF • VILLARRICA</text>
+
+  <!-- Calle lateral este hacia la playa -->
+  <path d="M 1820,0 L 1980,0 L 1980,2400 L 1820,2400 Z" fill="url(#asphaltGrad)"/>
+  <line x1="1900" y1="0" x2="1900" y2="2400" stroke="#f8fafc" stroke-width="3" stroke-dasharray="24, 16" opacity="0.6"/>
+
+  <!-- Estacionamiento de Vehículos (Costado Sur-Este) -->
+  <g id="stadiumParking" filter="url(#softShadow)">
+    <rect x="1450" y="2000" width="340" height="380" rx="16" fill="#2d3748" stroke="#4a5568" stroke-width="2"/>
+    <text x="1620" y="2035" fill="#f8fafc" font-family="'Outfit', sans-serif" font-weight="900" font-size="16" text-anchor="middle">🚗 ESTACIONAMIENTO</text>
+    <!-- Líneas de parqueo -->
+    <rect x="1475" y="2060" width="65" height="45" rx="4" fill="#3b4657" stroke="#64748b" stroke-width="1.2"/>
+    <rect x="1485" y="2066" width="45" height="33" rx="6" fill="#dc2626" opacity="0.85"/>
+    <rect x="1550" y="2060" width="65" height="45" rx="4" fill="#3b4657" stroke="#64748b" stroke-width="1.2"/>
+    <rect x="1560" y="2066" width="45" height="33" rx="6" fill="#2563eb" opacity="0.85"/>
+    <rect x="1625" y="2060" width="65" height="45" rx="4" fill="#3b4657" stroke="#64748b" stroke-width="1.2"/>
+    <rect x="1635" y="2066" width="45" height="33" rx="6" fill="#f8fafc" opacity="0.85"/>
+    <rect x="1700" y="2060" width="65" height="45" rx="4" fill="#3b4657" stroke="#64748b" stroke-width="1.2"/>
+    <rect x="1710" y="2066" width="45" height="33" rx="6" fill="#475569" opacity="0.85"/>
+    <rect x="1475" y="2120" width="65" height="45" rx="4" fill="#3b4657" stroke="#64748b" stroke-width="1.2"/>
+    <rect x="1485" y="2126" width="45" height="33" rx="6" fill="#ca8a04" opacity="0.85"/>
+    <rect x="1550" y="2120" width="65" height="45" rx="4" fill="#3b4657" stroke="#64748b" stroke-width="1.2"/>
+    <rect x="1560" y="2126" width="45" height="33" rx="6" fill="#16a34a" opacity="0.85"/>
+    <rect x="1625" y="2120" width="65" height="45" rx="4" fill="#3b4657" stroke="#64748b" stroke-width="1.2"/>
+    <rect x="1635" y="2126" width="45" height="33" rx="6" fill="#dc2626" opacity="0.85"/>
+    <rect x="1700" y="2120" width="65" height="45" rx="4" fill="#3b4657" stroke="#64748b" stroke-width="1.2"/>
+    <rect x="1710" y="2126" width="45" height="33" rx="6" fill="#2563eb" opacity="0.85"/>
+    <rect x="1475" y="2180" width="65" height="45" rx="4" fill="#3b4657" stroke="#64748b" stroke-width="1.2"/>
+    <rect x="1485" y="2186" width="45" height="33" rx="6" fill="#f8fafc" opacity="0.85"/>
+    <rect x="1550" y="2180" width="65" height="45" rx="4" fill="#3b4657" stroke="#64748b" stroke-width="1.2"/>
+    <rect x="1560" y="2186" width="45" height="33" rx="6" fill="#475569" opacity="0.85"/>
+    <rect x="1625" y="2180" width="65" height="45" rx="4" fill="#3b4657" stroke="#64748b" stroke-width="1.2"/>
+    <rect x="1635" y="2186" width="45" height="33" rx="6" fill="#ca8a04" opacity="0.85"/>
+    <rect x="1700" y="2180" width="65" height="45" rx="4" fill="#3b4657" stroke="#64748b" stroke-width="1.2"/>
+    <rect x="1710" y="2186" width="45" height="33" rx="6" fill="#16a34a" opacity="0.85"/>
+    <rect x="1475" y="2240" width="65" height="45" rx="4" fill="#3b4657" stroke="#64748b" stroke-width="1.2"/>
+    <rect x="1485" y="2246" width="45" height="33" rx="6" fill="#dc2626" opacity="0.85"/>
+    <rect x="1550" y="2240" width="65" height="45" rx="4" fill="#3b4657" stroke="#64748b" stroke-width="1.2"/>
+    <rect x="1560" y="2246" width="45" height="33" rx="6" fill="#2563eb" opacity="0.85"/>
+    <rect x="1625" y="2240" width="65" height="45" rx="4" fill="#3b4657" stroke="#64748b" stroke-width="1.2"/>
+    <rect x="1635" y="2246" width="45" height="33" rx="6" fill="#f8fafc" opacity="0.85"/>
+    <rect x="1700" y="2240" width="65" height="45" rx="4" fill="#3b4657" stroke="#64748b" stroke-width="1.2"/>
+    <rect x="1710" y="2246" width="45" height="33" rx="6" fill="#475569" opacity="0.85"/>
+    <rect x="1475" y="2300" width="65" height="45" rx="4" fill="#3b4657" stroke="#64748b" stroke-width="1.2"/>
+    <rect x="1485" y="2306" width="45" height="33" rx="6" fill="#ca8a04" opacity="0.85"/>
+    <rect x="1550" y="2300" width="65" height="45" rx="4" fill="#3b4657" stroke="#64748b" stroke-width="1.2"/>
+    <rect x="1560" y="2306" width="45" height="33" rx="6" fill="#16a34a" opacity="0.85"/>
+    <rect x="1625" y="2300" width="65" height="45" rx="4" fill="#3b4657" stroke="#64748b" stroke-width="1.2"/>
+    <rect x="1635" y="2306" width="45" height="33" rx="6" fill="#dc2626" opacity="0.85"/>
+    <rect x="1700" y="2300" width="65" height="45" rx="4" fill="#3b4657" stroke="#64748b" stroke-width="1.2"/>
+    <rect x="1710" y="2306" width="45" height="33" rx="6" fill="#2563eb" opacity="0.85"/>
+  </g>
+
+  <!-- ======================================================== -->
+  <!-- 2. COMPLEJO DEPORTIVO: ESTADIO MUNICIPAL MATÍAS VIDAL    -->
+  <!-- ======================================================== -->
+  <!-- Gran anillo de la Pista Atlética Olímpica -->
+  <!-- Centro del campo: X = 980, Y = 1260 -->
+  <g id="runningTrack" filter="url(#deepShadow)">
+    <!-- Suelo exterior de la pista -->
+    <path d="M 450,750 
+             C 450,380 1510,380 1510,750 
+             L 1510,1750 
+             C 1510,2120 450,2120 450,1750 Z" 
+          fill="url(#trackGrad)" stroke="#431407" stroke-width="8"/>
+    
+    <!-- Carriles de la Pista Atlética (Líneas blancas vectoriales) -->
+    <path d="M 480,760 C 480,420 1480,420 1480,760 L 1480,1740 C 1480,2080 480,2080 480,1740 Z" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2"/>
+    <path d="M 510,770 C 510,460 1450,460 1450,770 L 1450,1730 C 1450,2040 510,2040 510,1730 Z" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2"/>
+    <path d="M 540,780 C 540,500 1420,500 1420,780 L 1420,1720 C 1420,2000 540,2000 540,1720 Z" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2"/>
+    <path d="M 570,790 C 570,540 1390,540 1390,790 L 1390,1710 C 1390,1960 570,1960 570,1710 Z" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2"/>
+  </g>
+
+  <!-- CANCHA PRINCIPAL DE FÚTBOL (CÉSPED NATURAL / LIMPIO) -->
+  <g id="soccerPitch" filter="url(#softShadow)">
+    <!-- Césped Verde Base -->
+    <rect x="600" y="650" width="760" height="1200" rx="36" fill="url(#turfRadial)" stroke="#ffffff" stroke-width="5"/>
+    <!-- Franjas de Corte de Césped -->
+    <rect x="600" y="650" width="760" height="1200" rx="36" fill="url(#mowingPattern)"/>
+
+    <!-- Trazado Oficial de Cancha de Fútbol -->
+    <!-- Línea Central -->
+    <line x1="600" y1="1250" x2="1360" y2="1250" stroke="#ffffff" stroke-width="3.5" opacity="0.85"/>
+    <!-- Círculo Central -->
+    <circle cx="980" cy="1250" r="110" fill="none" stroke="#ffffff" stroke-width="3.5" opacity="0.85"/>
+    <circle cx="980" cy="1250" r="4" fill="#ffffff"/>
+
+    <!-- Área Norte (Zona de Concierto / Frente al Escenario) -->
+    <rect x="760" y="650" width="440" height="180" fill="none" stroke="#ffffff" stroke-width="3" opacity="0.85"/>
+    <rect x="850" y="650" width="260" height="70" fill="none" stroke="#ffffff" stroke-width="2.5" opacity="0.85"/>
+    <path d="M 910,830 C 940,860 1020,860 1050,830" fill="none" stroke="#ffffff" stroke-width="2.5" opacity="0.85"/>
+
+    <!-- Área Sur (Frente al Acceso) -->
+    <rect x="760" y="1670" width="440" height="180" fill="none" stroke="#ffffff" stroke-width="3" opacity="0.85"/>
+    <rect x="850" y="1780" width="260" height="70" fill="none" stroke="#ffffff" stroke-width="2.5" opacity="0.85"/>
+    <path d="M 910,1670 C 940,1640 1020,1640 1050,1670" fill="none" stroke="#ffffff" stroke-width="2.5" opacity="0.85"/>
+  </g>
+
+  <!-- ======================================================== -->
+  <!-- 3. TRIBUNA PRINCIPAL TECHADA DEL ESTADIO (Costado Este)   -->
+  <!-- ======================================================== -->
+  <g id="grandstandVillarrica" filter="url(#deepShadow)">
+    <!-- Base de Graderías de Cemento -->
+    <rect x="1530" y="800" width="160" height="900" rx="14" fill="#64748b" stroke="#334155" stroke-width="4"/>
+    <!-- Escalonado de Asientos / Butacas -->
+    <line x1="1538" y1="810" x2="1538" y2="1690" stroke="#475569" stroke-width="2"/>
+    <line x1="1550" y1="810" x2="1550" y2="1690" stroke="#475569" stroke-width="2"/>
+    <line x1="1562" y1="810" x2="1562" y2="1690" stroke="#475569" stroke-width="2"/>
+    <line x1="1574" y1="810" x2="1574" y2="1690" stroke="#475569" stroke-width="2"/>
+    <line x1="1586" y1="810" x2="1586" y2="1690" stroke="#475569" stroke-width="2"/>
+    <line x1="1598" y1="810" x2="1598" y2="1690" stroke="#475569" stroke-width="2"/>
+    <line x1="1610" y1="810" x2="1610" y2="1690" stroke="#475569" stroke-width="2"/>
+    <line x1="1622" y1="810" x2="1622" y2="1690" stroke="#475569" stroke-width="2"/>
+    <line x1="1634" y1="810" x2="1634" y2="1690" stroke="#475569" stroke-width="2"/>
+    <line x1="1646" y1="810" x2="1646" y2="1690" stroke="#475569" stroke-width="2"/>
+    <line x1="1658" y1="810" x2="1658" y2="1690" stroke="#475569" stroke-width="2"/>
+    <line x1="1670" y1="810" x2="1670" y2="1690" stroke="#475569" stroke-width="2"/>
+    <!-- Techo Curvo Metálico Icónico de la Tribuna -->
+    <path d="M 1520,780 L 1710,810 L 1710,1690 L 1520,1720 Z" fill="url(#grandstandRoofGrad)" stroke="#cbd5e1" stroke-width="3"/>
+    <line x1="1615" y1="795" x2="1615" y2="1705" stroke="#94a3b8" stroke-width="3"/>
+    <!-- Letrero de la Tribuna -->
+    <g transform="translate(1620, 1250) rotate(90)">
+      <rect x="-140" y="-18" width="280" height="36" rx="8" fill="#0f172a" stroke="#f8fafc" stroke-width="2"/>
+      <text x="0" y="6" fill="#f8fafc" font-family="'Outfit', sans-serif" font-weight="900" font-size="14" letter-spacing="2" text-anchor="middle">TRIBUNA OFICIAL VILLARRICA</text>
+    </g>
+  </g>
+
+  <!-- ======================================================== -->
+  <!-- 4. MONTAJE DEL FESTIVAL: BOULEVARD, PATIO & ESCENARIO    -->
+  <!-- ======================================================== -->
+  <!-- Gran Avenida Central Peatonal de Maicillo -->
+  <path d="M 940,650 L 1020,650 L 1020,1950 L 940,1950 Z" fill="url(#walkwayGrad)" opacity="0.9" filter="url(#softShadow)"/>
+  <!-- Paseo Conector Transversal Este-Oeste -->
+  <path d="M 520,1210 L 1440,1210 L 1440,1290 L 520,1290 Z" fill="url(#walkwayGrad)" opacity="0.85"/>
+
+  <!-- Línea guía de navegación punteada en el suelo -->
+  <line x1="980" y1="1920" x2="980" y2="680" stroke="#ffffff" stroke-width="4" stroke-dasharray="16, 14" opacity="0.75"/>
+  <polygon points="980,1500 970,1520 990,1520" fill="#ffffff" opacity="0.8"/>
+  <polygon points="980,1050 970,1070 990,1070" fill="#ffffff" opacity="0.8"/>
+  <polygon points="980,720 970,740 990,740" fill="#ffffff" opacity="0.8"/>
+
+  <!-- Patio de Mesas de Picnic en el Centro (Para comer y beber tranquilos) -->
+  <g id="centralPicnicTables">
+    <g transform="translate(800, 950)">
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.3"/>
+      <rect x="-22" y="-15" width="44" height="6" rx="2" fill="url(#woodGrad)"/>
+      <rect x="-22" y="-6" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)"/>
+      <!-- Sombrilla de terraza con color festivo -->
+      <circle cx="0" cy="1" r="16" fill="#f59e0b" stroke="#ffffff" stroke-width="1.5" opacity="0.9" filter="url(#softShadow)"/>
+    </g>
+    <g transform="translate(880, 950)">
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.3"/>
+      <rect x="-22" y="-15" width="44" height="6" rx="2" fill="url(#woodGrad)"/>
+      <rect x="-22" y="-6" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)"/>
+      <!-- Sombrilla de terraza con color festivo -->
+      <circle cx="0" cy="1" r="16" fill="#f59e0b" stroke="#ffffff" stroke-width="1.5" opacity="0.9" filter="url(#softShadow)"/>
+    </g>
+    <g transform="translate(800, 1070)">
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.3"/>
+      <rect x="-22" y="-15" width="44" height="6" rx="2" fill="url(#woodGrad)"/>
+      <rect x="-22" y="-6" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)"/>
+      <!-- Sombrilla de terraza con color festivo -->
+      <circle cx="0" cy="1" r="16" fill="#f59e0b" stroke="#ffffff" stroke-width="1.5" opacity="0.9" filter="url(#softShadow)"/>
+    </g>
+    <g transform="translate(880, 1070)">
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.3"/>
+      <rect x="-22" y="-15" width="44" height="6" rx="2" fill="url(#woodGrad)"/>
+      <rect x="-22" y="-6" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)"/>
+      <!-- Sombrilla de terraza con color festivo -->
+      <circle cx="0" cy="1" r="16" fill="#f59e0b" stroke="#ffffff" stroke-width="1.5" opacity="0.9" filter="url(#softShadow)"/>
+    </g>
+    <g transform="translate(800, 1420)">
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.3"/>
+      <rect x="-22" y="-15" width="44" height="6" rx="2" fill="url(#woodGrad)"/>
+      <rect x="-22" y="-6" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)"/>
+      <!-- Sombrilla de terraza con color festivo -->
+      <circle cx="0" cy="1" r="16" fill="#f59e0b" stroke="#ffffff" stroke-width="1.5" opacity="0.9" filter="url(#softShadow)"/>
+    </g>
+    <g transform="translate(880, 1420)">
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.3"/>
+      <rect x="-22" y="-15" width="44" height="6" rx="2" fill="url(#woodGrad)"/>
+      <rect x="-22" y="-6" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)"/>
+      <!-- Sombrilla de terraza con color festivo -->
+      <circle cx="0" cy="1" r="16" fill="#f59e0b" stroke="#ffffff" stroke-width="1.5" opacity="0.9" filter="url(#softShadow)"/>
+    </g>
+    <g transform="translate(800, 1540)">
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.3"/>
+      <rect x="-22" y="-15" width="44" height="6" rx="2" fill="url(#woodGrad)"/>
+      <rect x="-22" y="-6" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)"/>
+      <!-- Sombrilla de terraza con color festivo -->
+      <circle cx="0" cy="1" r="16" fill="#f59e0b" stroke="#ffffff" stroke-width="1.5" opacity="0.9" filter="url(#softShadow)"/>
+    </g>
+    <g transform="translate(880, 1540)">
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.3"/>
+      <rect x="-22" y="-15" width="44" height="6" rx="2" fill="url(#woodGrad)"/>
+      <rect x="-22" y="-6" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)"/>
+      <!-- Sombrilla de terraza con color festivo -->
+      <circle cx="0" cy="1" r="16" fill="#f59e0b" stroke="#ffffff" stroke-width="1.5" opacity="0.9" filter="url(#softShadow)"/>
+    </g>
+    <g transform="translate(1080, 950)">
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.3"/>
+      <rect x="-22" y="-15" width="44" height="6" rx="2" fill="url(#woodGrad)"/>
+      <rect x="-22" y="-6" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)"/>
+      <!-- Sombrilla de terraza con color festivo -->
+      <circle cx="0" cy="1" r="16" fill="#f59e0b" stroke="#ffffff" stroke-width="1.5" opacity="0.9" filter="url(#softShadow)"/>
+    </g>
+    <g transform="translate(1160, 950)">
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.3"/>
+      <rect x="-22" y="-15" width="44" height="6" rx="2" fill="url(#woodGrad)"/>
+      <rect x="-22" y="-6" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)"/>
+      <!-- Sombrilla de terraza con color festivo -->
+      <circle cx="0" cy="1" r="16" fill="#f59e0b" stroke="#ffffff" stroke-width="1.5" opacity="0.9" filter="url(#softShadow)"/>
+    </g>
+    <g transform="translate(1080, 1070)">
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.3"/>
+      <rect x="-22" y="-15" width="44" height="6" rx="2" fill="url(#woodGrad)"/>
+      <rect x="-22" y="-6" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)"/>
+      <!-- Sombrilla de terraza con color festivo -->
+      <circle cx="0" cy="1" r="16" fill="#f59e0b" stroke="#ffffff" stroke-width="1.5" opacity="0.9" filter="url(#softShadow)"/>
+    </g>
+    <g transform="translate(1160, 1070)">
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.3"/>
+      <rect x="-22" y="-15" width="44" height="6" rx="2" fill="url(#woodGrad)"/>
+      <rect x="-22" y="-6" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)"/>
+      <!-- Sombrilla de terraza con color festivo -->
+      <circle cx="0" cy="1" r="16" fill="#f59e0b" stroke="#ffffff" stroke-width="1.5" opacity="0.9" filter="url(#softShadow)"/>
+    </g>
+    <g transform="translate(1080, 1420)">
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.3"/>
+      <rect x="-22" y="-15" width="44" height="6" rx="2" fill="url(#woodGrad)"/>
+      <rect x="-22" y="-6" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)"/>
+      <!-- Sombrilla de terraza con color festivo -->
+      <circle cx="0" cy="1" r="16" fill="#f59e0b" stroke="#ffffff" stroke-width="1.5" opacity="0.9" filter="url(#softShadow)"/>
+    </g>
+    <g transform="translate(1160, 1420)">
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.3"/>
+      <rect x="-22" y="-15" width="44" height="6" rx="2" fill="url(#woodGrad)"/>
+      <rect x="-22" y="-6" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)"/>
+      <!-- Sombrilla de terraza con color festivo -->
+      <circle cx="0" cy="1" r="16" fill="#f59e0b" stroke="#ffffff" stroke-width="1.5" opacity="0.9" filter="url(#softShadow)"/>
+    </g>
+    <g transform="translate(1080, 1540)">
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.3"/>
+      <rect x="-22" y="-15" width="44" height="6" rx="2" fill="url(#woodGrad)"/>
+      <rect x="-22" y="-6" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)"/>
+      <!-- Sombrilla de terraza con color festivo -->
+      <circle cx="0" cy="1" r="16" fill="#f59e0b" stroke="#ffffff" stroke-width="1.5" opacity="0.9" filter="url(#softShadow)"/>
+    </g>
+    <g transform="translate(1160, 1540)">
+      <rect x="-24" y="-18" width="48" height="36" rx="4" fill="#000000" opacity="0.3"/>
+      <rect x="-22" y="-15" width="44" height="6" rx="2" fill="url(#woodGrad)"/>
+      <rect x="-22" y="-6" width="44" height="14" rx="2" fill="url(#woodGrad)" stroke="#3f1902" stroke-width="1"/>
+      <rect x="-22" y="10" width="44" height="6" rx="2" fill="url(#woodGrad)"/>
+      <!-- Sombrilla de terraza con color festivo -->
+      <circle cx="0" cy="1" r="16" fill="#f59e0b" stroke="#ffffff" stroke-width="1.5" opacity="0.9" filter="url(#softShadow)"/>
+    </g>
+  </g>
+
+  <!-- ======================================================== -->
+  <!-- 5. GRAN ESCENARIO PRINCIPAL (Frente Norte del Estadio)   -->
+  <!-- ======================================================== -->
+  <g id="mainStageVillarrica" filter="url(#deepShadow)" transform="translate(980, 520)">
+    <!-- Base / Tarima Negra Heavy-Duty -->
+    <rect x="-280" y="-110" width="560" height="220" rx="16" fill="#090d16" stroke="#475569" stroke-width="4"/>
+    <!-- Estructura de Truss Metálico Frontal -->
+    <rect x="-260" y="-90" width="520" height="180" rx="10" fill="#111827"/>
+    <!-- Pantalla LED Gigante Central -->
+    <rect x="-180" y="-70" width="360" height="120" rx="8" fill="#1e1b4b" stroke="#6366f1" stroke-width="3"/>
+    <!-- Focos de Iluminación y Efectos Escénicos -->
+    <circle cx="-130" cy="-75" r="7" fill="#ef4444"/>
+    <circle cx="-65" cy="-75" r="7" fill="#f59e0b"/>
+    <circle cx="0" cy="-75" r="7" fill="#38bdf8"/>
+    <circle cx="65" cy="-75" r="7" fill="#10b981"/>
+    <circle cx="130" cy="-75" r="7" fill="#ec4899"/>
+
+    <!-- Lona Techada Superior -->
+    <path d="M -290,-115 L 0,-175 L 290,-115 Z" fill="#f8fafc" stroke="#cbd5e1" stroke-width="3"/>
+    
+    <!-- Cartel Luminoso del Escenario -->
+    <g transform="translate(0, 70)">
+      <rect x="-160" y="-18" width="320" height="36" rx="18" fill="#dc2626" stroke="#ffffff" stroke-width="2.5" filter="url(#softShadow)"/>
+      <text x="0" y="6" fill="#ffffff" font-family="'Outfit', sans-serif" font-weight="900" font-size="16" letter-spacing="2" text-anchor="middle">🎸 ESCENARIO PRINCIPAL</text>
+    </g>
+  </g>
+
+  <!-- ======================================================== -->
+  <!-- 6. SERVICIOS CLAVE: BAÑOS, ACCESO Y SALUD               -->
+  <!-- ======================================================== -->
+  <!-- Sector Sanitarios / Baños (WC) - Esquina Nor-Oeste -->
+  <g id="wcSector" filter="url(#softShadow)" transform="translate(380, 720)">
+    <rect x="-120" y="-70" width="240" height="140" rx="14" fill="#0284c7" stroke="#ffffff" stroke-width="3"/>
+    <rect x="-110" y="-60" width="220" height="120" rx="10" fill="#0369a1"/>
+    <!-- Cabinas WC individuales ordenadas -->
+    <rect x="-95" y="-45" width="28" height="40" rx="4" fill="#f8fafc" stroke="#0284c7" stroke-width="1.5"/>
+    <rect x="-95" y="5" width="28" height="40" rx="4" fill="#f8fafc" stroke="#0284c7" stroke-width="1.5"/>
+    <rect x="-61" y="-45" width="28" height="40" rx="4" fill="#f8fafc" stroke="#0284c7" stroke-width="1.5"/>
+    <rect x="-61" y="5" width="28" height="40" rx="4" fill="#f8fafc" stroke="#0284c7" stroke-width="1.5"/>
+    <rect x="-27" y="-45" width="28" height="40" rx="4" fill="#f8fafc" stroke="#0284c7" stroke-width="1.5"/>
+    <rect x="-27" y="5" width="28" height="40" rx="4" fill="#f8fafc" stroke="#0284c7" stroke-width="1.5"/>
+    <rect x="7" y="-45" width="28" height="40" rx="4" fill="#f8fafc" stroke="#0284c7" stroke-width="1.5"/>
+    <rect x="7" y="5" width="28" height="40" rx="4" fill="#f8fafc" stroke="#0284c7" stroke-width="1.5"/>
+    <rect x="41" y="-45" width="28" height="40" rx="4" fill="#f8fafc" stroke="#0284c7" stroke-width="1.5"/>
+    <rect x="41" y="5" width="28" height="40" rx="4" fill="#f8fafc" stroke="#0284c7" stroke-width="1.5"/>
+    <rect x="75" y="-45" width="28" height="40" rx="4" fill="#f8fafc" stroke="#0284c7" stroke-width="1.5"/>
+    <rect x="75" y="5" width="28" height="40" rx="4" fill="#f8fafc" stroke="#0284c7" stroke-width="1.5"/>
+    <g transform="translate(0, 68)">
+      <rect x="-70" y="-14" width="140" height="28" rx="14" fill="#0f172a" stroke="#38bdf8" stroke-width="2"/>
+      <text x="0" y="5" fill="#38bdf8" font-family="'Outfit', sans-serif" font-weight="900" font-size="12" text-anchor="middle">🚻 BAÑOS / WC</text>
+    </g>
+  </g>
+
+  <!-- Puesto de Primeros Auxilios / Paramédicos (Esquina Sur-Oeste) -->
+  <g id="firstAidSector" filter="url(#softShadow)" transform="translate(380, 1850)">
+    <rect x="-90" y="-50" width="180" height="100" rx="12" fill="#dc2626" stroke="#ffffff" stroke-width="3"/>
+    <rect x="-80" y="-40" width="160" height="80" rx="8" fill="#b91c1c"/>
+    <path d="M -12,-20 L 12,-20 L 12,-4 L 28,-4 L 28,12 L 12,12 L 12,28 L -12,28 L -12,12 L -28,12 L -28,-4 L -12,-4 Z" fill="#ffffff"/>
+    <g transform="translate(0, 52)">
+      <rect x="-90" y="-12" width="180" height="24" rx="12" fill="#0f172a" stroke="#ffffff" stroke-width="1.5"/>
+      <text x="0" y="4" fill="#fca5a5" font-family="'Outfit', sans-serif" font-weight="900" font-size="10" text-anchor="middle">🚑 PRIMEROS AUXILIOS</text>
+    </g>
+  </g>
+
+  <!-- Pórtico de Acceso Principal y Boletería (Sur, frente a calle Epulef) -->
+  <g id="mainAccessGate" filter="url(#deepShadow)" transform="translate(980, 2220)">
+    <!-- Camino de Entrada de Madera / Pasarela -->
+    <rect x="-160" y="-60" width="320" height="140" rx="12" fill="#78350f" stroke="#d97706" stroke-width="3"/>
+    <!-- Torniquetes / Arcos de Acceso -->
+    <rect x="-140" y="-40" width="280" height="40" rx="8" fill="#1e293b" stroke="#ffffff" stroke-width="2"/>
+    <text x="-90" y="-15" fill="#4ade80" font-family="'Outfit', sans-serif" font-weight="900" font-size="14">ACCESO 1</text>
+    <text x="20" y="-15" fill="#4ade80" font-family="'Outfit', sans-serif" font-weight="900" font-size="14">ACCESO 2</text>
+
+    <!-- Letrero de Bienvenida Monumental -->
+    <g transform="translate(0, 50)">
+      <rect x="-240" y="-22" width="480" height="44" rx="22" fill="#0f172a" stroke="#f59e0b" stroke-width="3" filter="url(#softShadow)"/>
+      <text x="0" y="7" fill="#fbbf24" font-family="'Outfit', sans-serif" font-weight="900" font-size="18" letter-spacing="2" text-anchor="middle">🎟️ ACCESO PRINCIPAL • ESTADIO VILLARRICA</text>
+    </g>
+  </g>
+
+  <!-- ======================================================== -->
+  <!-- 7. ARBOLEDA PERIMETRAL NATIVA (Árboles 3D del Sur)      -->
+  <!-- ======================================================== -->
+  <g id="stadiumTrees" filter="url(#treeShadow)">
+    <circle cx="600" cy="320" r="55" fill="url(#treeCanopyDense)"/>
+    <circle cx="589.0" cy="306.25" r="24.75" fill="#ffffff" opacity="0.12"/>
+    <circle cx="720" cy="280" r="65" fill="url(#treeCanopyPine)"/>
+    <circle cx="707.0" cy="263.75" r="29.25" fill="#ffffff" opacity="0.12"/>
+    <circle cx="860" cy="260" r="60" fill="url(#treeCanopyDense)"/>
+    <circle cx="848.0" cy="245.0" r="27.0" fill="#ffffff" opacity="0.12"/>
+    <circle cx="1000" cy="250" r="70" fill="url(#treeCanopyPine)"/>
+    <circle cx="986.0" cy="232.5" r="31.5" fill="#ffffff" opacity="0.12"/>
+    <circle cx="1140" cy="260" r="60" fill="url(#treeCanopyDense)"/>
+    <circle cx="1128.0" cy="245.0" r="27.0" fill="#ffffff" opacity="0.12"/>
+    <circle cx="1280" cy="280" r="65" fill="url(#treeCanopyPine)"/>
+    <circle cx="1267.0" cy="263.75" r="29.25" fill="#ffffff" opacity="0.12"/>
+    <circle cx="1400" cy="320" r="55" fill="url(#treeCanopyDense)"/>
+    <circle cx="1389.0" cy="306.25" r="24.75" fill="#ffffff" opacity="0.12"/>
+    <circle cx="250" cy="500" r="70" fill="url(#treeCanopyDense)"/>
+    <circle cx="236.0" cy="482.5" r="31.5" fill="#ffffff" opacity="0.12"/>
+    <circle cx="220" cy="660" r="65" fill="url(#treeCanopyPine)"/>
+    <circle cx="207.0" cy="643.75" r="29.25" fill="#ffffff" opacity="0.12"/>
+    <circle cx="240" cy="820" r="75" fill="url(#treeCanopyDense)"/>
+    <circle cx="225.0" cy="801.25" r="33.75" fill="#ffffff" opacity="0.12"/>
+    <circle cx="230" cy="980" r="60" fill="url(#treeCanopyPine)"/>
+    <circle cx="218.0" cy="965.0" r="27.0" fill="#ffffff" opacity="0.12"/>
+    <circle cx="210" cy="1140" r="70" fill="url(#treeCanopyDense)"/>
+    <circle cx="196.0" cy="1122.5" r="31.5" fill="#ffffff" opacity="0.12"/>
+    <circle cx="240" cy="1300" r="65" fill="url(#treeCanopyPine)"/>
+    <circle cx="227.0" cy="1283.75" r="29.25" fill="#ffffff" opacity="0.12"/>
+    <circle cx="220" cy="1460" r="75" fill="url(#treeCanopyDense)"/>
+    <circle cx="205.0" cy="1441.25" r="33.75" fill="#ffffff" opacity="0.12"/>
+    <circle cx="230" cy="1620" r="70" fill="url(#treeCanopyPine)"/>
+    <circle cx="216.0" cy="1602.5" r="31.5" fill="#ffffff" opacity="0.12"/>
+    <circle cx="250" cy="1780" r="65" fill="url(#treeCanopyDense)"/>
+    <circle cx="237.0" cy="1763.75" r="29.25" fill="#ffffff" opacity="0.12"/>
+    <circle cx="260" cy="1960" r="60" fill="url(#treeCanopyDense)"/>
+    <circle cx="248.0" cy="1945.0" r="27.0" fill="#ffffff" opacity="0.12"/>
+    <circle cx="300" cy="2120" r="65" fill="url(#treeCanopyPine)"/>
+    <circle cx="287.0" cy="2103.75" r="29.25" fill="#ffffff" opacity="0.12"/>
+    <circle cx="1780" cy="500" r="65" fill="url(#treeCanopyPine)"/>
+    <circle cx="1767.0" cy="483.75" r="29.25" fill="#ffffff" opacity="0.12"/>
+    <circle cx="1800" cy="680" r="70" fill="url(#treeCanopyDense)"/>
+    <circle cx="1786.0" cy="662.5" r="31.5" fill="#ffffff" opacity="0.12"/>
+    <circle cx="1790" cy="860" r="60" fill="url(#treeCanopyPine)"/>
+    <circle cx="1778.0" cy="845.0" r="27.0" fill="#ffffff" opacity="0.12"/>
+    <circle cx="1810" cy="1040" r="75" fill="url(#treeCanopyDense)"/>
+    <circle cx="1795.0" cy="1021.25" r="33.75" fill="#ffffff" opacity="0.12"/>
+    <circle cx="1780" cy="1220" r="65" fill="url(#treeCanopyPine)"/>
+    <circle cx="1767.0" cy="1203.75" r="29.25" fill="#ffffff" opacity="0.12"/>
+    <circle cx="1800" cy="1400" r="70" fill="url(#treeCanopyDense)"/>
+    <circle cx="1786.0" cy="1382.5" r="31.5" fill="#ffffff" opacity="0.12"/>
+    <circle cx="1790" cy="1580" r="60" fill="url(#treeCanopyPine)"/>
+    <circle cx="1778.0" cy="1565.0" r="27.0" fill="#ffffff" opacity="0.12"/>
+    <circle cx="1810" cy="1760" r="75" fill="url(#treeCanopyDense)"/>
+    <circle cx="1795.0" cy="1741.25" r="33.75" fill="#ffffff" opacity="0.12"/>
+    <circle cx="1780" cy="1940" r="65" fill="url(#treeCanopyPine)"/>
+    <circle cx="1767.0" cy="1923.75" r="29.25" fill="#ffffff" opacity="0.12"/>
+  </g>
+
+  <!-- 4 Torres de Iluminación del Estadio (Focos Halógenos) -->
+  <g id="stadiumLightTowers" filter="url(#softShadow)">
+    <!-- Torre Nor-Oeste -->
+    <circle cx="480" cy="580" r="14" fill="#334155" stroke="#f8fafc" stroke-width="2"/>
+    <circle cx="480" cy="580" r="8" fill="#facc15"/>
+    <!-- Torre Nor-Este -->
+    <circle cx="1480" cy="580" r="14" fill="#334155" stroke="#f8fafc" stroke-width="2"/>
+    <circle cx="1480" cy="580" r="8" fill="#facc15"/>
+    <!-- Torre Sur-Oeste -->
+    <circle cx="480" cy="1920" r="14" fill="#334155" stroke="#f8fafc" stroke-width="2"/>
+    <circle cx="480" cy="1920" r="8" fill="#facc15"/>
+    <!-- Torre Sur-Este -->
+    <circle cx="1480" cy="1920" r="14" fill="#334155" stroke="#f8fafc" stroke-width="2"/>
+    <circle cx="1480" cy="1920" r="8" fill="#facc15"/>
+  </g>
+
+</svg>
