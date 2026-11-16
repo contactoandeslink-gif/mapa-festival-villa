@@ -760,9 +760,14 @@
           </div>
 
           <!-- Botón Centrar Recinto / Volver a ver todo -->
-          <button onclick="resetMapView()" title="Ver toda la cancha" class="bg-slate-900/95 backdrop-blur-md border border-amber-500/60 text-amber-300 hover:text-white px-3 py-1.5 rounded-xl shadow-lg text-xs font-black flex items-center gap-1 active:scale-95 transition">
-            🔄 Recinto Completo
-          </button>
+          <div class="flex items-center gap-1.5">
+            <button id="btnToggleMapStyle" onclick="toggleMapStyle()" title="Alternar entre Foto Satelital 4K y Plano Vectorial" class="bg-slate-900/95 backdrop-blur-md border border-emerald-500/60 text-emerald-300 hover:text-white px-2.5 sm:px-3 py-1.5 rounded-xl shadow-lg text-xs font-black flex items-center gap-1 active:scale-95 transition">
+              <span id="mapStyleBtnIcon">📸</span> <span id="mapStyleBtnText">Satélite 4K</span>
+            </button>
+            <button onclick="resetMapView()" title="Ver toda la cancha" class="bg-slate-900/95 backdrop-blur-md border border-amber-500/60 text-amber-300 hover:text-white px-2.5 sm:px-3 py-1.5 rounded-xl shadow-lg text-xs font-black flex items-center gap-1 active:scale-95 transition">
+              🔄 Centrar
+            </button>
+          </div>
         </div>
 
         <!-- Píldoras de Acceso Rápido 1-Toque (Escenario, Baños, Comidas, Cervezas) -->
@@ -1033,7 +1038,7 @@
   <!-- ======================================================== -->
   <script>
     // Limpiar caché vieja si la versión de datos cambió (con try/catch: Safari privado puede bloquear localStorage)
-    const DATA_VERSION = '2026.27.vector_hd_villarrica_v2';
+    const DATA_VERSION = '2026.28.satellite_hd_v1';
     function safeLSGet(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
     function safeLSSet(key, val) { try { localStorage.setItem(key, val); } catch (e) {} }
     function safeLSRemove(key) { try { localStorage.removeItem(key); } catch (e) {} }
@@ -3122,36 +3127,68 @@
     });
 
     // ========================================================
-    // CANCHA VECTORIAL HD - ESTADIO MUNICIPAL DE VILLARRICA
-    // 100% VECTORIAL (SVG), CERO PIXELACIÓN AL ACERCAR O ALEJAR
+    // CANCHA REALISTA 4K Y PLANO VECTORIAL (ESTADIO VILLARRICA)
     // ========================================================
-    let stadiumVectorOverlay = L.imageOverlay('estadio-villarrica-vector-hd.svg', stadiumBounds, {
+    const photoBounds = L.latLngBounds([
+      [-39.289650, -72.222105], // Suroeste
+      [-39.288438, -72.220007]  // Noreste
+    ]);
+
+    // Capa 1: Fotografía Satelital Cenital 4K Nítida (Generada por IA según el mapa)
+    const stadiumPhotoLayer = L.imageOverlay('estadio-villarrica-hd.jpg', photoBounds, {
       opacity: 1,
       interactive: false,
       zIndex: 10
     }).addTo(map);
 
-    try {
-      fetch('estadio-villarrica-vector-hd.svg')
-        .then(r => r.text())
-        .then(svgStr => {
-          const parser = new DOMParser();
-          const svgDoc = parser.parseFromString(svgStr, 'image/svg+xml');
-          const svgEl = svgDoc.documentElement;
-          if (stadiumVectorOverlay) map.removeLayer(stadiumVectorOverlay);
-          stadiumVectorOverlay = L.svgOverlay(svgEl, stadiumBounds, {
-            opacity: 1,
-            interactive: false,
-            zIndex: 10
-          }).addTo(map);
-        })
-        .catch(() => {});
-    } catch (e) {}
+    // Capa 2: Plano Vectorial HD (SVG)
+    let stadiumVectorOverlay = null;
+    function getOrCreateVectorOverlay() {
+      if (!stadiumVectorOverlay) {
+        stadiumVectorOverlay = L.imageOverlay('estadio-villarrica-vector-hd.svg', stadiumBounds, {
+          opacity: 1,
+          interactive: false,
+          zIndex: 10
+        });
+        try {
+          fetch('estadio-villarrica-vector-hd.svg')
+            .then(r => r.text())
+            .then(svgStr => {
+              const parser = new DOMParser();
+              const svgDoc = parser.parseFromString(svgStr, 'image/svg+xml');
+              const svgEl = svgDoc.documentElement;
+              if (stadiumVectorOverlay && map.hasLayer(stadiumVectorOverlay)) map.removeLayer(stadiumVectorOverlay);
+              stadiumVectorOverlay = L.svgOverlay(svgEl, stadiumBounds, { opacity: 1, interactive: false, zIndex: 10 });
+              if (currentMapStyle === 'vector') stadiumVectorOverlay.addTo(map);
+            }).catch(() => {});
+        } catch (e) {}
+      }
+      return stadiumVectorOverlay;
+    }
 
-    // Grupo de marcadores interactivos sobre la cancha real
-    const stadiumGroup = L.layerGroup().addTo(map);
+    let currentMapStyle = 'photo'; // Default: la foto satelital 4K nítida
+    window.toggleMapStyle = function() {
+      const btnIcon = document.getElementById('mapStyleBtnIcon');
+      const btnText = document.getElementById('mapStyleBtnText');
+      if (currentMapStyle === 'photo') {
+        currentMapStyle = 'vector';
+        if (map.hasLayer(stadiumPhotoLayer)) map.removeLayer(stadiumPhotoLayer);
+        const vec = getOrCreateVectorOverlay();
+        if (!map.hasLayer(vec)) vec.addTo(map);
+        if (btnIcon) btnIcon.textContent = '📐';
+        if (btnText) btnText.textContent = 'Vectorial';
+        showMapToast('📐 Modo: Plano Vectorial HD');
+      } else {
+        currentMapStyle = 'photo';
+        if (stadiumVectorOverlay && map.hasLayer(stadiumVectorOverlay)) map.removeLayer(stadiumVectorOverlay);
+        if (!map.hasLayer(stadiumPhotoLayer)) stadiumPhotoLayer.addTo(map);
+        if (btnIcon) btnIcon.textContent = '📸';
+        if (btnText) btnText.textContent = 'Satélite 4K';
+        showMapToast('📸 Modo: Foto Satelital 4K');
+      }
+    };
 
-    map.fitBounds(stadiumBounds);
+    map.fitBounds(photoBounds.pad(0.08));
 
     const stageHitbox = L.circleMarker([cLat + 0.0003165, cLng + 0.0004463], {
       radius: 34,
